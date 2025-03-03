@@ -37,6 +37,7 @@ body {
     outline: none;
     background-color: #333;
     color:white;
+    box-shadow: none;
 }
 
 .search-container {
