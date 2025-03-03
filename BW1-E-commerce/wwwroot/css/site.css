@@ -20,3 +20,51 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+/*NAVBAR*/
+
+.category-btn {
+    padding: 8px 15px;
+    border: 2px solid transparent;
+}
+
+.search-container input,
+.search-container input:focus,
+.search-container input:-webkit-autofill,
+.search-container input:-webkit-autofill:focus {
+    border: none;
+    outline: none;
+    background-color: #333;
+    color:white;
+}
+
+.search-container {
+    flex-grow: 1;
+    max-width: 100%;
+    position: relative;
+}
+
+.search-bar {
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 8px 15px;
+    width: 100%;
+}
+
+
+.search-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: white;
+}
+
+    .search-btn i {
+        font-size: 18px;
+    }
