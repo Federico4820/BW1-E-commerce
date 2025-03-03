@@ -20,6 +20,7 @@ CREATE TABLE Colors (
     nome NVARCHAR(50) NOT NULL UNIQUE
 );
 
+
 CREATE TABLE Materials (
     id_material INT IDENTITY(1,1) PRIMARY KEY,
     nome NVARCHAR(50) NOT NULL UNIQUE
@@ -31,7 +32,7 @@ CREATE TABLE Category (
 );
 
 CREATE TABLE Products (
-	id_prod UNIQUEIDENTIFIER PRIMARY KEY,
+	id_prod UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY,
 	brand NVARCHAR (50) NOT NULL,
 	gender NVARCHAR(1) NOT NULL,
 	nome NVARCHAR (255) NOT NULL,
@@ -44,6 +45,7 @@ CREATE TABLE Products (
 	CONSTRAINT CK_gender CHECK (gender IN ('F','M','U')),
 	CONSTRAINT FK_Prod_Catogry FOREIGN KEY (id_category) REFERENCES Category (id_category),
 )
+
 
 CREATE TABLE ProdSize (
 	id_prod UNIQUEIDENTIFIER NOT NULL,
@@ -60,6 +62,8 @@ CREATE TABLE ProdColor (
 	CONSTRAINT FK_ProdColor_prod FOREIGN KEY (id_prod) REFERENCES Products (id_prod),
 	CONSTRAINT FK_ProdColor_color FOREIGN KEY (id_color) REFERENCES Colors (id_color),
 )
+
+ALTER TABLE ProdColor ADD img_URL NVARCHAR(1000) NOT NULL
 
 CREATE TABLE ProdMaterial (
 	id_prod UNIQUEIDENTIFIER NOT NULL,
@@ -130,7 +134,6 @@ INSERT INTO Colors (nome) VALUES
 ('Blue');
 
 
-
 INSERT INTO Materials (nome) VALUES 
 ('Cotone'),
 ('Lino'),
@@ -151,6 +154,8 @@ INSERT INTO Category(nome) VALUES
 ('Pantaloncini'),
 ('Pezzi interi');
 
+SELECT * FROM Products
+
 
 -- Categoria 1: Top
 INSERT INTO Products (brand, gender, nome, id_category, descr, price, stock) 
@@ -159,12 +164,7 @@ VALUES
   ('Uniqlo', 'M', 'Polo in cotone', 1, 'Polo casual in cotone, comoda per tutte le occasioni.', 39.99, 110),
   ('Puma', 'M', 'Maglietta basic', 1, 'Maglietta basic da uomo in cotone, comoda e versatile.', 19.99, 200),
   ('H&M', 'U', 'T-shirt unisex', 1, 'T-shirt unisex, disponibile in diverse varianti di colore.', 24.99, 200),
-  ('Superdry', 'M', 'T-shirt vintage', 1, 'T-shirt uomo con grafica vintage sul davanti.', 29.99, 200),
-  ('Reebok', 'M', 'T-shirt sportiva', 1, 'T-shirt sportiva da uomo in materiale tecnico, ideale per allenamento.', 34.99, 120),
-  ('Adidas', 'F', 'Canotta sportiva', 1, 'Canotta da donna per attività sportive, leggera e comoda.', 24.99, 150),
-  ('Bershka', 'F', 'Top senza maniche', 1, 'Top senza maniche da donna, ideale per l''estate.', 29.99, 180),
-  ('Calvin Klein', 'U', 'Boxer da uomo', 1, 'Boxer da uomo in cotone, morbidi e confortevoli.', 19.99, 200),
-  ('Levi''s', 'U', 'Maglietta a righe', 1, 'Maglietta unisex a righe, perfetta per un look casual.', 24.99, 180);
+  ('Superdry', 'M', 'T-shirt vintage', 1, 'T-shirt uomo con grafica vintage sul davanti.', 29.99, 200);
 
 -- Categoria 2: Vestiti
 INSERT INTO Products (brand, gender, nome, id_category, descr, price, stock) 
@@ -173,12 +173,7 @@ VALUES
   ('Mango', 'F', 'Vestito lungo', 2, 'Vestito lungo in tessuto fluido, perfetto per una serata elegante.', 89.99, 75),
   ('H&M', 'F', 'Abito a trapezio', 2, 'Abito a trapezio in tessuto morbido, adatto a ogni occasione.', 49.99, 150),
   ('Zara', 'F', 'Giacca di jeans', 2, 'Giacca di jeans da donna con dettagli vintage.', 59.99, 50),
-  ('Mango', 'F', 'Gonna midi', 2, 'Gonna midi elegante in tessuto fluido, perfetta per ogni occasione.', 59.99, 120),
-  ('Pull&Bear', 'F', 'Abito corto', 2, 'Abito corto da donna con taglio moderno, perfetto per l''estate.', 39.99, 150),
-  ('Bershka', 'F', 'Vestito a tubo', 2, 'Vestito aderente da donna, ideale per una serata elegante.', 49.99, 100),
-  ('H&M', 'F', 'Abito elegante', 2, 'Abito lungo elegante, perfetto per cerimonie e occasioni speciali.', 99.99, 80),
-  ('Zara', 'F', 'Abito cocktail', 2, 'Abito da cocktail da donna, con scollo a V e dettagli in pizzo.', 119.99, 60),
-  ('Pull&Bear', 'F', 'Vestito da sera', 2, 'Vestito da sera elegante, con dettagli in raso.', 89.99, 70);
+  ('Mango', 'F', 'Gonna midi', 2, 'Gonna midi elegante in tessuto fluido, perfetta per ogni occasione.', 59.99, 120);
 
 -- Categoria 3: Jeans e Pantaloni
 INSERT INTO Products (brand, gender, nome, id_category, descr, price, stock) 
@@ -187,12 +182,8 @@ VALUES
   ('Calvin Klein', 'F', 'Jeans skinny', 3, 'Jeans da donna skinny, in denim elasticizzato per una vestibilità perfetta.', 79.99, 130),
   ('Uniqlo', 'M', 'Pantaloni casual', 3, 'Pantaloni casual unisex, ideali per il tempo libero.', 59.99, 100),
   ('Puma', 'M', 'Jeans comfort', 3, 'Jeans uomo con tasche laterali, per un look casual e comodo.', 49.99, 150),
-  ('Reebok', 'F', 'Pantaloni sportivi', 3, 'Pantaloni sportivi da donna in tessuto elasticizzato per la palestra.', 49.99, 150),
-  ('Diesel', 'M', 'Jeans regular fit', 3, 'Jeans uomo in cotone, con vestibilità regolare e comodità unica.', 89.99, 80),
-  ('H&M', 'F', 'Pantaloni in lino', 3, 'Pantaloni da donna in lino, leggeri e freschi per l''estate.', 39.99, 120),
-  ('Levi''s', 'M', 'Jeans a zampa', 3, 'Jeans da uomo a zampa d''elefante, per uno stile retrò.', 79.99, 60),
-  ('Pull&Bear', 'F', 'Pantaloni culotte', 3, 'Pantaloni culotte da donna, comodi e freschi per la stagione estiva.', 34.99, 150),
-  ('Zara', 'M', 'Pantaloni chino', 3, 'Pantaloni chino da uomo, ideali per un look casual ma elegante.', 69.99, 100);
+  ('Reebok', 'F', 'Pantaloni sportivi', 3, 'Pantaloni sportivi da donna in tessuto elasticizzato per la palestra.', 49.99, 150);
+
 
 -- Categoria 4: Maglieria e Felpe
 INSERT INTO Products (brand, gender, nome, id_category, descr, price, stock) 
@@ -201,12 +192,8 @@ VALUES
   ('H&M', 'M', 'Felpa con zip', 4, 'Felpa con zip da uomo, comoda e versatile.', 39.99, 150),
   ('Uniqlo', 'M', 'Felpa basic', 4, 'Felpa da uomo in cotone, calda e comoda per ogni giorno.', 49.99, 100),
   ('Adidas', 'F', 'Felpa sportiva', 4, 'Felpa da donna in materiale tecnico, ideale per attività sportive.', 69.99, 80),
-  ('Calvin Klein', 'M', 'Maglione in lana', 4, 'Maglione da uomo in lana merino, perfetto per l''inverno.', 119.99, 70),
-  ('Puma', 'F', 'Felpa con cappuccio', 4, 'Felpa da donna con cappuccio, ideale per il tempo libero.', 59.99, 100),
-  ('H&M', 'F', 'Maglione a collo alto', 4, 'Maglione da donna con collo alto, comodo e caldo per l''inverno.', 39.99, 120),
-  ('Zara', 'M', 'Maglione a righe', 4, 'Maglione da uomo a righe, elegante e comodo per ogni occasione.', 49.99, 90),
-  ('Adidas', 'U', 'Felpa con logo', 4, 'Felpa unisex con logo, comoda per ogni giorno.', 69.99, 150),
-  ('Pull&Bear', 'F', 'Cardigan lungo', 4, 'Cardigan lungo da donna, ideale per l''autunno e l''inverno.', 49.99, 100);
+  ('Calvin Klein', 'M', 'Maglione in lana', 4, 'Maglione da uomo in lana merino, perfetto per l''inverno.', 119.99, 70);
+
 
 -- Categoria 5: Gonne
 INSERT INTO Products (brand, gender, nome, id_category, descr, price, stock) 
@@ -215,12 +202,8 @@ VALUES
   ('H&M', 'F', 'Gonna a tubino', 5, 'Gonna a tubino da donna, perfetta per un look elegante.', 39.99, 120),
   ('Bershka', 'F', 'Gonna corta', 5, 'Gonna corta da donna, ideale per l''estate.', 29.99, 180),
   ('Zara', 'F', 'Gonna midi', 5, 'Gonna midi elegante, perfetta per il lavoro o una serata fuori.', 59.99, 100),
-  ('Mango', 'F', 'Gonna lunga', 5, 'Gonna lunga da donna, comoda e fresca per le giornate estive.', 69.99, 70),
-  ('Pull&Bear', 'F', 'Gonna a balze', 5, 'Gonna a balze da donna, perfetta per un look casual e moderno.', 39.99, 130),
-  ('Levi''s', 'F', 'Gonna in denim', 5, 'Gonna in denim da donna, un classico per ogni stagione.', 59.99, 90),
-  ('H&M', 'F', 'Gonna in pelle', 5, 'Gonna in pelle da donna, per un look grintoso e alla moda.', 79.99, 80),
-  ('Bershka', 'F', 'Gonna a ruota', 5, 'Gonna a ruota da donna, perfetta per un look romantico.', 49.99, 150),
-  ('Pull&Bear', 'F', 'Gonna longuette', 5, 'Gonna longuette da donna, elegante e chic per ogni occasione.', 59.99, 100);
+  ('Mango', 'F', 'Gonna lunga', 5, 'Gonna lunga da donna, comoda e fresca per le giornate estive.', 69.99, 70);
+ 
 
 -- Categoria 6: Soprabiti
 INSERT INTO Products (brand, gender, nome, id_category, descr, price, stock) 
@@ -228,11 +211,6 @@ VALUES
   ('Diesel', 'M', 'Cappotto in lana', 6, 'Cappotto da uomo in lana con tasche laterali.', 149.99, 40),
   ('Superdry', 'F', 'Giubbotto imbottito', 6, 'Giaccone imbottito da donna, ideale per l''inverno.', 139.99, 80),
   ('Levi''s', 'M', 'Giubbotto di pelle', 6, 'Giubbotto di pelle da uomo, robusto e alla moda.', 169.99, 50),
-  ('H&M', 'M', 'Parka con cappuccio', 6, 'Parka da uomo con cappuccio, perfetto per l''inverno.', 129.99, 100),
-  ('Zara', 'F', 'Cappotto lungo', 6, 'Cappotto lungo da donna, elegante e perfetto per ogni stagione.', 199.99, 60),
-  ('Bershka', 'M', 'Giubbotto bomber', 6, 'Giubbotto bomber da uomo in nylon con dettagli sulle spalle.', 99.99, 50),
-  ('Zara', 'F', 'Giubbotto in pelliccia sintetica', 6, 'Giubbotto donna in pelliccia sintetica per l''inverno.', 129.99, 60),
-  ('Tommy Hilfiger', 'U', 'Giacca casual', 6, 'Giacca casual unisex in tessuto tecnico, resistente e alla moda.', 119.99, 60),
-  ('Mango', 'F', 'Cappotto caldo', 6, 'Cappotto da donna caldo, ideale per l''inverno.', 149.99, 80),
   ('Diesel', 'M', 'Trench coat', 6, 'Trench coat da uomo in cotone, perfetto per ogni stagione.', 179.99, 50),
   ('Zara', 'F', 'Abito lungo', 2, 'Abito lungo elegante, ideale per cerimonie e occasioni speciali.', 99.99, 70);
+
