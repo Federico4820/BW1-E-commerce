@@ -1,0 +1,106 @@
+﻿@model ProductAddModel
+
+
+@{
+	var cat = ViewBag.Categories as List<Category>;
+	var color = ViewBag.Color as List<Color>;
+	var sizes = ViewBag.Sizes as List<Size>;
+	var mat = ViewBag.Material as List<Material>;
+	ViewData["Title"] = "Aggiungi Prodotto";
+}
+
+<form method="post" asp-controller="Products" asp-action="AddSave">
+	<fieldset class="row g-3">
+		<legend>Caratteristiche generali</legend>
+
+		<div class="form-group col-md-4">
+			<label asp-for="Name" class="control-label">Nome</label>
+			<input asp-for="Name" class="form-control" type="text" />
+		</div>
+
+		<div class="form-group col-md-3">
+			<label asp-for="Brand" class="control-label">Marca</label>
+			<input asp-for="Brand" class="form-control" type="text" />
+		</div>
+
+		<div class="form-group col-md-2">
+			<label asp-for="Gender" class="control-label">Genere</label>
+			<select class="form-select" asp-for="Gender">
+				<option selected disabled>Seleziona un'opzione</option>
+				<option value="F">Donna</option>
+				<option value="M">Uomo</option>
+				<option value="U">Unisex</option>
+			</select>
+		</div>
+
+		<div class="form-group col-md-2">
+			<label asp-for="IdCategory" class="control-label">Categoria</label>
+			<select asp-for="IdCategory" class="form-control">
+				<option selected disabled>Seleziona un'opzione</option>
+				@if (cat != null)
+				{
+					@foreach (var item in cat)
+					{
+						<option value="@item.IdCategory">@item.Name</option>
+					}
+				}
+			</select>
+		</div>
+
+		<div class="form-group col-md-1">
+			<label asp-for="Price" class="control-label">Prezzo</label>
+			<input asp-for="Price" class="form-control" type="number" step="0.01"/>
+		</div>
+
+		<div class="form-group col-12">
+			<label asp-for="Description" class="control-label">Descrizione</label>
+			<input asp-for="Description" class="form-control" type="text" step="0.01" />
+		</div>
+
+		<div class="form-group col-4">
+				<label asp-for="IdMaterial" class="control-label">colori</label>
+				<select asp-for="IdMaterial" class="form-control" name= "materiali">
+					@if (mat != null)
+					{
+						@foreach (var item in mat)
+						{
+							<option value="@item.IdMaterial">@item.Name</option>
+						}
+					}
+				</select>
+		</div>
+
+	</fieldset>
+
+
+</form>
+
+
+
+
+<div class="form-group col-md-3">
+	<label for="violazione" asp-for="IdColor" class="control-label">colori</label>
+	<select asp-for="IdColor" class="form-control">
+		@if (color != null)
+		{
+			@foreach (var item in color)
+			{
+				<option value="@item.IdColor">@item.Name</option>
+			}
+		}
+	</select>
+</div>
+
+<div class="form-group col-md-3">
+	<label for="violazione" asp-for="IdSize" class="control-label">taglia</label>
+	<select asp-for="IdSize" class="form-control">
+		@if (sizes != null)
+		{
+			@foreach (var item in sizes)
+			{
+				<option value="@item.IdSize">@item.Name</option>
+			}
+		}
+	</select>
+</div>
+
