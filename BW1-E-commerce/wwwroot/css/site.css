@@ -1,34 +1,25 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin-bottom: 60px;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 
 /*NAVBAR*/
+.navbar {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%; 
+    z-index: 1000;
+}
 
 .category-btn {
     padding: 8px 15px;
     border: 2px solid transparent;
 }
 
+/*BARRA DI RICERCA*/
 .search-container input,
 .search-container input:focus,
 .search-container input:-webkit-autofill,
@@ -47,13 +38,29 @@ body {
 
 .search-bar {
     background-color: #333;
-    color: white;
     border: none;
     border-radius: 25px;
     padding: 8px 15px;
     width: 100%;
 }
+   
 
+    .search-bar,
+    .search-btn,
+    .search-bar::placeholder {
+        color: white;
+    }
+
+   
+    .search-bar:focus {
+        outline: none; 
+        box-shadow: none; 
+    }
+
+        .search-bar::-webkit-search-cancel-button {
+            -webkit-appearance: none; 
+            appearance: none; 
+        }
 
 .search-btn {
     position: absolute;
@@ -62,9 +69,60 @@ body {
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: white;
+    cursor: pointer;
 }
 
     .search-btn i {
         font-size: 18px;
     }
+
+
+
+    /*DROPDOWN*/
+
+
+.dropdown a:hover {
+    border: 1px solid white; 
+    color: inherit; 
+    background-color: transparent; 
+    outline: none; 
+}
+
+
+.dropdown a {
+    border: 2px solid transparent; 
+    padding: 5px;
+}
+
+.dropdown-menu-end[data-bs-popper] {
+    right: 0px;
+    left: 5%;
+    margin-top:4px;
+}
+
+/*lista ABBIGLIAMENTO*/
+.sidebar {
+    position: sticky;
+    height:100vh;
+    top:200px !important;
+    left:auto;
+    overflow-y: auto;
+   
+    padding: 10px;
+    border-right: 1px solid black;
+}
+
+.sidebar a:hover{
+    color:darkred !important;
+}
+
+/*DROPDOWN MENU VESTITI*/
+
+.dropend{
+    position:fixed;
+    top:100px;
+    z-index:1000;
+}
+
+
+
