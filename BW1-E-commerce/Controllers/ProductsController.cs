@@ -21,6 +21,48 @@ namespace BW1_E_commerce.Controllers
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
+        public async Task<IActionResult> Index()
+        {
+            var prodList = new ProductListModel()
+            {
+                ProductList = new List<ProductBaseModel>()
+            };
+
+            await using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var query = @" WITH ImageSelection AS (SELECT PC.id_prod, PCI.img_URL, ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn FROM ProdColorImages PCI JOIN ProdColor PC ON PCI.id_prodColor = PC.id_prodColor) SELECT P.id_prod, P.nome, P.brand, P.price, P.descr, P.id_category, P.gender, ISel.img_URL FROM Products P LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1;";
+                await using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    await using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            prodList.ProductList.Add(
+                                new ProductBaseModel()
+                                {
+                                    IdProd = reader.GetGuid(0),
+                                    Name = reader["nome"].ToString(),
+                                    Brand = reader["brand"].ToString(),
+                                    Price = decimal.Parse(reader["price"].ToString()),
+                                    Description = reader["descr"].ToString().Split('/').Select(s => s.Trim()).ToList(),
+                                    IdCategory = int.Parse(reader["id_category"].ToString()),
+                                    Gender = reader["gender"].ToString(),
+                                    ImgURL = reader["img_URL"].ToString()
+                                }
+                            );
+                        }
+                    }
+
+                }
+
+            }
+            return View(prodList);
+        }
+
+
+
+
         //4 SELECT: Category, Color, Sizes e Materials
 
         private async Task<List<Category>> GetCategories()
@@ -126,9 +168,6 @@ namespace BW1_E_commerce.Controllers
             }
             return materials;
         }
-
-
-
         public async Task<IActionResult> Add()
         {
             ViewBag.Categories = await GetCategories();
@@ -251,10 +290,5 @@ namespace BW1_E_commerce.Controllers
             }
         }
 
-
-        public IActionResult Index()
-        {
-            return View();
-        }
     }
 }

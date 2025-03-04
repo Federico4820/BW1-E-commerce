@@ -56,18 +56,15 @@
           <div class="productCard p-0">
         <a class="text-decoration-none">
           <div class="card border-0">
-            <img
-              src=""
-              class="card-img-home" alt="Prodotto 1">
+            <img src=@item.ImgURL class="card-img-home" alt=@item.Name>
             <div class="productInfo_rwyH5">
-              <h2 class="productDescription">Vestito a trapezio
-                corto color avorio decorato con scollo quadrato</h2>
-              <p class="fw-bold text-danger"> 199,00€</p>
+              <h2 class="productDescription">@item.Name</h2>
+              <p class="fw-bold text-danger"> @item.Price €</p>
             </div>
           </div>
         </a>
         <button class="favorite-btn">
-          ♥
+         <i class="bi bi-heart"></i>
         </button>
       </div>
         }
@@ -93,5 +90,4 @@
             *@
     </div>
   </div>
-</div>
 </div>
