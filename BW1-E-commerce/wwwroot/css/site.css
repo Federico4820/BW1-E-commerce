@@ -79,3 +79,22 @@ input[type="number"]:active::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
+legend {
+    float: none;
+    display: block;
+    unicode-bidi: isolate;
+    padding-inline: 2px;
+}
+
+fieldset {
+    display: block;
+    min-inline-size: min-content;
+    margin-inline: 0.5em;
+    border-width: 1px;
+    border-style: groove;
+    border-color: threedface;
+    border-image: initial;
+    padding-block: 0.35em 0.625em;
+    padding-inline: 0.75em;
+}

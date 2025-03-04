@@ -1,4 +1,7 @@
-﻿using BW1_E_commerce.Models;
+﻿using System.Data.Common;
+using System.Drawing;
+using System.Transactions;
+using BW1_E_commerce.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
@@ -46,9 +49,9 @@ namespace BW1_E_commerce.Controllers
             return categories;
         }
 
-        private async Task<List<Color>> GetColor()
+        private async Task<List<BW1_E_commerce.Models.Color>> GetColor()
         {
-            List<Color> colors = new List<Color>();
+            List<Models.Color> colors = new List<Models.Color>();
             await using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
@@ -60,7 +63,7 @@ namespace BW1_E_commerce.Controllers
                         while (await reader.ReadAsync())
                         {
                             colors.Add(
-                                new Color()
+                                new Models.Color()
                                 {
                                     IdColor = reader.GetInt32(0),
                                     Name = reader.GetString(1)
@@ -72,9 +75,9 @@ namespace BW1_E_commerce.Controllers
             return colors;
         }
 
-        private async Task<List<Size>> GetSizes()
+        private async Task<List<BW1_E_commerce.Models.Size>> GetSizes()
         {
-            List<Size> sizes = new List<Size>();
+            List<Models.Size> sizes = new List<Models.Size>();
             await using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
@@ -86,7 +89,7 @@ namespace BW1_E_commerce.Controllers
                         while (await reader.ReadAsync())
                         {
                             sizes.Add(
-                                new Size()
+                                new Models.Size()
                                 {
                                     IdSize = reader.GetInt32(0),
                                     Name = reader.GetString(1)
@@ -136,7 +139,117 @@ namespace BW1_E_commerce.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddSave(ProductAddModel model)
+        {
+            var nameV = HttpContext.Request.Form["Name"];
 
+            try
+            {
+                await using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+                    using (var transaction = await connection.BeginTransactionAsync())
+                    {
+                        var queryProd = "INSERT INTO Products (brand, gender, nome, id_category, descr, price, stock) OUTPUT INSERTED.id_prod VALUES (@brand, @gender, @nome, @id_category, @descr, @price, @stock)";
+                        var productId = Guid.NewGuid();
+                        await using (SqlCommand prod = new SqlCommand(queryProd, connection, (SqlTransaction)transaction))
+                        {
+                            prod.Parameters.AddWithValue("@brand", model.Brand);
+                            prod.Parameters.AddWithValue("@gender", model.Gender);
+                            prod.Parameters.AddWithValue("@nome", model.Name);
+                            prod.Parameters.AddWithValue("@id_category", model.IdCategory);
+                            prod.Parameters.AddWithValue("@descr", model.Description);
+                            prod.Parameters.AddWithValue("@price", model.Price);
+                            prod.Parameters.AddWithValue("@stock", model.Stock);
+
+                            var result = await prod.ExecuteScalarAsync();
+
+                            if (result == DBNull.Value || result == null)
+                            {
+                                throw new Exception("L'inserimento del prodotto non è andato a buon fine.");
+                            }
+
+                            productId = (Guid)result;
+                        }
+
+                        var queryProdSize = @"INSERT INTO ProdSize (id_prod, id_size) VALUES (@id_prod, @id_size)";
+
+                        if (model.SelectedSizes != null && model.SelectedSizes.Count > 0)
+                        {
+                            foreach (var size in model.SelectedSizes)
+                            {
+                                await using (SqlCommand prodSize = new SqlCommand(queryProdSize, connection, (SqlTransaction)transaction))
+                                {
+                                    prodSize.Parameters.AddWithValue("@id_prod", productId);
+                                    prodSize.Parameters.AddWithValue("@id_size", size);
+                                    await prodSize.ExecuteNonQueryAsync();
+                                }
+                            }
+                        }
+
+                        var queryPrdColor = @"INSERT INTO ProdColor(id_prod, id_color) OUTPUT INSERTED.id_prodColor VALUES (@id_prod, @id_color)";
+                        var prodColor = Guid.NewGuid();
+                        var validColor = model.SelectedColor
+                            .Where(m => m != null && m.IdColor > 0 && m.ImgListModel != null && m.ImgListModel.Any(item => !string.IsNullOrEmpty(item)))
+                            .ToList();
+
+                        foreach (var color in validColor)
+                        {
+                            await using (SqlCommand prdColor = new SqlCommand(queryPrdColor, connection, (SqlTransaction)transaction))
+                            {
+                                prdColor.Parameters.AddWithValue("@id_prod", productId);
+                                prdColor.Parameters.AddWithValue("@id_color", color.IdColor);
+                                var result = await prdColor.ExecuteScalarAsync();
+
+                                if (result == DBNull.Value || result == null)
+                                {
+                                    throw new Exception("L'inserimento del prodotto non è andato a buon fine. in color");
+                                }
+
+                                prodColor = (Guid)result;
+                            }
+
+                            var queryColorImg = @"INSERT INTO ProdColorImages(id_prodColor, img_URL) VALUES (@id_prodColor, @img_URL)";
+                            var validImg = color.ImgListModel
+                            .Where(m => m != null && !string.IsNullOrEmpty(m))
+                            .ToList();
+                            foreach (var img in validImg)
+                            {
+                                await using (SqlCommand prdImg = new SqlCommand(queryColorImg, connection, (SqlTransaction)transaction))
+                                {
+                                    prdImg.Parameters.AddWithValue("@id_prodColor", prodColor);
+                                    prdImg.Parameters.AddWithValue("@img_URL", img);
+                                    await prdImg.ExecuteNonQueryAsync();
+                                }
+                            }
+                        }
+
+                        var queryMat = "INSERT INTO ProdMaterial (id_prod, id_material, percentage_mat) VALUES (@id_prod, @id_material, @percentage_mat)";
+                        var validMaterials = model.SelectedMaterials
+                            .Where(m => m.IdMaterial > 0 && m.Percentage > 0)
+                            .ToList();
+                        foreach (var mat in validMaterials)
+                        {
+                            await using (SqlCommand prdMat = new SqlCommand(queryMat, connection, (SqlTransaction)transaction))
+                            {
+                                prdMat.Parameters.AddWithValue("@id_prod", productId);
+                                prdMat.Parameters.AddWithValue("@id_material", mat.IdMaterial);
+                                prdMat.Parameters.AddWithValue("@percentage_mat", mat.Percentage);
+                                await prdMat.ExecuteNonQueryAsync();
+                            }
+                        }
+                        await transaction.CommitAsync();
+                    }
+                }
+                return RedirectToAction("Add");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Si è verificato un errore durante l'inserimento dei dati. Riprova più tardi. Errore: {ex.Message}";
+                return RedirectToAction("Add");
+            }
+        }
 
 
         public IActionResult Index()
