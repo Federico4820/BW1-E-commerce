@@ -19,7 +19,6 @@ html {
 
 body {
   margin-bottom: 60px;
-  background-color: antiquewhite;
 }
 
 .card-img-home {
@@ -33,7 +32,7 @@ body {
 
 .clickable-card:hover {
     transform: scale(1.05); /* Effetto ingrandimento al passaggio del mouse */
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Ombra più visibile */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Ombra piï¿½ visibile */
     cursor: pointer;
 }
 
@@ -70,3 +69,50 @@ footer {
     color: #fff;
     padding: 20px 0;
 }
+
+/*NAVBAR*/
+
+.category-btn {
+    padding: 8px 15px;
+    border: 2px solid transparent;
+}
+
+.search-container input,
+.search-container input:focus,
+.search-container input:-webkit-autofill,
+.search-container input:-webkit-autofill:focus {
+    border: none;
+    outline: none;
+    background-color: #333;
+    color:white;
+}
+
+.search-container {
+    flex-grow: 1;
+    max-width: 100%;
+    position: relative;
+}
+
+.search-bar {
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 8px 15px;
+    width: 100%;
+}
+
+
+.search-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: white;
+}
+
+    .search-btn i {
+        font-size: 18px;
+    }
