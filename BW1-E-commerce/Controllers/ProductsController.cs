@@ -132,7 +132,8 @@ namespace BW1_E_commerce.Controllers
             ViewBag.Color = await GetColor();
             ViewBag.Sizes = await GetSizes();
             ViewBag.Material = await GetMaterials();
-            return View();
+            var model = new ProductAddModel();
+            return View(model);
         }
 
 

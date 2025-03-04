@@ -4,5 +4,6 @@
     {
         public int IdMaterial { get; set; }
         public string Name { get; set; }
+        public decimal Percentage { get; set; }
     }
 }

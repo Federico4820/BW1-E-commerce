@@ -17,7 +17,8 @@
         public List<Color> Colors { get; set; }
         public List<Size> Sizes { get; set; }
         public List<Material> Materials { get; set; }
-        
+        public List<Material> SelectedMaterials { get; set; } = new List<Material> { };
+
 
     }
 }
