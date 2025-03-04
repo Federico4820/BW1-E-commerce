@@ -1,93 +1,78 @@
-﻿<!DOCTYPE html>
-<html lang="it">
+﻿@model ProductListModel
+@{
+  ViewData["Title"] = "HomePage";
+}
 
-<!-- chiocciola model IEnumerable<Product>-->
-<!-- altrimenti usare -->
-@* @{var products = ViewBag.Products as IEnumerable<Product>;} *@ 
-
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>E-Commerce Demo</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-
-<body>
-  <div class="row">
-    <div class="sidebar col-md-2 d-none d-md-block d-flex flex-column">
-      <div class="sidebaby">
-        <a class="text-decoration-none text-dark mt-4 mx-3" asp-area="" asp-controller="Gonna"
-          asp-action="Index">Gonna</a>
-        <hr class="text-secondary" />
-        <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Jeans e pantaloni"
-          asp-action="Index">Jeans e Pantaloni</a>
-        <hr class="text-secondary" />
-        <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Maglieria"
-          asp-action="Index">Maglieria e felpe</a>
-        <hr class="text-secondary" />
-        <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Pantaloncini"
-          asp-action="Index">Pantaloncini</a>
-        <hr class="text-secondary" />
-        <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Pezzi interi"
-          asp-action="Index">Pezzi interi</a>
-        <hr class="text-secondary" />
-        <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Soprabiti"
-          asp-action="Index">Soprabiti</a>
-        <hr class="text-secondary" />
-        <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Top" asp-action="Index">Top</a>
-        <hr class="text-secondary" />
-        <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Vestiti"
-          asp-action="Index">Vestiti</a>
-      </div>
-    </div>
-    <div class="btn-group dropend col-1 d-md-none d-xs-block">
-      <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Gonna" asp-action="Index">Gonna</a></li>
-        <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Jeans e pantaloni" asp-action="Index">Jeans e
-            pantaloni</a></li>
-        <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Maglieria" asp-action="Index">Maglieria</a></li>
-        <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Pantaloncini" asp-action="Index">Pantaloncini</a>
-        </li>
-        <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Pezzi interi" asp-action="Index">Pezzi interi</a>
-        </li>
-        <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Soprabiti" asp-action="Index">Soprabiti</a></li>
-        <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Top" asp-action="Index">Top</a></li>
-        <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Vestiti" asp-action="Index">Vestiti</a></li>
-      </ul>
-    </div>
-    <div class=" col-sm-11  col-md-10">
-      <div class="container">
-        <div class="row">
-          <div class="col-12 text-center">
-            <h1>Benvenuti in E-Commerce Team 2</h1>
-            <p>sachi ci mancherai!</p>
-          </div>
-        </div>
-        <!-- Schede dei prodotti -->
+<div class="row">
+  <div class="sidebar col-md-2 d-none d-md-block d-flex flex-column">
+    <a class="text-decoration-none text-dark mt-4 mx-3" asp-area="" asp-controller="Gonna" asp-action="Index">Gonna</a>
+    <hr class="text-secondary" />
+    <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Jeans e pantaloni"
+      asp-action="Index">Jeans e Pantaloni</a>
+    <hr class="text-secondary" />
+    <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Maglieria" asp-action="Index">Maglieria
+      e felpe</a>
+    <hr class="text-secondary" />
+    <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Pantaloncini"
+      asp-action="Index">Pantaloncini</a>
+    <hr class="text-secondary" />
+    <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Pezzi interi" asp-action="Index">Pezzi
+      interi</a>
+    <hr class="text-secondary" />
+    <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Soprabiti"
+      asp-action="Index">Soprabiti</a>
+    <hr class="text-secondary" />
+    <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Top" asp-action="Index">Top</a>
+    <hr class="text-secondary" />
+    <a class="text-decoration-none text-dark mx-3" asp-area="" asp-controller="Vestiti" asp-action="Index">Vestiti</a>
+  </div>
+  <div class="btn-group dropend col-1 d-md-none d-xs-block">
+    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Gonna" asp-action="Index">Gonna</a></li>
+      <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Jeans e pantaloni" asp-action="Index">Jeans e
+          pantaloni</a></li>
+      <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Maglieria" asp-action="Index">Maglieria</a></li>
+      <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Pantaloncini" asp-action="Index">Pantaloncini</a>
+      </li>
+      <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Pezzi interi" asp-action="Index">Pezzi interi</a>
+      </li>
+      <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Soprabiti" asp-action="Index">Soprabiti</a></li>
+      <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Top" asp-action="Index">Top</a></li>
+      <li><a class="dropdown-item mb-3" asp-area="" asp-controller="Vestiti" asp-action="Index">Vestiti</a></li>
+    </ul>
+  </div>
 
 
-        <div class="d-grid productContainer">
+  <!--MAIN CONTENT-->
+  <div class=" col-sm-11  col-md-10">
+    <!-- Schede dei prodotti -->
+    <div class="d-grid productContainer">
+      @if (Model.ProductList != null)
+      {
+        @foreach (var item in Model.ProductList)
+        {
           <div class="productCard p-0">
-            <a class="text-decoration-none">
-              <div class="card border-0">
-                <img
-                  src="https://www.modasposiatelier.it/wp-content/uploads/2022/06/Abito-mikado-glicine_pronovias_TP-STYLE-177.jpg"
-                  class="card-img-home" alt="Prodotto 1">
-                <div class="productInfo_rwyH5">
-                  <h2 class="productDescription">Vestito a trapezio
-                    corto color avorio decorato con scollo quadrato</h2>
-                  <p class="fw-bold text-danger"> 199,00€</p>
-                </div>
-              </div>
-            </a>
-            <button class="favorite-btn">
-              ♥
-            </button>
+        <a class="text-decoration-none">
+          <div class="card border-0">
+            <img
+              src=""
+              class="card-img-home" alt="Prodotto 1">
+            <div class="productInfo_rwyH5">
+              <h2 class="productDescription">Vestito a trapezio
+                corto color avorio decorato con scollo quadrato</h2>
+              <p class="fw-bold text-danger"> 199,00€</p>
+            </div>
           </div>
-          @*
+        </a>
+        <button class="favorite-btn">
+          ♥
+        </button>
+      </div>
+        }
+      }
+      @*
               @foreach (var product in Model) oppure (var product in products)
                 {
                   <div class="col-md-6 col-lg-4 col-xl-4 product-card clickable-card p-0">
@@ -106,12 +91,7 @@
                   </div>
                 }
             *@
-        </div>
-      </div>
-
     </div>
   </div>
-
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+</div>
+</div>
