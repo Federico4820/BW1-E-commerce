@@ -102,14 +102,12 @@
 
 /*lista ABBIGLIAMENTO*/
 .sidebar {
-    position: sticky;
+    position: fixed;
     height:100vh;
-    top:200px !important;
-    left:auto;
-    overflow-y: auto;
-   
+    top:20px !important;
+    left:auto; 
     padding: 10px;
-    border-right: 1px solid black;
+    border-right: 1px solid grey;
 }
 
 .sidebar a:hover{
