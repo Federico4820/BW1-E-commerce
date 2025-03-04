@@ -21,6 +21,12 @@ body {
   margin-bottom: 60px;
 }
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 .card-img-home {
     height: 400px;
     width: 100%;
@@ -71,12 +77,20 @@ footer {
 }
 
 /*NAVBAR*/
+.navbar {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%; 
+    z-index: 1000;
+}
 
 .category-btn {
     padding: 8px 15px;
     border: 2px solid transparent;
 }
 
+/*BARRA DI RICERCA*/
 .search-container input,
 .search-container input:focus,
 .search-container input:-webkit-autofill,
@@ -96,13 +110,29 @@ footer {
 
 .search-bar {
     background-color: #333;
-    color: white;
     border: none;
     border-radius: 25px;
     padding: 8px 15px;
     width: 100%;
 }
+   
 
+    .search-bar,
+    .search-btn,
+    .search-bar::placeholder {
+        color: white;
+    }
+
+   
+    .search-bar:focus {
+        outline: none; 
+        box-shadow: none; 
+    }
+
+        .search-bar::-webkit-search-cancel-button {
+            -webkit-appearance: none; 
+            appearance: none; 
+        }
 
 .search-btn {
     position: absolute;
@@ -111,7 +141,7 @@ footer {
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: white;
+    cursor: pointer;
 }
 
     .search-btn i {
@@ -146,3 +176,49 @@ fieldset {
     padding-block: 0.35em 0.625em;
     padding-inline: 0.75em;
 }
+
+    /*DROPDOWN*/
+
+.dropdown a:hover {
+    border: 1px solid white; 
+    color: inherit; 
+    background-color: transparent; 
+    outline: none; 
+}
+
+
+.dropdown a {
+    border: 2px solid transparent; 
+    padding: 5px;
+}
+
+.dropdown-menu-end[data-bs-popper] {
+    right: 0px;
+    left: 5%;
+    margin-top:4px;
+}
+
+/*lista ABBIGLIAMENTO*/
+.sidebar {
+    position: fixed;
+    height:100vh;
+    top:20px !important;
+    left:auto; 
+    padding: 10px;
+    border-right: 1px solid grey;
+}
+
+.sidebar a:hover{
+    color:darkred !important;
+}
+
+/*DROPDOWN MENU VESTITI*/
+
+.dropend{
+    position:fixed;
+    top:100px;
+    z-index:1000;
+}
+
+
+
