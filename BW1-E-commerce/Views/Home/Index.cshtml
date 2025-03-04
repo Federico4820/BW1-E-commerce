@@ -1,11 +1,87 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<!DOCTYPE html>
+<html lang="it">
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- chiocciola model IEnumerable<Product>-->
+<!-- altrimenti usare -->
+@* @{var products = ViewBag.Products as IEnumerable<Product>;} *@ 
 
-<!--Commento di prova dei branch-->
-<!--Altro commento-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Commerce Demo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>Benvenuti in E-Commerce Team 2</h1>
+                <p>sachi ci mancherai!</p>
+            </div>
+        </div>
+        <!-- Schede dei prodotti -->
+        <div class="row">
+            <div class="col-md-6 col-lg-4 col-xl-4 product-card clickable-card p-0">
+				<a href="#" class="text-decoration-none">
+                    <div class="card border-0">
+                        <img src="https://www.modasposiatelier.it/wp-content/uploads/2022/06/Abito-mikado-glicine_pronovias_TP-STYLE-177.jpg" class="card-img-home" alt="Prodotto 1">
+                        <div class="card-body">
+                            <p class="small text-muted">Descrizione breve del prodotto</p>
+                            <p class="card-text text-danger fw-bold">€20</p>
+                        </div>
+                    </div>
+				</a>
+                <button class="favorite-btn">
+                    ♥
+                </button>
+            </div>
+            <div class="col-md-4 product-card">
+                <div class="card">
+                    <img src="https://www.comeinunafavola.it/wedit/uploads/prodotti/417/abito-uomo-2.jpg" class="card-img-home" alt="Prodotto 2">
+                    <div class="card-body">
+                        <h5 class="card-title">Prodotto 2</h5>
+                        <p class="card-text">Descrizione breve del prodotto.</p>
+                        <p class="card-text font-weight-bold">€ 49,99</p>
+                        <a href="#" class="btn btn-primary">Dettagli</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 product-card">
+                <div class="card">
+                    <img src="https://img.fruugo.com/product/4/88/984879884_max.jpg" class="card-img-home" alt="Prodotto 3">
+                    <div class="card-body">
+                        <h5 class="card-title">Prodotto 3</h5>
+                        <p class="card-text">Descrizione breve del prodotto.</p>
+                        <p class="card-text font-weight-bold">€ 19,99</p>
+                        <a href="#" class="btn btn-primary">Dettagli</a>
+                    </div>
+                </div>
+            </div>
+            @*
+              @foreach (var product in Model) oppure (var product in products)
+                {
+                  <div class="col-md-6 col-lg-4 col-xl-4 product-card clickable-card p-0">
+                    <a href="@Url.Action("Details", "Home", new { id = product.Id })" class="text-decoration-none">
+                      <div class="card h-100 shadow-sm clickable-card">
+                        <img src="@product.ImagePath" alt="@product.Name" class="card-img-top" />
+                        <div class="card-body text-center">
+                          <p class="text-small text-muted">@product.Name</p>
+                          <p class="card-text text-danger">Prezzo: €@product.Price</p>
+                        </div>
+                      </div>
+                    </a>
+                    <button class="favorite-btn">
+                        ♥
+                    </button>
+                  </div>
+                }
+            *@
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
