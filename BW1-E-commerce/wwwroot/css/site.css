@@ -1,22 +1,250 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.clickable-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.imgContainer {
+    aspect-ratio: 87 / 111;
+}
+
+.imgProd {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+
+.favorite-btn{
+    -webkit-text-stroke: 1px black;
+    position: relative;
+    right: calc(-100% + 55px);
+    top: -142px;
+    background: white;
+    padding: 0.5em 0.7em;
+    border-radius:50%;
+    border: none;
+    cursor: pointer;
+    height: -webkit-fit-content;
+    height: -moz-fit-content;
+    height: fit-content;
+    outline: none;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+    font-size: 1.2em;
+}
+
+@media (min-width: 768px) {
+    .productContainer {
+        grid-template-columns: repeat(3, 1fr);
+        grid-column-gap: 2em;
+    }
+}
+
+@media (min-width: 1024px) {
+    .productContainer {
+        grid-template-columns: repeat(4, 1fr);
+        grid-column-gap: 1em;
+    }
+}
+
+@media (min-width: 1200px) {
+    .productContainer {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+.productCard {
+    box-sizing: border-box;
+    display: grid;
+    grid-row: span 2;
+    grid-template-rows: subgrid;
+    margin: 12px 0;
+    position: relative;
+}
+
+.productDescription {
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    box-sizing: border-box;
+    display: -webkit-box;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: .6px;
+    line-height: 20px;
+    overflow: hidden;
+    padding: 0 12px;
+    width: 100%;
+}
+
+footer {
+    background-color: #343a40;
+    color: #fff;
+    padding: 20px 0;
+}
+
+/*NAVBAR*/
+
+.category-btn {
+    padding: 8px 15px;
+    border: 2px solid transparent;
+}
+
+/*BARRA DI RICERCA*/
+.search-container input,
+.search-container input:focus,
+.search-container input:-webkit-autofill,
+.search-container input:-webkit-autofill:focus {
+    border: none;
+    outline: none;
+    background-color: #333;
+    color: white;
+    box-shadow: none;
+}
+
+.search-container {
+    flex-grow: 1;
+    max-width: 100%;
+    position: relative;
+}
+
+.search-bar {
+    background-color: #333;
+    border: none;
+    border-radius: 25px;
+    padding: 8px 15px;
+    width: 100%;
+}
+
+
+    .search-bar,
+    .search-btn,
+    .search-bar::placeholder {
+        color: white;
+    }
+
+
+        .search-bar:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .search-bar::-webkit-search-cancel-button {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+.search-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+    .search-btn i {
+        font-size: 18px;
+    }
+
+input[type="number"]:hover::-webkit-inner-spin-button,
+input[type="number"]:hover::-webkit-outer-spin-button,
+input[type="number"]:focus::-webkit-inner-spin-button,
+input[type="number"]:focus::-webkit-outer-spin-button,
+input[type="number"]:active::-webkit-inner-spin-button,
+input[type="number"]:active::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+legend {
+    float: none;
+    display: block;
+    unicode-bidi: isolate;
+    padding-inline: 2px;
+}
+
+fieldset {
+    display: block;
+    min-inline-size: min-content;
+    margin-inline: 0.5em;
+    border-width: 1px;
+    border-style: groove;
+    border-color: threedface;
+    border-image: initial;
+    padding-block: 0.35em 0.625em;
+    padding-inline: 0.75em;
+}
+
+/*DROPDOWN*/
+
+.dropdown a:hover {
+    border: 1px solid white;
+    color: inherit;
+    background-color: transparent;
+    outline: none;
+}
+
+
+.dropdown a {
+    border: 2px solid transparent;
+    padding: 5px;
+}
+
+.dropdown-menu-end[data-bs-popper] {
+    right: 0px;
+    left: 5%;
+    margin-top: 4px;
+}
+
+/*lista ABBIGLIAMENTO*/
+
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 55px);
+    z-index: 10;
+    padding: 10px;
+    border-right: 1px solid grey;
+}
+
+    .sidebar a:hover {
+        color: darkred !important;
+    }
+
+/*DROPDOWN MENU VESTITI*/
+
+.dropend {
+    position: fixed;
+    top: 100px;
+    z-index: 1000;
 }
