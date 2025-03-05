@@ -1,0 +1,274 @@
+﻿@model ProductAddModel
+
+
+@{
+	var cat = ViewBag.Categories as List<Category>;
+	var color = ViewBag.Color as List<Color>;
+	var sizes = ViewBag.Sizes as List<Size>;
+	var mat = ViewBag.Material as List<Material>;
+
+	ViewData["Title"] = "Aggiungi Prodotto";
+}
+
+@if (TempData["Error"] != null)
+{
+	<span class="text-danger">@TempData["Error"]</span>
+}
+
+<form method="post" asp-controller="Products" asp-action="AddSave">
+	<fieldset class="">
+		<legend>Caratteristiche generali</legend>
+		<div class ="row g-3">
+			<div class="form-group col-md-4">
+				<label asp-for="Name" class="control-label">Nome</label>
+				<input asp-for="Name" class="form-control" type="text" required />
+			</div>
+
+			<div class="form-group col-md-3">
+				<label asp-for="Brand" class="control-label">Marca</label>
+				<input asp-for="Brand" class="form-control" type="text" required />
+			</div>
+
+			<div class="form-group col-md-2">
+				<label asp-for="Gender" class="control-label">Genere</label>
+				<select class="form-select" asp-for="Gender" required>
+					<option selected disabled>Seleziona un'opzione</option>
+					<option value="F">Donna</option>
+					<option value="M">Uomo</option>
+					<option value="U">Unisex</option>
+				</select>
+			</div>
+
+			<div class="form-group col-md-2">
+				<label asp-for="IdCategory" class="control-label">Categoria</label>
+				<select asp-for="IdCategory" class="form-control" required>
+					<option selected disabled>Seleziona un'opzione</option>
+					@if (cat != null)
+					{
+						@foreach (var item in cat)
+						{
+							<option value="@item.IdCategory">@item.Name</option>
+						}
+					}
+				</select>
+			</div>
+
+			<div class="form-group col-md-1">
+				<label asp-for="Price" class="control-label">Prezzo</label>
+				<input asp-for="Price" class="form-control" type="number" step="0.01" required />
+			</div>
+
+			<div class="form-group col-12">
+				<label asp-for="Description" class="control-label">Descrizione</label>
+				<input asp-for="Description" class="form-control" type="text" required />
+			</div>
+
+			<div id="materialContainer">
+				<p>Composizione</p>
+				@for (int i = 0; i < mat.Count; i++)
+				{
+					<div class="matField mb-3" style="display:none">
+						<div class="row">
+							<div class="col-md-4">
+								<select name="SelectedMaterials[@i].IdMaterial" class="form-control">
+									<option value="" selected disabled>Seleziona un materiale</option>
+									@if (mat != null)
+									{
+										@foreach (var item in mat)
+										{
+											<option value="@item.IdMaterial">@item.Name</option>
+										}
+									}
+								</select>
+							</div>
+
+							<div class="col-md-4">
+								<input type="number" name="SelectedMaterials[@i].Percentage" class="form-control" min="0" max="100" />
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+
+			<a class="btn btn-sm btn-light" id="addMat">+</a>
+
+		</div>
+		
+	</fieldset>
+
+	<fieldset>
+		<legend>Taglie Disponibili</legend>
+		<div class="form-group">
+			<div class="d-flex justify-content-evenly">
+				@if (sizes != null)
+				{
+					@foreach (var item in sizes)
+					{
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input" id="@item.IdSize" name="SelectedSizes" value="@item.IdSize">
+							<label class="form-check-label" for="@item.IdSize">@item.Name</label>
+						</div>
+					}
+				}
+			</div>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend>Colori Disponibili</legend>
+		<div>
+			@for (int i = 0; i < color.Count; i++)
+			{
+				<div class="colorField mb-3" id="colorField-@i" style="display:none">
+					<div class="row align-items-start">
+						<div class="col-md-2">
+							<select name="SelectedColor[@i].IdColor" class="form-control">
+								<option value="" selected disabled>Seleziona un Colore</option>
+								@foreach (var item in color)
+								{
+									<option value="@item.IdColor">@item.Name</option>
+								}
+
+							</select>
+						</div>
+						<div class="col-md-9">
+							@for (int j = 1; j <= 4; j++)
+							{
+								<div class="extra-field" id="field-@i-@j" style="display: none;">
+									<div class="d-flex">
+										<span class="input-group-text mb-3" id="basic-addon3">https://example.com/photo.jpg</span>
+										<div class="mb-3 form-floating flex-grow-1">
+											<input type="text" class="form-control" id="image-@i-@j" placeholder="Inserisci l'URL dell'immagine"
+												    autocomplete="off" name="SelectedColor[@i].ImgListModel">
+											<label for="ImgListModel-@i-@j" class="text-secondary">Product ImageURL</label>
+										</div>
+									</div>
+								</div>
+							}
+						</div>
+						
+						<a class="btn btn-light mb-3 btn-sm add-btn col-md-1" id="add-btn-@i">Aggiungi immagine</a>
+					</div>
+				</div>
+			}
+			<a class="btn btn-sm btn-light" id="addColor">+</a>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend>Dati Vendita</legend>
+		<div class="row">
+			<div class="form-group col-md-10">
+				<label asp-for="Email" class="control-label">Email</label>
+				<input asp-for="Email" class="form-control" type="text" required />
+			</div>
+			<div class="form-group col-md-1">
+				<label asp-for="Stock" class="control-label">Quantità</label>
+				<input asp-for="Stock" class="form-control" type="number" required />
+			</div>
+		</div>
+	</fieldset>
+
+	<div class="form-group mt-4">
+		<button type="submit" class="btn btn-primary">Inviaaaaaa</button>
+	</div>
+
+</form>
+
+
+<script>
+
+	document.getElementById("addMat").addEventListener("click", function(){
+		let field = document.querySelectorAll(".matField");
+		for (let i=0; i<field.length; i++){
+			if(field[i].style.display ==="none"){
+				field[i].style.display="block"
+				return
+			}
+		}
+		alert("Hai raggiunto il limite massimo di materiali!")
+	});
+
+		document.getElementById("addColor").addEventListener("click", function(){
+		let field = document.querySelectorAll(".colorField");
+		for (let i=0; i<field.length; i++){
+			if(field[i].style.display ==="none"){
+				field[i].style.display="block"
+				return
+			}
+		}
+		alert("Hai raggiunto il limite massimo di materiali!")
+	});
+
+		document.addEventListener("DOMContentLoaded", function () {
+		const container = document.getElementById("materialContainer");
+
+		function updateSelectOptions() {
+			let selectedValues = new Set();
+			container.querySelectorAll("select[name^='SelectedMaterials']").forEach(select => {
+				if (select.value) {
+					selectedValues.add(select.value);
+				}
+			});
+			container.querySelectorAll("select[name^='SelectedMaterials']").forEach(select => {
+				let currentValue = select.value;
+				select.querySelectorAll("option").forEach(option => {
+					if (option.value !== "" && option.value !== currentValue) {
+						option.disabled = selectedValues.has(option.value);
+					} else {
+						option.disabled = false;
+					}
+				});
+			});
+		}
+
+		function validatePercentage() {
+			let total = 0;
+			container.querySelectorAll("input[name^='SelectedMaterials'][name$='Percentage']").forEach(input => {
+				total += parseFloat(input.value) || 0;
+			});
+			let warning = document.getElementById("percentageWarning");
+			if (!warning) {
+				warning = document.createElement("p");
+				warning.id = "percentageWarning";
+				warning.style.color = "red";
+				container.appendChild(warning);
+			}
+
+			if (total !== 100) {
+				warning.textContent = "La somma delle percentuali deve essere 100.";
+			} else {
+				warning.textContent = "";
+			}
+		}
+		container.addEventListener("change", function (event) {
+			if (event.target.tagName === "SELECT") {
+				updateSelectOptions();
+			}
+			if (event.target.tagName === "INPUT") {
+				validatePercentage();
+			}
+		});
+	});
+
+	document.querySelectorAll(".add-btn").forEach((e, index) => {
+		e.addEventListener("click", function () {
+			let colorField = document.getElementById("colorField-" + index);
+			let fields = colorField.querySelectorAll(".extra-field");
+			let visibleFields = Array.from(fields).filter(field => field.style.display !== "none");
+			const maxImages = 4;
+			if (visibleFields.length < maxImages) {
+				for (let i = 0; i < fields.length; i++) {
+					if (fields[i].style.display === "none") {
+						fields[i].style.display = "block";
+						break; 
+					}
+				}
+			} else {
+				alert("Hai raggiunto il limite massimo di 4 immagini per questo colore.");
+			}
+		});
+	});
+	 
+
+</script>
