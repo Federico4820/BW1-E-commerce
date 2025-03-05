@@ -1,37 +1,38 @@
-﻿@model ProductListModel
+﻿
+@model ProductListModel
+
 @{
-  ViewData["Title"] = "HomePage";
+	var productList = ViewBag.Prod as ProductListModel;
+	ViewData["Title"] = "HomePage";
 }
 
 <div class="row">
-        @await Html.PartialAsync("_SidabarPartial")
-  <!--MAIN CONTENT-->
-  <div class=" col-sm-11  col-md-10">
-    <!-- Schede dei prodotti -->
-    <div class="d-grid productContainer">
-      @if (Model.ProductList != null)
-      {
-        @foreach (var item in Model.ProductList)
-        {
-          <div class="productCard p-0">
-        <a class="text-decoration-none">
-          <div class="card border-0">
-              <div class="imgContainer">
-				<img src=@item.ImgURL class="card-img-home imgProd" alt=@item.Name>
-              </div>
-           
-            <div class="productInfo_rwyH5">
-              <h2 class="productDescription">@item.Name</h2>
-              <p class="fw-bold text-danger"> @item.Price €</p>
-            </div>
-          </div>
-        </a>
-        <button class="favorite-btn"> 
-         <i class="bi bi-heart"></i>
-        </button>
-      </div>
-        }
-      }
-    </div>
-  </div>
+	@await Html.PartialAsync("_SidabarPartial")
+	<!--MAIN CONTENT-->
+	<div class=" col-sm-11  col-md-10">
+		<!-- Schede dei prodotti -->
+		<div class="d-grid productContainer">
+			@if (productList!.ProductList != null)
+			{
+				@foreach (var item in productList.ProductList)
+				{
+					<div class="productCard p-0">
+						<a class="text-decoration-none" asp-controller="Products" asp-action="Details" asp-route-id="@item.IdProd">
+							<div class="imgContainer">
+								<img src=@item.ImgURL class="card-img-home imgProd" alt=@item.Name>
+							</div>
+							<div class="productInfo">
+								<h2 class="productDescription">@item.Name</h2>
+								<p class="fw-bold text-danger"> @item.Price €</p>
+
+							</div>						
+						</a>
+						<button class="favorite-btn">
+							<i class="bi bi-heart"></i>
+						</button>
+					</div>
+				}
+			}
+		</div>
+	</div>
 </div>

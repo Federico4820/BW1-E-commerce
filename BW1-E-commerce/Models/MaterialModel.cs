@@ -1,6 +1,6 @@
 ﻿namespace BW1_E_commerce.Models
 {
-    public class Material
+    public class MaterialModel
     {
         public int IdMaterial { get; set; }
         public string Name { get; set; }
