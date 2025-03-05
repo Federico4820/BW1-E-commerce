@@ -69,25 +69,6 @@
       </div>
         }
       }
-      @*
-              @foreach (var product in Model) oppure (var product in products)
-                {
-                  <div class="col-md-6 col-lg-4 col-xl-4 product-card clickable-card p-0">
-                    <a href="@Url.Action("Details", "Home", new { id = product.Id })" class="text-decoration-none">
-                      <div class="card h-100 shadow-sm clickable-card">
-                        <img src="@product.ImagePath" alt="@product.Name" class="card-img-top" />
-                        <div class="card-body text-center">
-                          <p class="text-small text-muted">@product.Name</p>
-                          <p class="card-text text-danger">Prezzo: €@product.Price</p>
-                        </div>
-                      </div>
-                    </a>
-                    <button class="favorite-btn">
-                        ♥
-                    </button>
-                  </div>
-                }
-            *@
     </div>
   </div>
 </div>
