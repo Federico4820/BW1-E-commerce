@@ -2,15 +2,9 @@
 
 @{
     var productList = ViewBag.Prod as ProductListModel;
-    var filteredProducts = productList.ProductList.Where(p => p.NameCategory == Model).ToList();
+    var filteredProducts = productList!.ProductList!.Where(p => p.NameCategory == Model).ToList();
 }
 
-@if (TempData["Error"] != null && !string.IsNullOrEmpty(TempData["Error"].ToString()))
-{
-    <div class="alert alert-danger">
-        @TempData["Error"]
-    </div>
-}
 
 @if (filteredProducts.Any())
 {
@@ -47,7 +41,6 @@
                 </div>
             }
         </div>
-        <!-- Controlli di navigazione -->
         <a class="carousel-control-prev" href="#multiItemCarousel" role="button" data-slide="prev">
             <i class="bi bi-chevron-left"></i> 
         </a>

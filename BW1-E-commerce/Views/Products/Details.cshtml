@@ -60,8 +60,13 @@
 							}
 						</div>
 						<div class="d-flex justify-content-between">
-							<p class="fw-bold">Taglie disponili</p>
-							<p>Guida alle taglie</p>
+							<p class="fw-bold">Taglie disponibili</p>
+							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sizeChart">
+								Guida alle taglie
+							</button>
+							<div class="modal fade" id="sizeChart" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								@await Html.PartialAsync("_TaglieDonna")
+							</div>
 						</div>
 
 						<select class="mb-2">
@@ -134,201 +139,9 @@
 				<div class="multiItemCustom d-flex justify-content-center">
 					@await Html.PartialAsync("_MultiItemCarousel", Model.Category)
 				</div>
-				
+
 			</section>
 		</div>
-	</div>
-</div>
-
-
-
-
-<div class="_2hZZZlE27e7BZmAwrPJlZU">
-	<header class="_2lpOsWm5_HC2pw1QHL17-z _3d-Trz2VLtUJbsPFlFOTI_">
-		<h1 id="modalTitle" class="_1phvQLZlv3F6sbmcIkBY1k">Guida alle taglie</h1>
-		<h2 class="_3BwVbPaMfPskeG8d5-825b">Donna / ASOS DESIGN</h2>
-		<button aria-label="Chiudi" class="_3z5-pslbrT9tKCzlHjnrNv">
-			<span class="_1uF9aVkZx57Dosdxc1Tkvc"></span>
-			<span class="_13OqjlM60KmS2hju9E9AwD"></span>
-		</button>
-	</header>
-	<div class="_14pMAy_gtKhlHD_ZW6wY5a">
-		<section class="up8_9oruFlTmUEzem32JH">
-			<h2 class="_2sEBtQElXk3EwVyYvH3SW2">Misure del corpo</h2>
-			<div class="_10z7CneYYqCeSYSWAVqSy4 w4mRdYe2Zc7DvxpPhr8Sr" aria-valuemax="97" tabindex="0" role="scrollbar" id="table-container-smbo7vzbd" aria-controls="table-container-smbo7vzbd" aria-orientation="horizontal" aria-valuemin="0" aria-valuenow="0">
-				<table class="_1DoSj9nrVomYxUoFlemuik">
-					<thead>
-						<tr class="_3zcyMO6mQP9-YFOyctlKnX">
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">Taglia</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">Petto</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">Fianchi</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">Fianchi bassi</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">Vita</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="_3D5PE_hrjP9o_TKJ8iaUp7">
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">XS</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">79-81.5</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">76-78.5</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">84-86.5</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">60-62.5</td>
-						</tr>
-						<tr class="_3D5PE_hrjP9o_TKJ8iaUp7">
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">S</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">84-89</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">81-86</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">89-94</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">65-70</td>
-						</tr>
-						<tr class="_3D5PE_hrjP9o_TKJ8iaUp7">
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">M</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">94-99</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">91-96</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">99-104</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">75-80</td>
-						</tr>
-						<tr class="_3D5PE_hrjP9o_TKJ8iaUp7">
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">L</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">104-111</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">101-108</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">109-116</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">85-92</td>
-						</tr>
-						<tr class="_3D5PE_hrjP9o_TKJ8iaUp7">
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">XL</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5"></td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5"></td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5"></td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5"></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</section>
-		<section class="_2ipdXLJsgWUv9wu9tcJYSD">
-			<h2 class="_2sEBtQElXk3EwVyYvH3SW2">Conversioni internazionali</h2>
-			<div class="_10z7CneYYqCeSYSWAVqSy4 w4mRdYe2Zc7DvxpPhr8Sr" aria-valuemax="943" tabindex="0" role="scrollbar" id="table-container-ylpgsnf7l" aria-controls="table-container-ylpgsnf7l" aria-orientation="horizontal" aria-valuemin="0" aria-valuenow="0">
-				<table class="_1DoSj9nrVomYxUoFlemuik">
-					<thead>
-						<tr class="_3zcyMO6mQP9-YFOyctlKnX">
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">Taglia</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">IT</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">UK</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">EU</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">US</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">FR</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">DE</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">ES</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">RU</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">AU</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">SE</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">DK</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">PL</th>
-							<th class="dSgQFgavDYfuDsxur-O5_" scope="col">NL</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="_3D5PE_hrjP9o_TKJ8iaUp7">
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">2XS</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">IT 34</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">UK 2</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 30</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">US 00</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 30</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 30</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 30</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 30</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">AU 2</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 30</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 30</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 30</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 30</td>
-						</tr>
-						<tr class="_3D5PE_hrjP9o_TKJ8iaUp7">
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">XS</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">IT 36-38</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">UK 4-6</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 32-34</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">US 0-2</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 32-34</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 32-34</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 32-34</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 32-34</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">AU 4-6</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 32-34</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 32-34</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 32-34</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 32-34</td>
-						</tr>
-						<tr class="_3D5PE_hrjP9o_TKJ8iaUp7">
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">S</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">IT 40-42</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">UK 8-10</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 36-38</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">US 4-6</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 36-38</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 36-38</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 36-38</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 36-38</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">AU 8-10</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 36-38</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 36-38</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 36-38</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 36-38</td>
-						</tr>
-						<tr class="_3D5PE_hrjP9o_TKJ8iaUp7">
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">M</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">IT 44-46</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">UK 12-14</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 40-42</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">US 8-10</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 40-42</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 40-42</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 40-42</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 40-42</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">AU 12-14</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 40-42</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 40-42</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 40-42</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 40-42</td>
-						</tr>
-						<tr class="_3D5PE_hrjP9o_TKJ8iaUp7">
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">L</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">IT 48- 50</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">UK 16-18</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 44-46</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">US 12-14</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">FR 44-46</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 44-46</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">ES 44-46</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 44-46</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">AU 16-18</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 44-46</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 44-46</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 44-46</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 44-46</td>
-						</tr>
-						<tr class="_3D5PE_hrjP9o_TKJ8iaUp7">
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">XL</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">IT 52-54</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">UK 20-22</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 48-50</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">US 16-18</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 48-50</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 48-50</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 48-50</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 48-50</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">AU 20-22</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 48-50</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 48-50</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 48-50</td>
-							<td class="b6gwYf1LyF6jYGKVfUFQ5">EU 48-50</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</section>
 	</div>
 </div>
 

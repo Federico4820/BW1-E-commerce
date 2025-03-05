@@ -460,15 +460,15 @@ fieldset {
     font-size: 2em;
 }
 
-.carousel-control-next:focus, .carousel-control-next:hover, .carousel-control-prev:focus, .carousel-control-prev:hover{
-    opacity:1;
-    color: black;
-}
-    /*SCROLL BAR*/
-    ::-webkit-scrollbar {
-        width: 5px;
-        height: 12px;
+    .carousel-control-next:focus, .carousel-control-next:hover, .carousel-control-prev:focus, .carousel-control-prev:hover {
+        opacity: 1;
+        color: black;
     }
+/*SCROLL BAR*/
+::-webkit-scrollbar {
+    width: 5px;
+    height: 12px;
+}
 
 ::-webkit-scrollbar-track {
     background: transparent;
@@ -495,4 +495,12 @@ fieldset {
 
 .accordion-collapse {
     border-bottom: 1px solid rgba(192, 192, 192, 0.5;
+}
+
+
+/*MODALE TAGLIE*/
+
+.modal-content{
+    background-color:black;
+    color: white;
 }
