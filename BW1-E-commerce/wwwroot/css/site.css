@@ -526,7 +526,7 @@ fieldset {
 }
 
 /*MODALE TAGLIE*/
-.modal{
+.modal {
     --bs-modal-border-color: none;
 }
 
@@ -544,48 +544,49 @@ fieldset {
     position: fixed;
 }
 
-.modal-content{
-    border-radius: 0;  
+.modal-content {
+    border-radius: 0;
 }
 
-.modal-content{
-    background-color:#121212;
+.modal-content {
+    background-color: #121212;
     color: white;
 }
 
-.modal-content th{
-    background-color: #3D3D3D !important;
-    color: white;
-    font-size: bold;
-    border: 1px solid rgba(192, 192, 192, 0.5);
-}
+    .modal-content th {
+        background-color: #3D3D3D !important;
+        color: white;
+        font-size: bold;
+        border: 1px solid rgba(192, 192, 192, 0.5);
+    }
 
-.modal-content td{
-    border: 1px solid rgba(192, 192, 192, 0.5);
-}
+    .modal-content td {
+        border: 1px solid rgba(192, 192, 192, 0.5);
+    }
 
-.table-dark{
+.table-dark {
     --bs-table-bg: #282828;
     --bs-table-border-color: #f8f8f8c2;
     --bs-table-striped-bg: #1f1f1f;
 }
 
-.border-bottom-custom{
+.border-bottom-custom {
     border-bottom: 1px solid rgba(192, 192, 192, 0.5);
 }
 
-.bi-x-lg{
+.bi-x-lg {
     cursor: pointer;
 }
-.letter-spacing1{
+
+.letter-spacing1 {
     letter-spacing: 0.1em;
 }
 
-.btn-link{
+.btn-link {
     color: #000000;
 }
 
-.customSelect{
+.customSelect {
     width: 100%;
     padding: 0.5em;
 }
@@ -604,45 +605,62 @@ fieldset {
     width: 2em;
     height: 2em;
     border-radius: 50%;
-    border: 2px solid transparent; 
-    
+    border: 2px solid transparent;
     transition: border-color 0.3s ease;
 }
 
 .color-radio:checked + .color-box {
-    box-shadow: 0 0 0 1px rgb(30, 52, 213); 
-
+    box-shadow: 0 0 0 1px rgb(30, 52, 213);
 }
 /*immagini statiche*/
 .image {
     position: relative;
     overflow: hidden;
-    padding:0;
+    padding: 0;
 }
 
     .image img {
         width: 100%;
-       height: 396px;
+        height: 396px;
         object-fit: fill;
-        top:-10px;
+        top: -10px;
     }
 
 
-    /*link uomo e donna*/
+/*link uomo e donna*/
 
 
 .hover-text {
     position: absolute;
-    top:47%;
-    left:47%;
-    font-size:50px;
-    font-weight:bold;
-    transform:translate(-50%, -50%);
-    opacity:0;
-    transition:opacity 0.3s ease-in-out;
+    top: 47%;
+    left: 47%;
+    font-size: 50px;
+    font-weight: bold;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
-.image:hover .hover-text{
-    opacity:1;
+.image:hover .hover-text {
+    opacity: 1;
 }
+
+.star-rating {
+    font-size: 1.8em;
+}
+
+.star-rating2 {
+    font-size: 1em;
+}
+
+.btn-custom {
+    padding: 1em 3em;
+    background-color: transparent;
+    border-radius: 50px;
+    transition: transform 0.1s ease-in;
+}
+
+    .btn-custom:hover {
+        transform: scale(1.05, 1.0.5)
+    }
 

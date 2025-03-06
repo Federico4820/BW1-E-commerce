@@ -48,7 +48,7 @@ namespace BW1_E_commerce.Controllers
                                     Price = decimal.Parse(reader["price"].ToString()),
                                     Description = reader["descr"].ToString().Split('/').Select(s => s.Trim()).ToList(),
                                     IdCategory = int.Parse(reader["id_category"].ToString()),
-                                    NameCategory= reader["category_name"].ToString(),
+                                    NameCategory = reader["category_name"].ToString(),
                                     Gender = reader["gender"].ToString(),
                                     ImgURL = reader["img_URL"].ToString()
                                 }
@@ -62,13 +62,11 @@ namespace BW1_E_commerce.Controllers
             return prodList;
         }
 
-
         public async Task<IActionResult> Index()
         {
             ViewBag.Prod = await GetProducts();
             return View();
         }
-
 
         [HttpGet("products/detail/{id:guid}")]
         public async Task<IActionResult> Details(Guid id)
@@ -172,10 +170,10 @@ namespace BW1_E_commerce.Controllers
                 }
             }
             ViewBag.Prod = await GetProducts();
+            ViewBag.Comments = await GetComments(id);
+            ViewBag.Commen = new SingleCommentModel();
             return View(detailProd);
         }
-
-
 
         //4 SELECT: Category, Color, Sizes e Materials
 
@@ -282,6 +280,7 @@ namespace BW1_E_commerce.Controllers
             }
             return materials;
         }
+        //ACTION PER FAR FUNZIONARE IL FORM DI AGGIUNTA PRODOTTO
         public async Task<IActionResult> Add()
         {
             ViewBag.Categories = await GetCategories();
@@ -291,12 +290,10 @@ namespace BW1_E_commerce.Controllers
             var model = new ProductAddModel();
             return View(model);
         }
-
         [HttpPost]
         public async Task<IActionResult> AddSave(ProductAddModel model)
         {
             var nameV = HttpContext.Request.Form["Name"];
-
             try
             {
                 await using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -404,5 +401,159 @@ namespace BW1_E_commerce.Controllers
             }
         }
 
+        //ACTION PER RECUPERARE I COMMENTI DI UN PRODOTTO
+
+        public async Task<CommentListModel> GetComments(Guid id)
+        {
+            var commentList = new CommentListModel()
+            {
+                CommentList = new List<SingleCommentModel>()
+
+            };
+            await using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var query = "SELECT R.id_rating, R.id_prod, R.id_user, R.comment, R.rating, R.CreatedAt, U.email FROM Ratings as R LEFT JOIN Products as P ON P.id_prod= R.id_prod LEFT JOIN Users as U ON R.id_user=U.id_user WHERE P.id_prod = @Id";
+                await using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+                    await using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            commentList.CommentList.Add(
+                                new SingleCommentModel()
+                                {
+                                    IdComment = reader.GetGuid(0),
+                                    IdUser = reader.GetGuid(2),
+                                    Comment = reader.GetString(3),
+                                    Rating = reader.GetInt32(4),
+                                    CreatedAt = reader.GetDateTime(5),
+                                    Email = reader.GetString(6)
+                                }
+                            );
+                        }
+                    }
+                }
+            }
+            commentList.TotalComment = commentList.CommentList.Count;
+            if (commentList.CommentList.Any())
+            {
+                commentList.AvgRating = (decimal)commentList.CommentList.Average(c => c.Rating);
+            }
+            else
+            {
+                commentList.AvgRating = 0;
+            }
+            return commentList;
+        }
+
+
+        //ACTION PER ADD DEL COMMENTO
+        [HttpPost]
+        public async Task<IActionResult> WriteComment(SingleCommentModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Qualcosa è andato storto";
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(errors);
+            }
+            try
+            {
+                await using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+                    Guid idUser = Guid.NewGuid();
+                    var queryUser = "SELECT id_user FROM Users WHERE email= @email";
+                    await using (SqlCommand command = new SqlCommand(queryUser, connection))
+                    {
+                        command.Parameters.AddWithValue("@email", model.Email);
+                        var result = await command.ExecuteScalarAsync() as Guid?;
+                        if (result.HasValue)
+                        {
+                            idUser = result.Value;
+                        }
+                        else
+                        {
+                            var queryInsertUser = @" INSERT INTO Users (id_user, email, user_role) VALUES (@id_user, @email, @user_role)";
+
+                            await using (SqlCommand insertCommand = new SqlCommand(queryInsertUser, connection))
+                            {
+                                insertCommand.Parameters.AddWithValue("@id_user", idUser);
+                                insertCommand.Parameters.AddWithValue("@email", model.Email);
+                                insertCommand.Parameters.AddWithValue("@user_role", "User");
+                                await insertCommand.ExecuteNonQueryAsync();
+                            }
+                        }
+
+                    }
+
+                    var queryComment = @" INSERT INTO Ratings (id_rating, id_prod, id_user, comment, rating, CreatedAt) VALUES (@IdRating, @ProductId, @UserId, @Comment, @Rating, @CreatedAt)";
+                    await using (SqlCommand comment = new SqlCommand(queryComment, connection))
+                    {
+                        comment.Parameters.AddWithValue("@IdRating", Guid.NewGuid());
+                        comment.Parameters.AddWithValue("@ProductId", model.idProd);
+                        comment.Parameters.AddWithValue("@UserId", idUser);
+                        comment.Parameters.AddWithValue("@Comment", model.Comment);
+                        comment.Parameters.AddWithValue("@Rating", model.Rating);
+                        comment.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
+
+                        await comment.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Si è verificato un errore durante l'inserimento dei dati. Riprova più tardi. Errore: {ex.Message}";
+                return RedirectToAction("Add");
+            }
+            return RedirectToAction("Details", new { id = model.idProd });
+        }
+
+
+        //ACTION PER AGGIUNTA AL CARRELLO
+
+        public async Task<IActionResult> AddToCart(Guid idProd, int quantity, string price)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                //se esiste
+                string checkQuery = "SELECT qt FROM Cart WHERE id_order = 1 AND id_prod = @idProd;";
+                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@idOrder", 1);
+                    checkCmd.Parameters.AddWithValue("@idProd", idProd);
+                    var result = checkCmd.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        string updateQuery = "UPDATE Cart SET qt = qt + @quantity WHERE id_order = 1 AND id_prod = @idProd;";
+                        using (SqlCommand updateCmd = new SqlCommand(updateQuery, conn))
+                        {
+                            updateCmd.Parameters.AddWithValue("@idOrder", 1);
+                            updateCmd.Parameters.AddWithValue("@idProd", idProd);
+                            updateCmd.Parameters.AddWithValue("@quantity", quantity);
+                            updateCmd.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        string insertQuery = "INSERT INTO Cart (id_order, id_prod, qt, price) VALUES (1, @idProd, @quantity, @price);";
+                        using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                        {
+                            insertCmd.Parameters.AddWithValue("@idOrder", 1);
+                            insertCmd.Parameters.AddWithValue("@idProd", idProd);
+                            insertCmd.Parameters.AddWithValue("@quantity", quantity);
+                            insertCmd.Parameters.AddWithValue("@price", decimal.Parse(price));
+                            insertCmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+                //se non esiste prima insert di un nuovo ordine e poi insert del prodotto nel carrello
+            }
+            return RedirectToAction("Index");
+        }
     }
 }

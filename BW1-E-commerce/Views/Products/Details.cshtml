@@ -2,6 +2,8 @@
 
 @{
 	var productList = ViewBag.Prod as ProductListModel;
+	var commentList = ViewBag.Comments as CommentListModel;
+	var singleComment = ViewBag.Comment as SingleCommentModel;
 	ViewData["Title"] = "Pagina Dettagli";
 }
 
@@ -14,12 +16,16 @@
 <div class="container-fluid">
 	<nav aria-label="breadcrumb">
 		<ol class="breadcrumb">
-			<li class="breadcrumbCust-item"><a class="nav-link" asp-controller="Products" asp-action="Index">Home</a>
+			<li class="breadcrumbCust-item">
+				<a class="nav-link" asp-controller="Products" asp-action="Index">Home</a>
 			</li>
-			<li class="breadcrumbCust-item"><span aria-hidden="true">›</span><a class="nav-link"
-					asp-controller="Products" asp-action="Index">@Model.Category</a></li>
-			<li class="breadcrumbCust-item active" aria-current="page" id="dataPage"><span
-					aria-hidden="true">›</span>@Model.Name</li>
+			<li class="breadcrumbCust-item">
+				<span aria-hidden="true">›</span><a class="nav-link"
+												asp-controller="Products" asp-action="Index">@Model.Category</a>
+			</li>
+			<li class="breadcrumbCust-item active" aria-current="page" id="dataPage">
+				<span aria-hidden="true">›</span>@Model.Name
+			</li>
 		</ol>
 	</nav>
 	<div class="row">
@@ -52,8 +58,10 @@
 
 						<div class="p-2 discountSpan mb-3 rounded-2">
 							<i class="bi bi-tag"></i>
-							<p>SEI NUOVO QUI? Ricevi il -10% su una selezione di stili! Con il codice:
-								<strong>EPICODE</strong></p>
+							<p>
+								SEI NUOVO QUI? Ricevi il -10% su una selezione di stili! Con il codice:
+								<strong>EPICODE</strong>
+							</p>
 						</div>
 
 						<p class="fw-bold">Colori disponibili: <span class="fw-normal" id="color-name"></span></p>
@@ -69,11 +77,11 @@
 						<div class="d-flex justify-content-between align-items-center mb-2">
 							<p class="fw-bold m-0 p-0">Taglie disponibili</p>
 							<button type="button" class="nav-link text-decoration-underline" data-bs-toggle="modal"
-								data-bs-target="#sizeChart">
+									data-bs-target="#sizeChart">
 								Guida alle taglie
 							</button>
 							<div class="modal fade" id="sizeChart" tabindex="-1" aria-labelledby="exampleModalLabel"
-								aria-hidden="true">
+								 aria-hidden="true">
 								@await Html.PartialAsync("_TaglieDonna")
 							</div>
 						</div>
@@ -87,8 +95,10 @@
 						</select>
 
 						<div class="mb-3 d-flex align-items-center">
-							<button class="btn btn-success btn-lg rounded-0 fw-bolder me-4 flex-grow-1">AGGIUNGI AL
-								CARRELLO</button>
+							<a class="btn btn-success btn-lg rounded-0 fw-bolder me-4 flex-grow-1" asp-controller="Products" asp-action="AddToCart" asp-route-idProd=@Model.Id asp-route-quantity=1 asp-route-price=@Model.Price>
+								AGGIUNGI AL
+								CARRELLO
+							</a>
 							<button class="favorite-detail">
 								<i class="bi bi-heart"></i>
 							</button>
@@ -115,7 +125,7 @@
 							<div class="accordion-item">
 								<h2 class="accordion-header">
 									<button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse"
-										data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+											data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
 										Dettagli del prodotto
 									</button>
 								</h2>
@@ -131,13 +141,14 @@
 							<div class="accordion-item">
 								<h2 class="accordion-header">
 									<button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse"
-										data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapseOne">
+											data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapseOne">
 										Composizione
 									</button>
 								</h2>
 								<div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#Detail">
-									<p class="ms-3">@string.Join(", ", Model.Materials.Select(detail =>
-										$"{detail.Percentage}% {detail.Name}")));</ p >
+									<p class="ms-3">
+										@string.Join(", ", Model.Materials.Select(detail =>
+																						$"{detail.Percentage}% {detail.Name}")));</ p >
 
 								</div>
 							</div>
@@ -156,37 +167,170 @@
 				</div>
 
 			</section>
+
+			<section>
+				<div class="commentSection container-fluid">
+					<div class="row px-5 text-center ">
+						<div class="col">
+							<h2>@commentList.TotalComment Commenti</h2>
+							<p class="p-0 m-0"><small>Overall rating</small></p>
+							@{
+								decimal rating = commentList.AvgRating;
+								int fullStars = (int)rating;
+								bool hasHalfStar = (rating - fullStars) >= 0.5m;
+								int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+							}
+
+							<div class="star-rating mb-3">
+								<span>
+									@fullStars@if (fullStars > 0)
+									{@if (hasHalfStar)
+										{
+											<span>.5</span>
+										}
+										else
+										{
+											<span>.0</span>
+										}}
+								</span>
+								@for (int i = 0; i < fullStars; i++)
+								{
+									<span><i class="bi bi-star-fill"></i></span>
+								}
+								@if (hasHalfStar)
+								{
+									<span><i class="bi bi-star-half"></i></span>
+								}
+								@for (int i = 0; i < emptyStars; i++)
+								{
+									<span><i class="bi bi-star"></i></span>
+								}
+							</div>
+
+							<div>
+								<button class="btn-custom"> Scrivi una recensione!</button>
+							</div>
+
+							<form asp-controller="Products" asp-action="WriteComment" method="post">
+								<input type="hidden" name="IdProd" value="@Model.Id" />
+
+								<div class="form-group">
+									<label for="Email">Email</label>
+									<input name="Email" type="email" class="form-control" required />
+								</div>
+
+								<div class="form-group">
+									<label for="Comment">Commento</label>
+									<textarea name="Comment" class="form-control" required></textarea>
+								</div>
+
+								<div class="form-group">
+									<label for="Rating">Valutazione</label>
+									<input type="number" name="Rating" class="form-control" min="1" max="5" required />
+								</div>
+
+								<button type="submit" class="btn btn-primary">Invia Commento</button>
+							</form>
+
+						</div>
+
+						@if (commentList != null && commentList.TotalComment > 0)
+						{
+							<div class="col-md-8">
+								@{
+									var allComments = commentList.CommentList.ToList();
+								}
+
+								@for (int i = 0; i < allComments.Count; i++)
+								{
+									var comment = allComments[i];
+									<div class="row comment-item @(i >= 6 ? "d-none" : "")">
+										<div class="col-md-2">
+											<p><strong>@comment.Email.Split('@')[0]</strong></p>
+										</div>
+										<div class="col-md-10 text-start">
+											<div class="d-flex justify-content-between">
+												@{
+													decimal rating2 = comment.Rating;
+													int fullStars2 = (int)rating2;
+													bool hasHalfStar2 = (rating2 - fullStars2) >= 0.5m;
+													int emptyStars2 = 5 - fullStars2 - (hasHalfStar2 ? 1 : 0);
+												}
+												<div class="star-rating2 mb-3">
+													@for (int j = 0; j < fullStars; j++)
+													{
+														<span><i class="bi bi-star-fill"></i></span>
+													}
+													@if (hasHalfStar)
+													{
+														<span><i class="bi bi-star-half"></i></span>
+													}
+													@for (int j = 0; j < emptyStars; j++)
+													{
+														<span><i class="bi bi-star"></i></span>
+													}
+												</div>
+												<p>@comment.CreatedAt.ToShortDateString()</p>
+											</div>
+											<p class="text-start">@comment.Comment</p>
+										</div>
+									</div>
+								}
+
+								@if (allComments.Count > 6)
+								{
+									<button id="showMoreButton" class="btn btn-link mt-3">Mostra altro</button>
+								}
+							</div>
+						}
+				</div>
+			</section>
 		</div>
 	</div>
 </div>
 
 <script>
-	document.addEventListener('DOMContentLoaded', function () {
-		const thumbnails = document.querySelectorAll('.thumbnail');
-		const mainImg = document.getElementById('mainImg');
+		document.addEventListener('DOMContentLoaded', function () {
+			const thumbnails = document.querySelectorAll('.thumbnail');
+			const mainImg = document.getElementById('mainImg');
 
-		thumbnails.forEach(thumbnail => {
-			thumbnail.addEventListener('click', function () {
-				const targetImg = this.getAttribute('data-target');
-				mainImg.setAttribute('src', targetImg);
-				thumbnails.forEach(t => t.style.borderColor = 'transparent');
-				this.style.borderColor = '#c0c0c0';
+			thumbnails.forEach(thumbnail => {
+				thumbnail.addEventListener('click', function () {
+					const targetImg = this.getAttribute('data-target');
+					mainImg.setAttribute('src', targetImg);
+					thumbnails.forEach(t => t.style.borderColor = 'transparent');
+					this.style.borderColor = '#c0c0c0';
+				});
+			});
+		});
+
+		document.addEventListener('DOMContentLoaded', function () {
+		const colorOptions = document.querySelectorAll('.color-option');
+		const colorName = document.getElementById('color-name');
+
+		colorOptions.forEach(option => {
+			option.addEventListener('mouseover', function () {
+				colorName.innerText = this.getAttribute('data-color');
+			});
+
+			option.addEventListener('mouseout', function () {
+				colorName.textContent = '';
 			});
 		});
 	});
 
-	document.addEventListener('DOMContentLoaded', function () {
-    const colorOptions = document.querySelectorAll('.color-option');
-    const colorName = document.getElementById('color-name');
+			document.getElementById('showMoreButton')?.addEventListener('click', function () {
+		// Trova tutti i commenti nascosti
+		const hiddenComments = document.querySelectorAll('.comment-item.d-none');
 
-    colorOptions.forEach(option => {
-        option.addEventListener('mouseover', function () {
-            colorName.innerText = this.getAttribute('data-color');
-        });
+		// Mostra i prossimi 6 commenti nascosti
+		for (let i = 0; i < 6 && i < hiddenComments.length; i++) {
+			hiddenComments[i].classList.remove('d-none');
+		}
 
-        option.addEventListener('mouseout', function () {
-            colorName.textContent = '';
-        });
-    });
-});
+		// Nascondi il pulsante se non ci sono più commenti da mostrare
+		if (document.querySelectorAll('.comment-item.d-none').length === 0) {
+			this.style.display = 'none';
+		}
+	});
 </script>
