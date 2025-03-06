@@ -326,27 +326,27 @@ namespace BW1_E_commerce.Controllers
             return View(cart);
         }
 
-
-
-        public IActionResult AddToCart(int idOrder, Guid idProd, int quantity, decimal price)
+        // Da Controllare il funzionamento ADDCART per l'aggiunto di un prodotto al carrello
+        // ------------------------------
+        public IActionResult AddToCart(Guid idProd, int quantity, decimal price)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
 
-                string checkQuery = "SELECT qt FROM Cart WHERE id_order = @idOrder AND id_prod = @idProd;";
+                string checkQuery = "SELECT qt FROM Cart WHERE id_order = 1 AND id_prod = @idProd;";
                 using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
                 {
-                    checkCmd.Parameters.AddWithValue("@idOrder", idOrder);
+                    checkCmd.Parameters.AddWithValue("@idOrder", 1);
                     checkCmd.Parameters.AddWithValue("@idProd", idProd);
                     var result = checkCmd.ExecuteScalar();
 
                     if (result != null)
                     {
-                        string updateQuery = "UPDATE Cart SET qt = qt + @quantity WHERE id_order = @idOrder AND id_prod = @idProd;";
+                        string updateQuery = "UPDATE Cart SET qt = qt + @quantity WHERE id_order = 1 AND id_prod = @idProd;";
                         using (SqlCommand updateCmd = new SqlCommand(updateQuery, conn))
                         {
-                            updateCmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            updateCmd.Parameters.AddWithValue("@idOrder", 1);
                             updateCmd.Parameters.AddWithValue("@idProd", idProd);
                             updateCmd.Parameters.AddWithValue("@quantity", quantity);
                             updateCmd.ExecuteNonQuery();
@@ -354,10 +354,10 @@ namespace BW1_E_commerce.Controllers
                     }
                     else
                     {
-                        string insertQuery = "INSERT INTO Cart (id_order, id_prod, qt, price) VALUES (@idOrder, @idProd, @quantity, @price);";
+                        string insertQuery = "INSERT INTO Cart (id_order, id_prod, qt, price) VALUES (1, @idProd, @quantity, @price);";
                         using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
                         {
-                            insertCmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            insertCmd.Parameters.AddWithValue("@idOrder", 1);
                             insertCmd.Parameters.AddWithValue("@idProd", idProd);
                             insertCmd.Parameters.AddWithValue("@quantity", quantity);
                             insertCmd.Parameters.AddWithValue("@price", price);
@@ -369,6 +369,7 @@ namespace BW1_E_commerce.Controllers
 
             return RedirectToAction("Cart");
         }
+        // -----------------------
 
         public IActionResult RemoveFromCart(Guid idProd)
         {
@@ -404,8 +405,10 @@ namespace BW1_E_commerce.Controllers
             return RedirectToAction("Cart", new { idOrder });
         }
 
-        public IActionResult Checkout(int idOrder)
+        public IActionResult Checkout()
         {
+            
+
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -413,26 +416,37 @@ namespace BW1_E_commerce.Controllers
                 {
                     try
                     {
-                        string insertOrder = @"
+                        string updateOrderQuery = @"
                         DECLARE @total DECIMAL(10,2) = (SELECT COALESCE(SUM(qt * price), 0) FROM Cart WHERE id_order = 1);
                         UPDATE Orders SET total = @total WHERE id_order = 1;";
 
-                        using (SqlCommand cmd = new SqlCommand(insertOrder, conn, trans))
+                        using (SqlCommand cmd = new SqlCommand(updateOrderQuery, conn, trans))
                         {
-                            cmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            cmd.Parameters.AddWithValue("@idOrder", 1);
                             cmd.ExecuteNonQuery();
                         }
-
-                        trans.Commit();
+                        
+                        string clearCartQuery = "DELETE FROM Cart WHERE id_order = 1;";
+                        using (SqlCommand cmd = new SqlCommand(clearCartQuery, conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@idOrder", 1);
+                            cmd.ExecuteNonQuery();
+                        }
+                        trans.Commit(); 
                         return RedirectToAction("OrderSuccess");
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         trans.Rollback();
-                        return RedirectToAction("OrderFailed");
+                        return StatusCode(500, "Errore durante il checkout: " + ex.Message);
                     }
                 }
             }
+        }
+
+        public IActionResult OrderSuccess()
+        {
+            return View();
         }
     }
 }
