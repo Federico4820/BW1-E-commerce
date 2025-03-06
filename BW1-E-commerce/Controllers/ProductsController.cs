@@ -281,7 +281,8 @@ namespace BW1_E_commerce.Controllers
             return materials;
         }
         //ACTION PER FAR FUNZIONARE IL FORM DI AGGIUNTA PRODOTTO
-        public async Task<IActionResult> Add()
+
+        public async Task<IActionResult> AddDelete()
         {
             ViewBag.Categories = await GetCategories();
             ViewBag.Color = await GetColor();
@@ -489,17 +490,40 @@ namespace BW1_E_commerce.Controllers
 
                     }
 
-                    var queryComment = @" INSERT INTO Ratings (id_rating, id_prod, id_user, comment, rating, CreatedAt) VALUES (@IdRating, @ProductId, @UserId, @Comment, @Rating, @CreatedAt)";
-                    await using (SqlCommand comment = new SqlCommand(queryComment, connection))
+                    var queryUser2 = "SELECT id_user FROM Ratings WHERE id_user= @id_user AND id_prod = @id_prod";
+                    await using (SqlCommand command = new SqlCommand(queryUser2, connection))
                     {
-                        comment.Parameters.AddWithValue("@IdRating", Guid.NewGuid());
-                        comment.Parameters.AddWithValue("@ProductId", model.idProd);
-                        comment.Parameters.AddWithValue("@UserId", idUser);
-                        comment.Parameters.AddWithValue("@Comment", model.Comment);
-                        comment.Parameters.AddWithValue("@Rating", model.Rating);
-                        comment.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
+                        command.Parameters.AddWithValue("@id_user", idUser);
+                        command.Parameters.AddWithValue("@id_prod", model.idProd);
+                        var result = await command.ExecuteScalarAsync() as Guid?;
+                        if (result.HasValue)
+                        {
+                            var querUpdate = "UPDATE Ratings SET comment = @Comment, rating = @Rating, CreatedAt = @CreatedAt WHERE id_user = @UserId AND id_prod = @ProductId;";
+                            await using (SqlCommand comment = new SqlCommand(querUpdate, connection))
+                            {
+                                comment.Parameters.AddWithValue("@UserId", idUser);
+                                comment.Parameters.AddWithValue("@ProductId", model.idProd);
+                                comment.Parameters.AddWithValue("@Comment", model.Comment);
+                                comment.Parameters.AddWithValue("@Rating", model.Rating);
+                                comment.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
+                                await comment.ExecuteNonQueryAsync();
+                            }
+                        }
+                        else
+                        {
+                            var queryComment = @" INSERT INTO Ratings (id_rating, id_prod, id_user, comment, rating, CreatedAt) VALUES (@IdRating, @ProductId, @UserId, @Comment, @Rating, @CreatedAt)";
+                            await using (SqlCommand comment = new SqlCommand(queryComment, connection))
+                            {
+                                comment.Parameters.AddWithValue("@IdRating", Guid.NewGuid());
+                                comment.Parameters.AddWithValue("@ProductId", model.idProd);
+                                comment.Parameters.AddWithValue("@UserId", idUser);
+                                comment.Parameters.AddWithValue("@Comment", model.Comment);
+                                comment.Parameters.AddWithValue("@Rating", model.Rating);
+                                comment.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
 
-                        await comment.ExecuteNonQueryAsync();
+                                await comment.ExecuteNonQueryAsync();
+                            }
+                        }
                     }
                 }
             }
@@ -516,44 +540,115 @@ namespace BW1_E_commerce.Controllers
 
         public async Task<IActionResult> AddToCart(Guid idProd, int quantity, string price)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            await using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                conn.Open();
-                //se esiste
-                string checkQuery = "SELECT qt FROM Cart WHERE id_order = 1 AND id_prod = @idProd;";
-                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
-                {
-                    checkCmd.Parameters.AddWithValue("@idOrder", 1);
-                    checkCmd.Parameters.AddWithValue("@idProd", idProd);
-                    var result = checkCmd.ExecuteScalar();
+                await conn.OpenAsync();
 
-                    if (result != null)
+                using (var transaction = await conn.BeginTransactionAsync())
+                {
+                    var idOrder = Guid.NewGuid();
+                    string checkOrderQuery = "SELECT COUNT(*) FROM Orders";
+                    await using (SqlCommand checkOrderCmd = new SqlCommand(checkOrderQuery, conn, (SqlTransaction)transaction))
                     {
-                        string updateQuery = "UPDATE Cart SET qt = qt + @quantity WHERE id_order = 1 AND id_prod = @idProd;";
-                        using (SqlCommand updateCmd = new SqlCommand(updateQuery, conn))
+                        int orderExists = (int)checkOrderCmd.ExecuteScalar();
+
+                        if (orderExists == 0)
                         {
-                            updateCmd.Parameters.AddWithValue("@idOrder", 1);
-                            updateCmd.Parameters.AddWithValue("@idProd", idProd);
-                            updateCmd.Parameters.AddWithValue("@quantity", quantity);
-                            updateCmd.ExecuteNonQuery();
+                            try
+                            {
+                                string createOrderQuery = "INSERT INTO Orders (id_order, total) VALUES (@id_order, 1);";
+                                await using (SqlCommand createOrderCmd = new SqlCommand(createOrderQuery, conn, (SqlTransaction)transaction))
+                                {
+                                    createOrderCmd.Parameters.AddWithValue("@id_order", idOrder);
+                                    await createOrderCmd.ExecuteNonQueryAsync();
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                TempData["Error"] = $"Si è verificato un errore durante l'inserimento dei dati. Riprova più tardi. Errore: {ex.Message}";
+                                return RedirectToAction("Add");
+                            }
+
                         }
                     }
-                    else
+                    string checkCartQuery = "SELECT qt FROM Cart WHERE id_order = @id_order AND id_prod = @idProd;";
+                    await using (SqlCommand checkCartCmd = new SqlCommand(checkCartQuery, conn, (SqlTransaction)transaction))
                     {
-                        string insertQuery = "INSERT INTO Cart (id_order, id_prod, qt, price) VALUES (1, @idProd, @quantity, @price);";
-                        using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                        checkCartCmd.Parameters.AddWithValue("@idProd", idProd);
+                        checkCartCmd.Parameters.AddWithValue("@id_order", idOrder);
+                        var result = checkCartCmd.ExecuteScalar();
+
+                        if (result != null)
                         {
-                            insertCmd.Parameters.AddWithValue("@idOrder", 1);
-                            insertCmd.Parameters.AddWithValue("@idProd", idProd);
-                            insertCmd.Parameters.AddWithValue("@quantity", quantity);
-                            insertCmd.Parameters.AddWithValue("@price", decimal.Parse(price));
-                            insertCmd.ExecuteNonQuery();
+                            string updateCartQuery = "UPDATE Cart SET qt = qt + @quantity WHERE id_order = @id_order AND id_prod = @idProd;";
+                            await using (SqlCommand updateCartCmd = new SqlCommand(updateCartQuery, conn, (SqlTransaction)transaction))
+                            {
+                                updateCartCmd.Parameters.AddWithValue("@id_order", idOrder);
+                                updateCartCmd.Parameters.AddWithValue("@idProd", idProd);
+                                updateCartCmd.Parameters.AddWithValue("@quantity", quantity);
+                                await updateCartCmd.ExecuteNonQueryAsync();
+                            }
+                        }
+                        else
+                        {
+                            string insertCartQuery = "INSERT INTO Cart (id_order, id_prod, qt, price) VALUES (@id_order, @idProd, @quantity, @price);";
+                            await using (SqlCommand insertCartCmd = new SqlCommand(insertCartQuery, conn, (SqlTransaction)transaction))
+                            {
+                                insertCartCmd.Parameters.AddWithValue("@id_order", idOrder);
+                                insertCartCmd.Parameters.AddWithValue("@idProd", idProd);
+                                insertCartCmd.Parameters.AddWithValue("@quantity", quantity);
+                                insertCartCmd.Parameters.AddWithValue("@price", decimal.Parse(price));
+                                await insertCartCmd.ExecuteNonQueryAsync();
+                            }
                         }
                     }
+                    await transaction.CommitAsync();
+                    return RedirectToAction("Index");
+
                 }
-                //se non esiste prima insert di un nuovo ordine e poi insert del prodotto nel carrello
             }
-            return RedirectToAction("Index");
+        }
+
+        //ACTION DI FILTRO!
+
+        public async Task<ProductListModel> GetProductFiltered()
+        {
+            var prodList = new ProductListModel()
+            {
+                ProductList = new List<ProductBaseModel>()
+            };
+
+            await using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var query = @" WITH ImageSelection AS (SELECT PC.id_prod, PCI.img_URL, ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn FROM ProdColorImages PCI JOIN ProdColor PC ON PCI.id_prodColor = PC.id_prodColor) SELECT P.id_prod, P.nome, P.brand, P.price, P.descr, P.id_category, C.nome as category_name, P.gender, ISel.img_URL FROM Products P LEFT JOIN Category as C ON P.id_category = C.id_category LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1;";
+                await using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    await using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            prodList.ProductList.Add(
+                                new ProductBaseModel()
+                                {
+                                    IdProd = reader.GetGuid(0),
+                                    Name = reader["nome"].ToString(),
+                                    Brand = reader["brand"].ToString(),
+                                    Price = decimal.Parse(reader["price"].ToString()),
+                                    Description = reader["descr"].ToString().Split('/').Select(s => s.Trim()).ToList(),
+                                    IdCategory = int.Parse(reader["id_category"].ToString()),
+                                    NameCategory = reader["category_name"].ToString(),
+                                    Gender = reader["gender"].ToString(),
+                                    ImgURL = reader["img_URL"].ToString()
+                                }
+                            );
+                        }
+                    }
+
+                }
+
+            }
+            return prodList;
         }
     }
 }

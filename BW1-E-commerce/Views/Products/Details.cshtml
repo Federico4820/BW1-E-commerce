@@ -208,29 +208,31 @@
 							</div>
 
 							<div>
-								<button class="btn-custom"> Scrivi una recensione!</button>
+								<button class="btn-custom" id="scriviForm"> Scrivi una recensione!</button>
 							</div>
+							<div style="display: none" id="recensioneForm">
+								<form asp-controller="Products" asp-action="WriteComment" method="post"  >
+									<input type="hidden" name="IdProd" value="@Model.Id" />
 
-							<form asp-controller="Products" asp-action="WriteComment" method="post">
-								<input type="hidden" name="IdProd" value="@Model.Id" />
+									<div class="form-group">
+										<label for="Email">Email</label>
+										<input name="Email" type="email" class="form-control" required />
+									</div>
 
-								<div class="form-group">
-									<label for="Email">Email</label>
-									<input name="Email" type="email" class="form-control" required />
-								</div>
+									<div class="form-group">
+										<label for="Comment">Commento</label>
+										<textarea name="Comment" class="form-control" required></textarea>
+									</div>
 
-								<div class="form-group">
-									<label for="Comment">Commento</label>
-									<textarea name="Comment" class="form-control" required></textarea>
-								</div>
+									<div class="form-group">
+										<label for="Rating">Valutazione</label>
+										<input type="number" name="Rating" class="form-control" min="1" max="5" required />
+									</div>
 
-								<div class="form-group">
-									<label for="Rating">Valutazione</label>
-									<input type="number" name="Rating" class="form-control" min="1" max="5" required />
-								</div>
-
-								<button type="submit" class="btn btn-primary">Invia Commento</button>
-							</form>
+									<button type="submit" class="btn btn-primary">Invia Commento</button>
+								</form>
+							</div>
+							
 
 						</div>
 
@@ -257,15 +259,15 @@
 													int emptyStars2 = 5 - fullStars2 - (hasHalfStar2 ? 1 : 0);
 												}
 												<div class="star-rating2 mb-3">
-													@for (int j = 0; j < fullStars; j++)
+													@for (int j = 0; j < fullStars2; j++)
 													{
 														<span><i class="bi bi-star-fill"></i></span>
 													}
-													@if (hasHalfStar)
+													@if (hasHalfStar2)
 													{
 														<span><i class="bi bi-star-half"></i></span>
 													}
-													@for (int j = 0; j < emptyStars; j++)
+													@for (int j = 0; j < emptyStars2; j++)
 													{
 														<span><i class="bi bi-star"></i></span>
 													}
@@ -320,17 +322,23 @@
 	});
 
 			document.getElementById('showMoreButton')?.addEventListener('click', function () {
-		// Trova tutti i commenti nascosti
 		const hiddenComments = document.querySelectorAll('.comment-item.d-none');
-
-		// Mostra i prossimi 6 commenti nascosti
 		for (let i = 0; i < 6 && i < hiddenComments.length; i++) {
 			hiddenComments[i].classList.remove('d-none');
 		}
-
-		// Nascondi il pulsante se non ci sono più commenti da mostrare
 		if (document.querySelectorAll('.comment-item.d-none').length === 0) {
 			this.style.display = 'none';
 		}
+
 	});
+
+
+	document.getElementById('scriviForm').addEventListener('click', function () {
+			const form = document.getElementById('recensioneForm');
+			if(form.style.display ==='none' || form.style.display === ''){
+				form.style.display = 'block'
+			} else {
+				form.style.display = 'none'
+			}
+		})
 </script>

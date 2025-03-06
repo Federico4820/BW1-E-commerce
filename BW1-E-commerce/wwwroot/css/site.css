@@ -661,6 +661,6 @@ fieldset {
 }
 
     .btn-custom:hover {
-        transform: scale(1.05, 1.0.5)
+        transform: scale(1.05, 1.05);
     }
 
