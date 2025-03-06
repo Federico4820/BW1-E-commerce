@@ -14,9 +14,12 @@
 <div class="container-fluid">
 	<nav aria-label="breadcrumb">
 		<ol class="breadcrumb">
-			<li class="breadcrumbCust-item"><a class="nav-link" asp-controller="Products" asp-action="Index">Home</a></li>
-			<li class="breadcrumbCust-item"><span aria-hidden="true">›</span><a class="nav-link" asp-controller="Products" asp-action="Index">@Model.Category</a></li>
-			<li class="breadcrumbCust-item active" aria-current="page" id="dataPage"><span aria-hidden="true">›</span>@Model.Name</li>
+			<li class="breadcrumbCust-item"><a class="nav-link" asp-controller="Products" asp-action="Index">Home</a>
+			</li>
+			<li class="breadcrumbCust-item"><span aria-hidden="true">›</span><a class="nav-link"
+					asp-controller="Products" asp-action="Index">@Model.Category</a></li>
+			<li class="breadcrumbCust-item active" aria-current="page" id="dataPage"><span
+					aria-hidden="true">›</span>@Model.Name</li>
 		</ol>
 	</nav>
 	<div class="row">
@@ -49,27 +52,33 @@
 
 						<div class="p-2 discountSpan mb-3 rounded-2">
 							<i class="bi bi-tag"></i>
-							<p>SEI NUOVO QUI? Ricevi il -10% su una selezione di stili! Con il codice: <strong>EPICODE</strong></p>
+							<p>SEI NUOVO QUI? Ricevi il -10% su una selezione di stili! Con il codice:
+								<strong>EPICODE</strong></p>
 						</div>
 
-						<p class="fw-bold">Colori disponibili</p>
+						<p class="fw-bold">Colori disponibili: <span class="fw-normal" id="color-name"></span></p>
 						<div class="colorsContainer mb-3">
 							@foreach (var color in Model.Colors)
 							{
-								<div class="@color.Name colors"></div>
+								<label class="color-option" data-color="@color.Name">
+									<input type="radio" name="color" value="@color.IdColor" class="color-radio" />
+									<span class="color-box @color.Name"></span>
+								</label>
 							}
 						</div>
-						<div class="d-flex justify-content-between">
-							<p class="fw-bold">Taglie disponibili</p>
-							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sizeChart">
+						<div class="d-flex justify-content-between align-items-center mb-2">
+							<p class="fw-bold m-0 p-0">Taglie disponibili</p>
+							<button type="button" class="nav-link text-decoration-underline" data-bs-toggle="modal"
+								data-bs-target="#sizeChart">
 								Guida alle taglie
 							</button>
-							<div class="modal fade" id="sizeChart" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+							<div class="modal fade" id="sizeChart" tabindex="-1" aria-labelledby="exampleModalLabel"
+								aria-hidden="true">
 								@await Html.PartialAsync("_TaglieDonna")
 							</div>
 						</div>
 
-						<select class="mb-2">
+						<select class="mb-4 customSelect">
 							<option selected disabled>Seleziona un'opzione</option>
 							@foreach (var item in Model.Sizes)
 							{
@@ -78,7 +87,8 @@
 						</select>
 
 						<div class="mb-3 d-flex align-items-center">
-							<button class="btn btn-success btn-lg rounded-0 fw-bolder me-4 flex-grow-1">AGGIUNGI AL CARRELLO</button>
+							<button class="btn btn-success btn-lg rounded-0 fw-bolder me-4 flex-grow-1">AGGIUNGI AL
+								CARRELLO</button>
 							<button class="favorite-detail">
 								<i class="bi bi-heart"></i>
 							</button>
@@ -95,14 +105,17 @@
 								<p class="p-0 m-0">Resi gratuiti</p>
 							</div>
 							<div class="">
-								<a><p class="m-auto w-75">Guarda le nostre politiche sulle spedizione e dui resi</p></a>
+								<a>
+									<p class="m-auto w-75">Guarda le nostre politiche sulle spedizione e dui resi</p>
+								</a>
 							</div>
 
 						</div>
 						<div class="accordion">
 							<div class="accordion-item">
 								<h2 class="accordion-header">
-									<button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+									<button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse"
+										data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
 										Dettagli del prodotto
 									</button>
 								</h2>
@@ -117,12 +130,14 @@
 							</div>
 							<div class="accordion-item">
 								<h2 class="accordion-header">
-									<button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapseOne">
+									<button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse"
+										data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapseOne">
 										Composizione
 									</button>
 								</h2>
 								<div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#Detail">
-									<p class="ms-3">@string.Join(", ", Model.Materials.Select(detail => $"{detail.Percentage}% {detail.Name}")));</p>
+									<p class="ms-3">@string.Join(", ", Model.Materials.Select(detail =>
+										$"{detail.Percentage}% {detail.Name}")));</ p >
 
 								</div>
 							</div>
@@ -159,4 +174,19 @@
 			});
 		});
 	});
+
+	document.addEventListener('DOMContentLoaded', function () {
+    const colorOptions = document.querySelectorAll('.color-option');
+    const colorName = document.getElementById('color-name');
+
+    colorOptions.forEach(option => {
+        option.addEventListener('mouseover', function () {
+            colorName.innerText = this.getAttribute('data-color');
+        });
+
+        option.addEventListener('mouseout', function () {
+            colorName.textContent = '';
+        });
+    });
+});
 </script>

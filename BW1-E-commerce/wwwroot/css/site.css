@@ -358,19 +358,13 @@ fieldset {
     gap: 1em
 }
 
-.colors {
-    width: 2em;
-    height: 2em;
-    border-radius: 50%;
-}
-
 .Black {
     background-color: #000000;
 }
 
 .White {
     background-color: #FFFFFF;
-    border: 1px solid black
+    border: 1px solid black !important;
 }
 
 .Pink {
@@ -551,4 +545,37 @@ fieldset {
 }
 .letter-spacing1{
     letter-spacing: 0.1em;
+}
+
+.btn-link{
+    color: #000000;
+}
+
+.customSelect{
+    width: 100%;
+    padding: 0.5em;
+}
+
+.color-option {
+    position: relative;
+    cursor: pointer;
+}
+
+.color-radio {
+    display: none;
+}
+
+.color-box {
+    display: inline-block;
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    border: 2px solid transparent; 
+    
+    transition: border-color 0.3s ease;
+}
+
+.color-radio:checked + .color-box {
+    box-shadow: 0 0 0 1px rgb(30, 52, 213); 
+
 }
