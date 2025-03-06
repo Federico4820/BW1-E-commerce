@@ -208,28 +208,31 @@
 							</div>
 
 							<div>
-								<button class="btn-custom" id="scriviForm"> Scrivi una recensione!</button>
+								<button class="btn-custom mb-3" id="scriviForm"> Scrivi una recensione!</button>
 							</div>
 							<div style="display: none" id="recensioneForm">
-								<form asp-controller="Products" asp-action="WriteComment" method="post"  >
+								<form asp-controller="Products" asp-action="WriteComment" method="post" class="d-flex flex-column" >
 									<input type="hidden" name="IdProd" value="@Model.Id" />
+
+		
+									<div class="stars">
+										<input type="radio" id="star5" name="Rating" value="5"><label for="star5">★</label>
+										<input type="radio" id="star4" name="Rating" value="4"><label for="star4">★</label>
+										<input type="radio" id="star3" name="Rating" value="3"><label for="star3">★</label>
+										<input type="radio" id="star2" name="Rating" value="2"><label for="star2">★</label>
+										<input type="radio" id="star1" name="Rating" value="1"><label for="star1">★</label>
+									</div>
 
 									<div class="form-group">
 										<label for="Email">Email</label>
 										<input name="Email" type="email" class="form-control" required />
 									</div>
 
-									<div class="form-group">
+									<div class="form-group mb-3">
 										<label for="Comment">Commento</label>
 										<textarea name="Comment" class="form-control" required></textarea>
 									</div>
-
-									<div class="form-group">
-										<label for="Rating">Valutazione</label>
-										<input type="number" name="Rating" class="form-control" min="1" max="5" required />
-									</div>
-
-									<button type="submit" class="btn btn-primary">Invia Commento</button>
+									<button type="submit" class="btn-review ms-auto">Invia Commento</button>
 								</form>
 							</div>
 							

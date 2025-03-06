@@ -664,3 +664,32 @@ fieldset {
         transform: scale(1.05, 1.05);
     }
 
+
+.stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+}
+
+    .stars input {
+        display: none;
+    }
+
+    .stars label {
+        font-size: 30px;
+        color: #c0c0c0;
+        cursor: pointer;
+    }
+
+        .stars input:checked ~ label,
+        .stars label:hover,
+        .stars label:hover ~ label {
+            color: black;
+        }
+
+.btn-review {
+    padding: 0.5em;
+    background-color: transparent;
+    border: 1px solid #8b8b8b;
+    transition: transform 0.1s ease-in;
+}

@@ -62,9 +62,14 @@ namespace BW1_E_commerce.Controllers
             return prodList;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? filter)
         {
             ViewBag.Prod = await GetProducts();
+            ViewBag.Categories = await GetCategories();
+            if (filter.HasValue)
+            {
+                ViewBag.Filtered = await GetProductFiltered(filter.Value);
+            }
             return View();
         }
 
@@ -611,7 +616,7 @@ namespace BW1_E_commerce.Controllers
 
         //ACTION DI FILTRO!
 
-        public async Task<ProductListModel> GetProductFiltered()
+        public async Task<ProductListModel> GetProductFiltered(int filter)
         {
             var prodList = new ProductListModel()
             {
@@ -621,9 +626,10 @@ namespace BW1_E_commerce.Controllers
             await using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                var query = @" WITH ImageSelection AS (SELECT PC.id_prod, PCI.img_URL, ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn FROM ProdColorImages PCI JOIN ProdColor PC ON PCI.id_prodColor = PC.id_prodColor) SELECT P.id_prod, P.nome, P.brand, P.price, P.descr, P.id_category, C.nome as category_name, P.gender, ISel.img_URL FROM Products P LEFT JOIN Category as C ON P.id_category = C.id_category LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1;";
+                var query = @" WITH ImageSelection AS (SELECT PC.id_prod, PCI.img_URL, ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn FROM ProdColorImages PCI JOIN ProdColor PC ON PCI.id_prodColor = PC.id_prodColor) SELECT P.id_prod, P.nome, P.brand, P.price, P.descr, P.id_category, C.nome as category_name, P.gender, ISel.img_URL FROM Products P LEFT JOIN Category as C ON P.id_category = C.id_category LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1 WHERE C.id_category = @filter;";
                 await using (SqlCommand command = new SqlCommand(query, connection))
                 {
+                    command.Parameters.AddWithValue("@filter", filter);
                     await using (SqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
@@ -650,5 +656,8 @@ namespace BW1_E_commerce.Controllers
             }
             return prodList;
         }
+
+
+
     }
 }
