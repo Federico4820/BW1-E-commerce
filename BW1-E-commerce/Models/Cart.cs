@@ -2,7 +2,7 @@
 {
     public class Cart
     {
-        public int IdOrder { get; set; }
+        public Guid IdOrder { get; set; }
         public decimal Total {  get; set; }
     }
 }

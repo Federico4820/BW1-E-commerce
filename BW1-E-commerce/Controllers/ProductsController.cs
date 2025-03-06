@@ -291,85 +291,54 @@ namespace BW1_E_commerce.Controllers
         }
 
         // CARRELLO
-        public IActionResult Cart(int idOrder)
+        private async Task<CartViewModel> GetCartItems(Guid idOrder)
         {
-            Console.WriteLine($"idOrder ricevuto: {idOrder}");
             CartViewModel cart = new CartViewModel { IdOrder = idOrder };
-            
-                using (SqlConnection conn = new SqlConnection(_connectionString))
-                {
-                    conn.Open();
-                    string query = @"
-                    SELECT c.id_prod, p.nome, c.qt, c.price 
-                    FROM Cart c
-                    JOIN Products p ON c.id_prod = p.id_prod
-                    WHERE c.id_order = 1;";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@idOrder", idOrder);
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                cart.Items.Add(new CartItem
-                                {
-                                    IdProd = reader.GetGuid(0),
-                                    ProductName = reader.GetString(1),
-                                    Quantity = reader.GetInt32(2),
-                                    Price = reader.GetDecimal(3)
-                                });
-                            }
-                        }
-                    }
-                }
-            return View(cart);
-        }
+            var checkGuid = Guid.NewGuid();
 
-        // Da Controllare il funzionamento ADDCART per l'aggiunto di un prodotto al carrello
-        // ------------------------------
-        public IActionResult AddToCart(Guid idProd, int quantity, decimal price)
-        {
+
+
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                await conn.OpenAsync();
+                string query = @"
+            SELECT c.id_prod, p.nome, c.qt, c.price 
+            FROM Cart c
+            JOIN Products p ON c.id_prod = p.id_prod
+            WHERE c.id_order = @idOrder;";
 
-                string checkQuery = "SELECT qt FROM Cart WHERE id_order = 1 AND id_prod = @idProd;";
-                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    checkCmd.Parameters.AddWithValue("@idOrder", 1);
-                    checkCmd.Parameters.AddWithValue("@idProd", idProd);
-                    var result = checkCmd.ExecuteScalar();
+                    cmd.Parameters.AddWithValue("@idOrder", idOrder);
 
-                    if (result != null)
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
-                        string updateQuery = "UPDATE Cart SET qt = qt + @quantity WHERE id_order = 1 AND id_prod = @idProd;";
-                        using (SqlCommand updateCmd = new SqlCommand(updateQuery, conn))
+                        while (await reader.ReadAsync())
                         {
-                            updateCmd.Parameters.AddWithValue("@idOrder", 1);
-                            updateCmd.Parameters.AddWithValue("@idProd", idProd);
-                            updateCmd.Parameters.AddWithValue("@quantity", quantity);
-                            updateCmd.ExecuteNonQuery();
-                        }
-                    }
-                    else
-                    {
-                        string insertQuery = "INSERT INTO Cart (id_order, id_prod, qt, price) VALUES (1, @idProd, @quantity, @price);";
-                        using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
-                        {
-                            insertCmd.Parameters.AddWithValue("@idOrder", 1);
-                            insertCmd.Parameters.AddWithValue("@idProd", idProd);
-                            insertCmd.Parameters.AddWithValue("@quantity", quantity);
-                            insertCmd.Parameters.AddWithValue("@price", price);
-                            insertCmd.ExecuteNonQuery();
+                            cart.Items.Add(new CartItem
+                            {
+                                IdProd = reader.GetGuid(0),
+                                ProductName = reader.GetString(1),
+                                Quantity = reader.GetInt32(2),
+                                Price = reader.GetDecimal(3)
+                            });
                         }
                     }
                 }
             }
 
-            return RedirectToAction("Cart");
+            return cart;
         }
-        // -----------------------
+
+        public async Task<IActionResult> Cart(Guid idOrder)
+        {
+            Console.WriteLine($"idOrder ricevuto: {idOrder}");
+
+            CartViewModel cart = await GetCartItems(idOrder);
+
+            return View(cart);
+        }
 
         public IActionResult RemoveFromCart(Guid idProd)
         {
@@ -388,12 +357,12 @@ namespace BW1_E_commerce.Controllers
             return RedirectToAction("Cart");
         }
 
-        public IActionResult ClearCart(int idOrder)
+        public IActionResult ClearCart(Guid idOrder)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-                string query = "DELETE FROM Cart WHERE id_order = 1;";
+                string query = "DELETE FROM Cart WHERE id_order = @idOrder;";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -405,7 +374,7 @@ namespace BW1_E_commerce.Controllers
             return RedirectToAction("Cart", new { idOrder });
         }
 
-        public IActionResult Checkout()
+        public IActionResult Checkout(Guid idOrder)
         {
             
 
@@ -417,19 +386,19 @@ namespace BW1_E_commerce.Controllers
                     try
                     {
                         string updateOrderQuery = @"
-                        DECLARE @total DECIMAL(10,2) = (SELECT COALESCE(SUM(qt * price), 0) FROM Cart WHERE id_order = 1);
-                        UPDATE Orders SET total = @total WHERE id_order = 1;";
+                        DECLARE @total DECIMAL(10,2) = (SELECT COALESCE(SUM(qt * price), 0) FROM Cart WHERE id_order = @idOrder);
+                        UPDATE Orders SET total = @total WHERE id_order = @idOrder;";
 
                         using (SqlCommand cmd = new SqlCommand(updateOrderQuery, conn, trans))
                         {
-                            cmd.Parameters.AddWithValue("@idOrder", 1);
+                            cmd.Parameters.AddWithValue("@idOrder", idOrder);
                             cmd.ExecuteNonQuery();
                         }
                         
-                        string clearCartQuery = "DELETE FROM Cart WHERE id_order = 1;";
+                        string clearCartQuery = "DELETE FROM Cart WHERE id_order = @idOrder;";
                         using (SqlCommand cmd = new SqlCommand(clearCartQuery, conn, trans))
                         {
-                            cmd.Parameters.AddWithValue("@idOrder", 1);
+                            cmd.Parameters.AddWithValue("@idOrder", idOrder);
                             cmd.ExecuteNonQuery();
                         }
                         trans.Commit(); 
