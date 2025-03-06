@@ -290,5 +290,149 @@ namespace BW1_E_commerce.Controllers
             }
         }
 
+        // CARRELLO
+        public IActionResult Cart(int idOrder)
+        {
+            Console.WriteLine($"idOrder ricevuto: {idOrder}");
+            CartViewModel cart = new CartViewModel { IdOrder = idOrder };
+            
+                using (SqlConnection conn = new SqlConnection(_connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                    SELECT c.id_prod, p.nome, c.qt, c.price 
+                    FROM Cart c
+                    JOIN Products p ON c.id_prod = p.id_prod
+                    WHERE c.id_order = 1;";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@idOrder", idOrder);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                cart.Items.Add(new CartItem
+                                {
+                                    IdProd = reader.GetGuid(0),
+                                    ProductName = reader.GetString(1),
+                                    Quantity = reader.GetInt32(2),
+                                    Price = reader.GetDecimal(3)
+                                });
+                            }
+                        }
+                    }
+                }
+            return View(cart);
+        }
+
+
+
+        public IActionResult AddToCart(int idOrder, Guid idProd, int quantity, decimal price)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                string checkQuery = "SELECT qt FROM Cart WHERE id_order = @idOrder AND id_prod = @idProd;";
+                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@idOrder", idOrder);
+                    checkCmd.Parameters.AddWithValue("@idProd", idProd);
+                    var result = checkCmd.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        string updateQuery = "UPDATE Cart SET qt = qt + @quantity WHERE id_order = @idOrder AND id_prod = @idProd;";
+                        using (SqlCommand updateCmd = new SqlCommand(updateQuery, conn))
+                        {
+                            updateCmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            updateCmd.Parameters.AddWithValue("@idProd", idProd);
+                            updateCmd.Parameters.AddWithValue("@quantity", quantity);
+                            updateCmd.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        string insertQuery = "INSERT INTO Cart (id_order, id_prod, qt, price) VALUES (@idOrder, @idProd, @quantity, @price);";
+                        using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                        {
+                            insertCmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            insertCmd.Parameters.AddWithValue("@idProd", idProd);
+                            insertCmd.Parameters.AddWithValue("@quantity", quantity);
+                            insertCmd.Parameters.AddWithValue("@price", price);
+                            insertCmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
+
+            return RedirectToAction("Cart");
+        }
+
+        public IActionResult RemoveFromCart(Guid idProd)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string query = "DELETE FROM Cart WHERE id_prod = @idProd;";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@idProd", idProd);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            return RedirectToAction("Cart");
+        }
+
+        public IActionResult ClearCart(int idOrder)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string query = "DELETE FROM Cart WHERE id_order = 1;";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@idOrder", idOrder);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            return RedirectToAction("Cart", new { idOrder });
+        }
+
+        public IActionResult Checkout(int idOrder)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        string insertOrder = @"
+                        DECLARE @total DECIMAL(10,2) = (SELECT COALESCE(SUM(qt * price), 0) FROM Cart WHERE id_order = 1);
+                        UPDATE Orders SET total = @total WHERE id_order = 1;";
+
+                        using (SqlCommand cmd = new SqlCommand(insertOrder, conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        trans.Commit();
+                        return RedirectToAction("OrderSuccess");
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        return RedirectToAction("OrderFailed");
+                    }
+                }
+            }
+        }
     }
 }
