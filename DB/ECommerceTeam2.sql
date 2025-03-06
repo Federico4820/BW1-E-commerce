@@ -84,27 +84,24 @@ CREATE TABLE ProdMaterial (
 
 
 CREATE TABLE Orders (
-	id_order INT IDENTITY (1,1) PRIMARY KEY,
-	id_user UNIQUEIDENTIFIER NOT NULL,
-	date_order DATETIME DEFAULT GETDATE(),
-	total DECIMAL(10,2) not null,
-	stateOrder NVARCHAR(50) NOT NULL,
-	CONSTRAINT CK_totale CHECK (total >= 0),
-	CONSTRAINT CK_stato CHECK (stateOrder IN ('in elaborazione','spedito','consegnato')),
-	CONSTRAINT FK_Ordini_Utenti FOREIGN KEY (id_user) REFERENCES Users (id_user),
+    id_order INT IDENTITY (1,1) PRIMARY KEY,
+    total DECIMAL(10,2) not null,
+    CONSTRAINT CK_totale CHECK (total >= 0),
 )
 
 CREATE TABLE Cart (
-	id_order INT IDENTITY (1,1) NOT NULL,
-	id_prod UNIQUEIDENTIFIER NOT NULL,
-	qt INT NOT NULL,
-	price DECIMAL (10,2) NOT NULL,
-	CONSTRAINT PK_ordineprodotto PRIMARY KEY (id_order, id_prod), 
-	CONSTRAINT CK_quantita CHECK (qt >0),
-	CONSTRAINT CK_prezzo_unitario CHECK (price >0),
-	CONSTRAINT FK_OrdineProdotto_Ordine FOREIGN KEY (id_order) REFERENCES Orders (id_order),
-	CONSTRAINT FK_OrdineProdotto_Prodotto FOREIGN KEY (id_prod) REFERENCES Products (id_prod) 
+    id_order INT NOT NULL,
+    id_prod UNIQUEIDENTIFIER NOT NULL,
+    qt INT NOT NULL,
+    price DECIMAL (10,2) NOT NULL,
+    CONSTRAINT PK_ordineprodotto PRIMARY KEY (id_order, id_prod), 
+    CONSTRAINT CK_quantita CHECK (qt >0),
+    CONSTRAINT CK_prezzo_unitario CHECK (price >0),
+    CONSTRAINT FK_OrdineProdotto_Ordine FOREIGN KEY (id_order) REFERENCES Orders (id_order),
+    CONSTRAINT FK_OrdineProdotto_Prodotto FOREIGN KEY (id_prod) REFERENCES Products (id_prod) 
 )
+
+INSERT INTO Orders (total) VALUES (1)
 
 CREATE TABLE Ratings(
 	id_rating UNIQUEIDENTIFIER PRIMARY KEY,
@@ -467,7 +464,6 @@ JOIN
 
         (@4m, 13, 'https://img01.ztat.net/article/spp-media-p1/4e2617982ae34f2b8eea7b9ecc9c8e85/95f8707e2a894c27af76e17f5403feb3.jpg?imwidth=1800'),
         (@4m, 1, 'https://img01.ztat.net/article/spp-media-p1/7b932e2e82fa44d59bedefcb2a63316f/f1f0e004c44c4c0f9eef4bff7e52c23a.jpg?imwidth=1800'),
-        (@4m, 9, 'https://img01.ztat.net/article/spp-media-p1/382c281a522a47a0a052e6a2f69ecfc7/520fa9289b5b48838eafeb1d6aad7725.jpg?imwidth=1800'),
         (@4m, 2, 'https://img01.ztat.net/article/spp-media-p1/13847dccd115463bad8109b6ccd75342/ef329fabf61949abbabef7ddf7762b0d.jpg?imwidth=1800'),
         (@4m, 3, 'https://img01.ztat.net/article/spp-media-p1/dfc6d49cef8c4abc9321369cd7d4d243/993a7933fa814600a48a0680f808e9b9.jpg?imwidth=1800'),
         (@4m, 5, 'https://img01.ztat.net/article/spp-media-p1/932c51a6dcb1445a9fe2a73c806e2875/f6a545a340504b19919aa1281a10da9e.jpg?imwidth=1800'),
@@ -756,3 +752,4 @@ INSERT INTO ProdSize (id_prod, id_size) VALUES
   (@3p, 5, 100.00),
   (@4p, 5, 100.00),
   (@5p, 5, 100.00)
+
