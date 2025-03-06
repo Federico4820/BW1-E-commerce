@@ -1,0 +1,35 @@
+﻿@model BW1_E_commerce.Models.CartViewModel
+
+<h2>Carrello</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Prodotto</th>
+            <th>Quantità</th>
+            <th>Prezzo</th>
+            <th>Totale</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.ProductName</td>
+                <td>@item.Quantity</td>
+                <td>@item.Price.ToString("C")</td>
+                <td>@item.Total.ToString("C")</td>
+                <td>
+                    <a asp-action="RemoveFromCart" asp-route-idOrder="@Model.IdOrder" asp-route-idProd="@item.IdProd" class="btn btn-danger">Rimuovi</a>
+                </td>
+            </tr>
+            <p> </p>
+        }
+    </tbody>
+</table>
+
+<h3>Totale: @Model.Total.ToString("C")</h3>
+
+<a asp-action="Checkout" asp-route-idOrder="@Model.IdOrder" class="btn btn-success">Checkout</a>
+<a asp-action="ClearCart" asp-route-idOrder="@Model.IdOrder" class="btn btn-warning">Svuota Carrello</a>

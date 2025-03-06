@@ -614,6 +614,180 @@ namespace BW1_E_commerce.Controllers
             }
         }
 
+        private async Task<CartViewModel> GetCartItems()
+        {
+            CartViewModel cart = new CartViewModel();
+            Guid idOrder;
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                await conn.OpenAsync();
+
+                string checkOrderQuery = @"
+                SELECT TOP 1 id_order FROM Orders ORDER BY id_order DESC;";
+
+                using (SqlCommand checkCmd = new SqlCommand(checkOrderQuery, conn))
+                {
+                    object result = await checkCmd.ExecuteScalarAsync();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        idOrder = (Guid)result;
+                    }
+                    else
+                    {
+                        idOrder = Guid.NewGuid();
+                        string insertOrderQuery = @"
+                        INSERT INTO Orders (id_order, total) 
+                        VALUES (@idOrder, 0);";
+
+                        using (SqlCommand insertCmd = new SqlCommand(insertOrderQuery, conn))
+                        {
+                            insertCmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            await insertCmd.ExecuteNonQueryAsync();
+                        }
+                    }
+                }
+
+                cart.IdOrder = idOrder;
+
+                string query = @"
+                SELECT c.id_prod, p.nome, c.qt, c.price 
+                FROM Cart c
+                JOIN Products p ON c.id_prod = p.id_prod
+                WHERE c.id_order = @idOrder;";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@idOrder", idOrder);
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            cart.Items.Add(new CartItem
+                            {
+                                IdProd = reader.GetGuid(0),
+                                ProductName = reader.GetString(1),
+                                Quantity = reader.GetInt32(2),
+                                Price = reader.GetDecimal(3)
+                            });
+                        }
+                    }
+                }
+            }
+
+            return cart;
+        }
+
+        public async Task<IActionResult> Cart()
+        {
+            CartViewModel cart = await GetCartItems();
+            Console.WriteLine($"idOrder usato: {cart.IdOrder}");
+
+            return View(cart);
+        }
+
+
+
+        public IActionResult RemoveFromCart(Guid idProd)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string query = "DELETE FROM Cart WHERE id_prod = @idProd;";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@idProd", idProd);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            return RedirectToAction("Cart");
+        }
+
+        public async Task<IActionResult> ClearCart()
+        {
+            Guid? idOrder = null;
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                await conn.OpenAsync();
+
+                string checkOrderQuery = @"
+                SELECT TOP 1 id_order FROM Orders ORDER BY id_order DESC;";
+
+                using (SqlCommand checkCmd = new SqlCommand(checkOrderQuery, conn))
+                {
+                    object result = await checkCmd.ExecuteScalarAsync();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        idOrder = (Guid)result;
+                    }
+                }
+
+                if (idOrder.HasValue)
+                {
+                    string deleteQuery = "DELETE FROM Cart WHERE id_order = @idOrder;";
+
+                    using (SqlCommand deleteCmd = new SqlCommand(deleteQuery, conn))
+                    {
+                        deleteCmd.Parameters.AddWithValue("@idOrder", idOrder.Value);
+                        await deleteCmd.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+
+            return RedirectToAction("Cart");
+        }
+
+
+
+        public IActionResult Checkout(Guid idOrder)
+        {
+
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        string updateOrderQuery = @"
+                        DECLARE @total DECIMAL(10,2) = (SELECT COALESCE(SUM(qt * price), 0) FROM Cart WHERE id_order = @idOrder);
+                        UPDATE Orders SET total = @total WHERE id_order = @idOrder;";
+
+                        using (SqlCommand cmd = new SqlCommand(updateOrderQuery, conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        string clearCartQuery = "DELETE FROM Cart WHERE id_order = @idOrder;";
+                        using (SqlCommand cmd = new SqlCommand(clearCartQuery, conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            cmd.ExecuteNonQuery();
+                        }
+                        trans.Commit();
+                        return RedirectToAction("OrderSuccess");
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return StatusCode(500, "Errore durante il checkout: " + ex.Message);
+                    }
+                }
+            }
+        }
+
+        public IActionResult OrderSuccess()
+        {
+            return View();
+        }
+
+
         //ACTION DI FILTRO!
 
         public async Task<ProductListModel> GetProductFiltered(int filter)
