@@ -46,23 +46,31 @@
                         </span>
                         <ul class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="dropdownMenuButton">
                             <li><a class="dropdown-item text-light" asp-area="" asp-controller="account" asp-action="Index">Il mio account</a></li>
-                            <li><a class="dropdown-item text-light" asp-area="" asp-controller="Aggiungi" asp-action="Index">aggiungi</a></li>
                             <li><a class="dropdown-item text-light" href="">Logout</a></li>
                         </ul>
                     </div>
 
                     <!-- le altre icone -->
                     <a class="text-light me-5" asp-area="" asp-controller="lista preferiti" asp-action="Index"><i class="bi bi-heart fs-5"></i></a>
-                    <a  class=" text-light" asp-area="" asp-controller="Uomo" asp-action="Index"><i class="bi bi-bag fs-5"></i></a>
+                    <a  class=" text-light me-5" asp-area="" asp-controller="carrello" asp-action="Index"><i class="bi bi-bag fs-5"></i></a>
+                    <a class=" text-light" asp-area="" asp-controller="Home" asp-action="AddDelete"><i class="bi bi-plus-lg fs-5"></i></a>
                 </div>
                 
             </div>
-            <a class="nav-link text-uppercase fw-bold category-btn text-white" asp-controller="Products" asp-action="Add">Aggiungi</a>
+            
         </nav>
-
+        
+            <div style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+                <ol class="breadcrumb ms-5 mt-2">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Library</li>
+                </ol>
+            </div>
+        
 
     </header>
     <div class="container-fluid">
+        
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

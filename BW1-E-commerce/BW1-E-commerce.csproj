@@ -8,6 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Products\Aggiungi.cshtml.cs" />
+    <Compile Remove="Views\Products\Index.cshtml.cs" />
+    <Compile Remove="Views\Products\Index1.cshtml.cs" />
+    <Compile Remove="Views\Shared\Aggiungi.cshtml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Views\Products\Aggiungi.cshtml" />
+    <Content Remove="Views\Products\Index1.cshtml" />
+    <Content Remove="Views\Shared\Aggiungi.cshtml" />
+    <Content Remove="Views\Shared\Index.cshtml" />
+    <Content Remove="Views\Shared\_Layout1.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
   </ItemGroup>
 
