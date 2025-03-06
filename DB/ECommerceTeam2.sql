@@ -287,7 +287,7 @@ JOIN
     (VALUES
         (@1v, 2, 'https://img01.ztat.net/article/spp-media-p1/df77400696784f35818dc8f29eff3df6/ad69cead60f94b60b7c615eac5b4052f.jpg?imwidth=1800'),
         (@1v, 1, 'https://img01.ztat.net/article/spp-media-p1/3ebd6c6c152d4c319dc6aa3295691fae/baa60038184a461c9abcefe8df258f38.jpg?imwidth=1800'),
-        (@1v, 13, 'https://img01.ztat.net/article/spp-media-p1/352d8937eca947429b8a75bcc397d58d/c55961323dba46da8aa490dadb26423c.jpg?imwidth=1800&filter=packshot'),
+        (@1v, 13, 'https://img01.ztat.net/article/spp-media-p1/352d8937eca947429b8a75bcc397d58d/c55961323dba46da8aa490dadb26423c.jpg?imwidth=1800'),
         (@1v, 5, 'https://img01.ztat.net/article/spp-media-p1/34a85b8e3f8c409caa00fc8f61483716/ae697d0c0a13437d9a3adaaa3b463be8.jpg?imwidth=1800'),
         (@1v, 3, 'https://img01.ztat.net/article/spp-media-p1/816ce4fa5fda44eabd32b8ee11691865/fa6fa7a896f64d139ef7e52830d17ed0.jpg?imwidth=1800'),
         
@@ -469,7 +469,7 @@ JOIN
         (@4m, 1, 'https://img01.ztat.net/article/spp-media-p1/7b932e2e82fa44d59bedefcb2a63316f/f1f0e004c44c4c0f9eef4bff7e52c23a.jpg?imwidth=1800'),
         (@4m, 9, 'https://img01.ztat.net/article/spp-media-p1/382c281a522a47a0a052e6a2f69ecfc7/520fa9289b5b48838eafeb1d6aad7725.jpg?imwidth=1800'),
         (@4m, 2, 'https://img01.ztat.net/article/spp-media-p1/13847dccd115463bad8109b6ccd75342/ef329fabf61949abbabef7ddf7762b0d.jpg?imwidth=1800'),
-        (@4m, 3, 'https://img01.ztat.net/article/spp-media-p1/dfc6d49cef8c4abc9321369cd7d4d243/993a7933fa814600a48a0680f808e9b9.jpg?imwidth=762'),
+        (@4m, 3, 'https://img01.ztat.net/article/spp-media-p1/dfc6d49cef8c4abc9321369cd7d4d243/993a7933fa814600a48a0680f808e9b9.jpg?imwidth=1800'),
         (@4m, 5, 'https://img01.ztat.net/article/spp-media-p1/932c51a6dcb1445a9fe2a73c806e2875/f6a545a340504b19919aa1281a10da9e.jpg?imwidth=1800'),
         (@4m, 10, 'https://img01.ztat.net/article/spp-media-p1/2b216bd819dc4b359e3e64a349f72a20/b8d668d0122940eeb2989ff050dfe0dc.jpg?imwidth=1800'),
 
@@ -529,22 +529,22 @@ FROM
     ProdColor pc
 JOIN  
 (VALUES
-  (1, @1sk, 'https://img01.ztat.net/article/spp-media-p1/3a3fcb1a78544ceea57333438fbe7762/3538389b8063457fac9107ce4f619163.jpg?imwidth=156&filter=packshot'), 
-  (13, @1sk, 'https://img01.ztat.net/article/spp-media-p1/9dc3d1d84eaf48d391f296cbb555f0e9/dd3a47a9dbcb47fca4f1f33e1abce8c2.jpg?imwidth=156&filter=packshot'), 
-  (5, @1sk, 'https://img01.ztat.net/article/spp-media-p1/6747c66774794a8c9b39a5118c5ea3e7/e4606c2675ac4bec8c7d01246b3ada75.jpg?imwidth=156&filter=packshot'), 
-  (7, @1sk, 'https://img01.ztat.net/article/spp-media-p1/613c7232b0654f2d930521bb8ee9ad16/c329a669b77e4b2c8b3bb1eaf450771e.jpg?imwidth=156&filter=packshot'), 
+  (1, @1sk, 'https://img01.ztat.net/article/spp-media-p1/3a3fcb1a78544ceea57333438fbe7762/3538389b8063457fac9107ce4f619163.jpg?imwidth=1800'), 
+  (13, @1sk, 'https://img01.ztat.net/article/spp-media-p1/9dc3d1d84eaf48d391f296cbb555f0e9/dd3a47a9dbcb47fca4f1f33e1abce8c2.jpg?imwidth=1800'), 
+  (5, @1sk, 'https://img01.ztat.net/article/spp-media-p1/6747c66774794a8c9b39a5118c5ea3e7/e4606c2675ac4bec8c7d01246b3ada75.jpg?imwidth=1800'), 
+  (7, @1sk, 'https://img01.ztat.net/article/spp-media-p1/613c7232b0654f2d930521bb8ee9ad16/c329a669b77e4b2c8b3bb1eaf450771e.jpg?imwidth=1800'), 
 
-  (1, @2sk, 'https://img01.ztat.net/article/spp-media-p1/e6adba289b2c42ee97e767056fa0ecdf/aee5f4d5c20b486c833ad2b0974882f2.jpg?imwidth=156'), 
-  (11, @2sk, 'https://img01.ztat.net/article/spp-media-p1/cd804bc7f77a49fb8610fa2172b5524f/c3efdc5b580949e98f08f1d6195903e9.jpg?imwidth=156'), 
+  (1, @2sk, 'https://img01.ztat.net/article/spp-media-p1/e6adba289b2c42ee97e767056fa0ecdf/aee5f4d5c20b486c833ad2b0974882f2.jpg?imwidth=1800'), 
+  (11, @2sk, 'https://img01.ztat.net/article/spp-media-p1/cd804bc7f77a49fb8610fa2172b5524f/c3efdc5b580949e98f08f1d6195903e9.jpg?imwidth=1800'), 
 
-  (5, @3sk, 'https://img01.ztat.net/article/spp-media-p1/689a2e59b08c4b0d909a61cdefe905a8/e642a8ab19904eb7adcf3cab3347d8cf.jpg?imwidth=156'), 
-  (9, @3sk, 'https://img01.ztat.net/article/spp-media-p1/d4899e12cece4e32be1998563f364a42/7eea58a84a4d4343997669e25dda3026.jpg?imwidth=156'), 
-  (1, @3sk, 'https://img01.ztat.net/article/spp-media-p1/95fc9114eb8944f59a54417589f3f008/cf7964de0bfe444284d75cb7c853efbe.jpg?imwidth=156'), 
+  (5, @3sk, 'https://img01.ztat.net/article/spp-media-p1/689a2e59b08c4b0d909a61cdefe905a8/e642a8ab19904eb7adcf3cab3347d8cf.jpg?imwidth=1800'), 
+  (9, @3sk, 'https://img01.ztat.net/article/spp-media-p1/d4899e12cece4e32be1998563f364a42/7eea58a84a4d4343997669e25dda3026.jpg?imwidth=1800'), 
+  (1, @3sk, 'https://img01.ztat.net/article/spp-media-p1/95fc9114eb8944f59a54417589f3f008/cf7964de0bfe444284d75cb7c853efbe.jpg?imwidth=1800'), 
   
-  (1, @4sk, 'https://img01.ztat.net/article/spp-media-p1/375cab725a644b9d98bdba3e8cf1df20/95d4ea2c8397483880d65905278135dd.jpg?imwidth=156&filter=packshot'), 
-  (13, @4sk, 'https://img01.ztat.net/article/spp-media-p1/008e99fe45924c93b4b3201dd42f4083/2c94b08ecf594cbfb0e74111eb00d6f0.jpg?imwidth=156&filter=packshot'), 
+  (1, @4sk, 'https://img01.ztat.net/article/spp-media-p1/375cab725a644b9d98bdba3e8cf1df20/95d4ea2c8397483880d65905278135dd.jpg?imwidth=1800'), 
+  (13, @4sk, 'https://img01.ztat.net/article/spp-media-p1/008e99fe45924c93b4b3201dd42f4083/2c94b08ecf594cbfb0e74111eb00d6f0.jpg?imwidth=1800'), 
 
-  (2, @5sk, 'https://img01.ztat.net/article/spp-media-p1/51a5581ea1714374ac07a721e2d40f9f/266b18ed97724ad183ed0323de9d2a19.jpg?imwidth=762')
+  (2, @5sk, 'https://img01.ztat.net/article/spp-media-p1/51a5581ea1714374ac07a721e2d40f9f/266b18ed97724ad183ed0323de9d2a19.jpg?imwidth=1800')
       ) AS img(id_color, id_prod, img_URL)
     ON pc.id_prod = img.id_prod 
     AND pc.id_color = img.id_color;
@@ -599,17 +599,17 @@ FROM
     ProdColor pc
 JOIN 
     (VALUES
-        (@1g, 9, 'https://img01.ztat.net/article/spp-media-p1/2bb07039577a4ae38c8bce8ef5807b71/339ba472c8ef4baca54e5d3a382682ed.jpg?imwidth=762'),
-        (@2g, 1, 'https://img01.ztat.net/article/spp-media-p1/03748667c284411d8c9655e5cda6b8db/7e14dd9eb63943a6ac0f09f4cf3fd080.jpg?imwidth=156'),
-        (@2g, 5, 'https://img01.ztat.net/article/spp-media-p1/11d08ebc00f54d248b90c97b64ea1318/38457c6884334276ad1ee6e26e79f798.jpg?imwidth=156'),
-        (@2g, 13, 'https://img01.ztat.net/article/spp-media-p1/357deb031e104714b38350268aa218ed/d8cd16a0afd64b11914ae7dba65bfd33.jpg?imwidth=156'),
-        (@2g, 2,  'https://img01.ztat.net/article/spp-media-p1/1498708cb13247e8aba6548d1f61cb6c/bb6161c74bc7458d96dae3a24d5fce03.jpg?imwidth=156'),
-        (@3g,1, 'https://img01.ztat.net/article/spp-media-p1/1167dc858ed2474eaef917dcf720fbcb/385846db17f247b69ef5b6f561656be3.jpg?imwidth=156'),
-        (@4g,1, 'https://img01.ztat.net/article/spp-media-p1/767c00e6f47748f797d9f63d7ee1539a/c23aaff71566412fba6790696d47a33c.jpg?imwidth=156'),
-        (@5g,1, 'https://img01.ztat.net/article/spp-media-p1/f7533a57a1ae44a198922e2a2b73b5b5/6deff79992cf452eb9f79e2064d60af8.jpg?imwidth=156'),
-        (@5g,2, 'https://img01.ztat.net/article/spp-media-p1/90dc977e2c6f45f2b01b298a1337304d/d4dda8666523423f864447ba75f14924.jpg?imwidth=156'),
-        (@5g,13, 'https://img01.ztat.net/article/spp-media-p1/a92ae3176e52473c9e632f9b4daa864e/d00219b6856446fba2eb4a0bc1f24cd6.jpg?imwidth=156'),
-        (@5g,10, 'https://img01.ztat.net/article/spp-media-p1/a4d1ec17ee504b6dbe5d6c876184db44/c2003b175f2547e992f50c56c6bb74f5.jpg?imwidth=156')
+        (@1g, 9, 'https://img01.ztat.net/article/spp-media-p1/2bb07039577a4ae38c8bce8ef5807b71/339ba472c8ef4baca54e5d3a382682ed.jpg?imwidth=1800'),
+        (@2g, 1, 'https://img01.ztat.net/article/spp-media-p1/03748667c284411d8c9655e5cda6b8db/7e14dd9eb63943a6ac0f09f4cf3fd080.jpg?imwidth=1800'),
+        (@2g, 5, 'https://img01.ztat.net/article/spp-media-p1/11d08ebc00f54d248b90c97b64ea1318/38457c6884334276ad1ee6e26e79f798.jpg?imwidth=1800'),
+        (@2g, 13, 'https://img01.ztat.net/article/spp-media-p1/357deb031e104714b38350268aa218ed/d8cd16a0afd64b11914ae7dba65bfd33.jpg?imwidth=1800'),
+        (@2g, 2,  'https://img01.ztat.net/article/spp-media-p1/1498708cb13247e8aba6548d1f61cb6c/bb6161c74bc7458d96dae3a24d5fce03.jpg?imwidth=1800'),
+        (@3g,1, 'https://img01.ztat.net/article/spp-media-p1/1167dc858ed2474eaef917dcf720fbcb/385846db17f247b69ef5b6f561656be3.jpg?imwidth=1800'),
+        (@4g,1, 'https://img01.ztat.net/article/spp-media-p1/767c00e6f47748f797d9f63d7ee1539a/c23aaff71566412fba6790696d47a33c.jpg?imwidth=1800'),
+        (@5g,1, 'https://img01.ztat.net/article/spp-media-p1/f7533a57a1ae44a198922e2a2b73b5b5/6deff79992cf452eb9f79e2064d60af8.jpg?imwidth=1800'),
+        (@5g,2, 'https://img01.ztat.net/article/spp-media-p1/90dc977e2c6f45f2b01b298a1337304d/d4dda8666523423f864447ba75f14924.jpg?imwidth=1800'),
+        (@5g,13, 'https://img01.ztat.net/article/spp-media-p1/a92ae3176e52473c9e632f9b4daa864e/d00219b6856446fba2eb4a0bc1f24cd6.jpg?imwidth=1800'),
+        (@5g,10, 'https://img01.ztat.net/article/spp-media-p1/a4d1ec17ee504b6dbe5d6c876184db44/c2003b175f2547e992f50c56c6bb74f5.jpg?imwidth=1800')
     ) AS img(id_prod, id_color, img_URL)
 ON pc.id_prod = img.id_prod 
 AND pc.id_color = img.id_color;
@@ -662,15 +662,15 @@ FROM
     ProdColor pc
 JOIN 
     (VALUES
-        (@1s, 8, 'https://img01.ztat.net/article/spp-media-p1/fbc34275901d42a38172c153b268c957/40ed55d2e69d4c47b13fabe4aaa3dcca.jpg?imwidth=156&filter=packshot'),
-        (@1s, 1, 'https://img01.ztat.net/article/spp-media-p1/8a3f7b1208f33ea382e945c5abdcf535/6491d363ddee453280698080add78198.jpg?imwidth=156&filter=packshot'),
-        (@1s, 13, 'https://img01.ztat.net/article/spp-media-p1/01284039466941389c5965885fdd1235/819b03105f3c4d2ca1cfc849403ea180.jpg?imwidth=156&filter=packshot'),
-        (@1s, 7, 'https://img01.ztat.net/article/spp-media-p1/26fe473a25b64f8bba6e8ff3a87155f5/93b42f7b029c4767942dc730874aff4f.jpg?imwidth=156&filter=packshot'),
-        (@2s, 1, 'https://img01.ztat.net/article/spp-media-p1/fe7f55adf2154aa5a78db45cc17d1d2f/5b8d456ec4bc4fc5a9bfa75c6177ef4a.jpg?imwidth=156'),
-        (@3s, 1, 'https://img01.ztat.net/article/spp-media-p1/34f3817f40a64aa19632686333e51e97/cceaedca70154c5cbb8e05ddb47355ed.jpg?imwidth=156'),
-        (@3s, 2, 'https://img01.ztat.net/article/spp-media-p1/1da32f3689094327b3e78a239530d8c1/735c055f962a42d8a2bf8cd5b30ad723.jpg?imwidth=156'),
-        (@4s, 13, 'https://img01.ztat.net/article/spp-media-p1/767c00e6f47748f797d9f63d7ee1539a/c23aaff71566412fba6790696d47a33c.jpg?imwidth=156'),
-        (@5s, 12, 'https://img01.ztat.net/article/spp-media-p1/8a1f474688894a1d80844ce6b94bfb14/e05ad9bdc28e44cda25e79fefa3ca02b.jpg?imwidth=156')
+        (@1s, 8, 'https://img01.ztat.net/article/spp-media-p1/fbc34275901d42a38172c153b268c957/40ed55d2e69d4c47b13fabe4aaa3dcca.jpg?imwidth=1800'),
+        (@1s, 1, 'https://img01.ztat.net/article/spp-media-p1/8a3f7b1208f33ea382e945c5abdcf535/6491d363ddee453280698080add78198.jpg?imwidth=1800t'),
+        (@1s, 13, 'https://img01.ztat.net/article/spp-media-p1/01284039466941389c5965885fdd1235/819b03105f3c4d2ca1cfc849403ea180.jpg?imwidth=1800'),
+        (@1s, 7, 'https://img01.ztat.net/article/spp-media-p1/26fe473a25b64f8bba6e8ff3a87155f5/93b42f7b029c4767942dc730874aff4f.jpg?imwidth=1800'),
+        (@2s, 1, 'https://img01.ztat.net/article/spp-media-p1/fe7f55adf2154aa5a78db45cc17d1d2f/5b8d456ec4bc4fc5a9bfa75c6177ef4a.jpg?imwidth=1800'),
+        (@3s, 1, 'https://img01.ztat.net/article/spp-media-p1/34f3817f40a64aa19632686333e51e97/cceaedca70154c5cbb8e05ddb47355ed.jpg?imwidth=1800'),
+        (@3s, 2, 'https://img01.ztat.net/article/spp-media-p1/1da32f3689094327b3e78a239530d8c1/735c055f962a42d8a2bf8cd5b30ad723.jpg?imwidth=1800'),
+        (@4s, 13, 'https://img01.ztat.net/article/spp-media-p1/767c00e6f47748f797d9f63d7ee1539a/c23aaff71566412fba6790696d47a33c.jpg?imwidth=1800'),
+        (@5s, 12, 'https://img01.ztat.net/article/spp-media-p1/8a1f474688894a1d80844ce6b94bfb14/e05ad9bdc28e44cda25e79fefa3ca02b.jpg?imwidth=1800')
     ) AS img(id_prod, id_color, img_URL)
     ON pc.id_prod = img.id_prod 
     AND pc.id_color = img.id_color;
@@ -725,20 +725,20 @@ FROM
     ProdColor pc
 JOIN 
     (VALUES
-        (@1p, 4, 'https://img01.ztat.net/article/spp-media-p1/6a129f93120044a08a17d45df050dee6/dfa57a7c5b204b499ed3048e083465f8.jpg?imwidth=156'),
-        (@1p, 1, 'https://img01.ztat.net/article/spp-media-p1/7274b03d463f491a876fc7f32c74a280/a48d40320d054e2f9e640d22c328cd22.jpg?imwidth=156'),
-        (@1p, 13, 'https://img01.ztat.net/article/spp-media-p1/7274b03d463f491a876fc7f32c74a280/a48d40320d054e2f9e640d22c328cd22.jpg?imwidth=156'),
-        (@1p, 5, 'https://img01.ztat.net/article/spp-media-p1/0577b0c9c98848bb9a98fd767e328bb0/e305c3459a334015983bd8a28b1cf70c.jpg?imwidth=156'),
+        (@1p, 4, 'https://img01.ztat.net/article/spp-media-p1/6a129f93120044a08a17d45df050dee6/dfa57a7c5b204b499ed3048e083465f8.jpg?imwidth=1800'),
+        (@1p, 1, 'https://img01.ztat.net/article/spp-media-p1/7274b03d463f491a876fc7f32c74a280/a48d40320d054e2f9e640d22c328cd22.jpg?imwidth=1800'),
+        (@1p, 13, 'https://img01.ztat.net/article/spp-media-p1/7274b03d463f491a876fc7f32c74a280/a48d40320d054e2f9e640d22c328cd22.jpg?imwidth=1800'),
+        (@1p, 5, 'https://img01.ztat.net/article/spp-media-p1/0577b0c9c98848bb9a98fd767e328bb0/e305c3459a334015983bd8a28b1cf70c.jpg?imwidth=1800'),
 
-        (@2p, 1, 'https://img01.ztat.net/article/spp-media-p1/5a8c145625444dffb89acfcf2c6ed77e/b0f3e2d07e3c40f1b463e2e8279731f0.jpg?imwidth=156'),
-        (@2p, 2, 'https://img01.ztat.net/article/spp-media-p1/16afac3af0264601bc2d5f7673e8abe8/04131f2c783342fa99f9ed0e9589d129.jpg?imwidth=156'),
+        (@2p, 1, 'https://img01.ztat.net/article/spp-media-p1/5a8c145625444dffb89acfcf2c6ed77e/b0f3e2d07e3c40f1b463e2e8279731f0.jpg?imwidth=1800'),
+        (@2p, 2, 'https://img01.ztat.net/article/spp-media-p1/16afac3af0264601bc2d5f7673e8abe8/04131f2c783342fa99f9ed0e9589d129.jpg?imwidth=1800'),
 
-        (@3p, 1, 'https://img01.ztat.net/article/spp-media-p1/cae3859d5ef042a791e32aa2c327e894/2e7f795587264ade93a1244f46a9bbaa.jpg?imwidth=156'),
-        (@3p, 2, 'https://img01.ztat.net/article/spp-media-p1/3605d488b1464d04bb87d365bef39a0d/43d887452b01439fb20dc2dd27393046.jpg?imwidth=156'),
+        (@3p, 1, 'https://img01.ztat.net/article/spp-media-p1/cae3859d5ef042a791e32aa2c327e894/2e7f795587264ade93a1244f46a9bbaa.jpg?imwidth=1800'),
+        (@3p, 2, 'https://img01.ztat.net/article/spp-media-p1/3605d488b1464d04bb87d365bef39a0d/43d887452b01439fb20dc2dd27393046.jpg?imwidth=1800'),
 
-        (@4p, 12, 'https://img01.ztat.net/article/spp-media-p1/f9f59c68a8b3480fbead65883e4cab2c/acb385af4ccb469fa12f5f3c446874a7.jpg?imwidth=156'),
+        (@4p, 12, 'https://img01.ztat.net/article/spp-media-p1/f9f59c68a8b3480fbead65883e4cab2c/acb385af4ccb469fa12f5f3c446874a7.jpg?imwidth=1800'),
 
-        (@5p, 3, 'https://img01.ztat.net/article/spp-media-p1/14cd47c4adf3414e8545058514b315ea/32ac62ee0484441988e1a710a96a17c4.jpg?imwidth=156')
+        (@5p, 3, 'https://img01.ztat.net/article/spp-media-p1/14cd47c4adf3414e8545058514b315ea/32ac62ee0484441988e1a710a96a17c4.jpg?imwidth=1800')
     ) AS img(id_prod, id_color, img_URL)
     ON pc.id_prod = img.id_prod 
     AND pc.id_color = img.id_color;
@@ -756,5 +756,3 @@ INSERT INTO ProdSize (id_prod, id_size) VALUES
   (@3p, 5, 100.00),
   (@4p, 5, 100.00),
   (@5p, 5, 100.00)
-
-
