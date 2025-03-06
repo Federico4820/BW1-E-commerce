@@ -1,5 +1,6 @@
 ﻿@{
 	var cat = ViewBag.Categories as List<Category>;
+	var gender = ViewBag.gender as string;
 }
 
 
@@ -9,7 +10,7 @@
 	{
 		@foreach (var item in cat)
 		{
-			<a class="text-decoration-none text-dark mt-4 mx-3" asp-controller="Products" asp-action="Filter" asp-route-filter =@item.IdCategory>@item.Name</a>
+			<a class="text-decoration-none text-dark mt-4 mx-3" asp-controller="Products" asp-action="Index" asp-route-filter=@item.IdCategory asp-route-gender=@gender>@item.Name</a>
 			<hr class="text-secondary" />
 		}
 	}

@@ -4,6 +4,7 @@
 	var productList = ViewBag.Prod as ProductListModel;
 	var commentList = ViewBag.Comments as CommentListModel;
 	var singleComment = ViewBag.Comment as SingleCommentModel;
+	var gender = ViewBag.gender as string;
 	ViewData["Title"] = "Pagina Dettagli";
 }
 
@@ -17,11 +18,11 @@
 	<nav aria-label="breadcrumb">
 		<ol class="breadcrumb">
 			<li class="breadcrumbCust-item">
-				<a class="nav-link" asp-controller="Products" asp-action="Index">Home</a>
+				<a class="nav-link" asp-controller="Products" asp-action="Index" asp-route-gender=gender>Home</a>
 			</li>
 			<li class="breadcrumbCust-item">
 				<span aria-hidden="true">›</span><a class="nav-link"
-												asp-controller="Products" asp-action="Index">@Model.Category</a>
+				asp-controller="Products" asp-action="Index" asp-route-filter=@Model.IdCategory asp-route-gender=gender>@Model.Category</a>
 			</li>
 			<li class="breadcrumbCust-item active" aria-current="page" id="dataPage">
 				<span aria-hidden="true">›</span>@Model.Name

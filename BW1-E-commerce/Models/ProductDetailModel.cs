@@ -7,6 +7,7 @@
         public string Brand { get; set; }
         public decimal Price { get; set; }
         public List<string> Description { get; set; }
+        public int? IdCategory { get; set; }
         public string Category { get; set; }
         public string Gender { get; set; }
         public int Stock { get; set; }

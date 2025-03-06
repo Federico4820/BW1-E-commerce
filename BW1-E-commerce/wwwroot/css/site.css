@@ -691,5 +691,24 @@ fieldset {
     padding: 0.5em;
     background-color: transparent;
     border: 1px solid #8b8b8b;
-    transition: transform 0.1s ease-in;
+    transition: transform 0.5s ease-in;
 }
+
+.custom-w{
+    width: 80%;
+}
+
+.imgIntro{
+height: 70vh;
+filter: grayscale(5);
+ transition: color 1s ease-in;
+
+}
+.imgIntro:hover {
+            filter: grayscale(0)
+        }
+
+.custom-w img, .imgIntro {
+    height:100%;    
+}
+        

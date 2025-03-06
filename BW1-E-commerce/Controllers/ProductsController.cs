@@ -22,7 +22,7 @@ namespace BW1_E_commerce.Controllers
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task<ProductListModel> GetProducts()
+        public async Task<ProductListModel> GetProducts(string gender)
         {
             var prodList = new ProductListModel()
             {
@@ -32,9 +32,10 @@ namespace BW1_E_commerce.Controllers
             await using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                var query = @" WITH ImageSelection AS (SELECT PC.id_prod, PCI.img_URL, ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn FROM ProdColorImages PCI JOIN ProdColor PC ON PCI.id_prodColor = PC.id_prodColor) SELECT P.id_prod, P.nome, P.brand, P.price, P.descr, P.id_category, C.nome as category_name, P.gender, ISel.img_URL FROM Products P LEFT JOIN Category as C ON P.id_category = C.id_category LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1;";
+                var query = @" WITH ImageSelection AS (SELECT PC.id_prod, PCI.img_URL, ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn FROM ProdColorImages PCI JOIN ProdColor PC ON PCI.id_prodColor = PC.id_prodColor) SELECT P.id_prod, P.nome, P.brand, P.price, P.descr, P.id_category, C.nome as category_name, P.gender, ISel.img_URL FROM Products P LEFT JOIN Category as C ON P.id_category = C.id_category LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1 WHERE P.gender IN (@gender, 'U');";
                 await using (SqlCommand command = new SqlCommand(query, connection))
                 {
+                    command.Parameters.AddWithValue("@gender", gender);
                     await using (SqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
@@ -62,19 +63,26 @@ namespace BW1_E_commerce.Controllers
             return prodList;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Intro()
         {
-            ViewBag.Prod = await GetProducts();
+            return View();
+        }
+
+
+        public async Task<IActionResult> Index(int? filter, string gender)
+        {
+            ViewBag.Prod = await GetProducts(gender);
             ViewBag.Categories = await GetCategories();
-            //if (filter.HasValue)
-            //{
-            //    ViewBag.Filtered = await GetProductFiltered(filter.Value);
-            //}
+            if (filter.HasValue)
+            {
+                ViewBag.Filtered = await GetProductFiltered(filter.Value, gender);
+            }
+            ViewBag.Gender = gender;
             return View();
         }
 
         [HttpGet("products/detail/{id:guid}")]
-        public async Task<IActionResult> Details(Guid id)
+        public async Task<IActionResult> Details(Guid id, string gender)
         {
             var detailProd = new ProductDetailModel();
 
@@ -132,6 +140,7 @@ namespace BW1_E_commerce.Controllers
                             detailProd.Category = reader["category"].ToString();
                             detailProd.Gender = reader["gender"].ToString();
                             detailProd.Stock = int.Parse(reader["stock"].ToString());
+                            detailProd.IdCategory = int.Parse(reader["id_category"].ToString());
                         }
 
                         await reader.NextResultAsync();
@@ -174,10 +183,11 @@ namespace BW1_E_commerce.Controllers
                     }
                 }
             }
-            ViewBag.Prod = await GetProducts();
+            ViewBag.Prod = await GetProducts(gender);
             ViewBag.Comments = await GetComments(id);
             ViewBag.Commen = new SingleCommentModel();
             ViewBag.Categories = await GetCategories();
+            ViewBag.Gender = gender;
             return View(detailProd);
         }
 
@@ -775,7 +785,7 @@ namespace BW1_E_commerce.Controllers
 
         //ACTION DI FILTRO!
 
-        public async Task<ProductListModel> GetProductFiltered(int filter)
+        public async Task<ProductListModel> GetProductFiltered(int filter , string gender)
         {
             var prodList = new ProductListModel()
             {
@@ -785,9 +795,10 @@ namespace BW1_E_commerce.Controllers
             await using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                var query = @" WITH ImageSelection AS (SELECT PC.id_prod, PCI.img_URL, ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn FROM ProdColorImages PCI JOIN ProdColor PC ON PCI.id_prodColor = PC.id_prodColor) SELECT P.id_prod, P.nome, P.brand, P.price, P.descr, P.id_category, C.nome as category_name, P.gender, ISel.img_URL FROM Products P LEFT JOIN Category as C ON P.id_category = C.id_category LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1 WHERE C.id_category = @filter;";
+                var query = @" WITH ImageSelection AS (SELECT PC.id_prod, PCI.img_URL, ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn FROM ProdColorImages PCI JOIN ProdColor PC ON PCI.id_prodColor = PC.id_prodColor) SELECT P.id_prod, P.nome, P.brand, P.price, P.descr, P.id_category, C.nome as category_name, P.gender, ISel.img_URL FROM Products P LEFT JOIN Category as C ON P.id_category = C.id_category LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1 WHERE C.id_category = @filter AND (P.gender = @gender OR P.gender = 'U'); ";
                 await using (SqlCommand command = new SqlCommand(query, connection))
                 {
+                    command.Parameters.AddWithValue("@gender", gender);
                     command.Parameters.AddWithValue("@filter", filter);
                     await using (SqlDataReader reader = await command.ExecuteReaderAsync())
                     {
