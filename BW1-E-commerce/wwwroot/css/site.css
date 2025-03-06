@@ -265,6 +265,40 @@ fieldset {
     z-index: 1000;
 }
 
+/*immagini statiche*/
+.image {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+}
+
+    .image img {
+        width: 100%;
+        height: 396px;
+        object-fit: fill;
+        top: -10px;
+    }
+
+
+/*link uomo e donna*/
+
+
+.hover-text {
+    position: absolute;
+    top: 47%;
+    left: 47%;
+    font-size: 50px;
+    font-weight: bold;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.image:hover .hover-text {
+    opacity: 1;
+}
+
+
 /*DETAILS PAGE */
 
 /* BREADCRUMB*/
