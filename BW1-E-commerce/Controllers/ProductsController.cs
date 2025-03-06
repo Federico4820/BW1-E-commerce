@@ -62,14 +62,14 @@ namespace BW1_E_commerce.Controllers
             return prodList;
         }
 
-        public async Task<IActionResult> Index(int? filter)
+        public async Task<IActionResult> Index()
         {
             ViewBag.Prod = await GetProducts();
             ViewBag.Categories = await GetCategories();
-            if (filter.HasValue)
-            {
-                ViewBag.Filtered = await GetProductFiltered(filter.Value);
-            }
+            //if (filter.HasValue)
+            //{
+            //    ViewBag.Filtered = await GetProductFiltered(filter.Value);
+            //}
             return View();
         }
 
@@ -177,6 +177,7 @@ namespace BW1_E_commerce.Controllers
             ViewBag.Prod = await GetProducts();
             ViewBag.Comments = await GetComments(id);
             ViewBag.Commen = new SingleCommentModel();
+            ViewBag.Categories = await GetCategories();
             return View(detailProd);
         }
 
@@ -552,28 +553,23 @@ namespace BW1_E_commerce.Controllers
                 using (var transaction = await conn.BeginTransactionAsync())
                 {
                     var idOrder = Guid.NewGuid();
-                    string checkOrderQuery = "SELECT COUNT(*) FROM Orders";
+                    string checkOrderQuery = "SELECT TOP 1 id_order FROM Orders ORDER BY id_order DESC;";
                     await using (SqlCommand checkOrderCmd = new SqlCommand(checkOrderQuery, conn, (SqlTransaction)transaction))
                     {
-                        int orderExists = (int)checkOrderCmd.ExecuteScalar();
-
-                        if (orderExists == 0)
+                        object result = await checkOrderCmd.ExecuteScalarAsync();
+                        if (result != null && result != DBNull.Value)
                         {
-                            try
+                            idOrder = (Guid)result;
+                        }
+                        else
+                        {
+                            idOrder = Guid.NewGuid();
+                            string createOrderQuery = "INSERT INTO Orders (id_order, total) VALUES (@id_order, 0);";
+                            await using (SqlCommand createOrderCmd = new SqlCommand(createOrderQuery, conn, (SqlTransaction)transaction))
                             {
-                                string createOrderQuery = "INSERT INTO Orders (id_order, total) VALUES (@id_order, 1);";
-                                await using (SqlCommand createOrderCmd = new SqlCommand(createOrderQuery, conn, (SqlTransaction)transaction))
-                                {
-                                    createOrderCmd.Parameters.AddWithValue("@id_order", idOrder);
-                                    await createOrderCmd.ExecuteNonQueryAsync();
-                                }
+                                createOrderCmd.Parameters.AddWithValue("@id_order", idOrder);
+                                await createOrderCmd.ExecuteNonQueryAsync();
                             }
-                            catch (Exception ex)
-                            {
-                                TempData["Error"] = $"Si è verificato un errore durante l'inserimento dei dati. Riprova più tardi. Errore: {ex.Message}";
-                                return RedirectToAction("Add");
-                            }
-
                         }
                     }
                     string checkCartQuery = "SELECT qt FROM Cart WHERE id_order = @id_order AND id_prod = @idProd;";
@@ -613,7 +609,6 @@ namespace BW1_E_commerce.Controllers
                 }
             }
         }
-
         private async Task<CartViewModel> GetCartItems()
         {
             CartViewModel cart = new CartViewModel();
@@ -678,7 +673,6 @@ namespace BW1_E_commerce.Controllers
 
             return cart;
         }
-
         public async Task<IActionResult> Cart()
         {
             CartViewModel cart = await GetCartItems();
@@ -686,9 +680,6 @@ namespace BW1_E_commerce.Controllers
 
             return View(cart);
         }
-
-
-
         public IActionResult RemoveFromCart(Guid idProd)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -705,7 +696,6 @@ namespace BW1_E_commerce.Controllers
 
             return RedirectToAction("Cart");
         }
-
         public async Task<IActionResult> ClearCart()
         {
             Guid? idOrder = null;
@@ -740,9 +730,6 @@ namespace BW1_E_commerce.Controllers
 
             return RedirectToAction("Cart");
         }
-
-
-
         public IActionResult Checkout(Guid idOrder)
         {
 
@@ -781,12 +768,10 @@ namespace BW1_E_commerce.Controllers
                 }
             }
         }
-
         public IActionResult OrderSuccess()
         {
             return View();
         }
-
 
         //ACTION DI FILTRO!
 
