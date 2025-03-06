@@ -609,6 +609,134 @@ namespace BW1_E_commerce.Controllers
             }
         }
 
+        private async Task<CartViewModel> GetCartItems(Guid idOrder)
+        {
+            CartViewModel cart = new CartViewModel { IdOrder = idOrder };
+
+            var checkGuid = Guid.NewGuid();
+
+
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                await conn.OpenAsync();
+                string query = @"
+            SELECT c.id_prod, p.nome, c.qt, c.price 
+            FROM Cart c
+            JOIN Products p ON c.id_prod = p.id_prod
+            WHERE c.id_order = @idOrder;";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@idOrder", idOrder);
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            cart.Items.Add(new CartItem
+                            {
+                                IdProd = reader.GetGuid(0),
+                                ProductName = reader.GetString(1),
+                                Quantity = reader.GetInt32(2),
+                                Price = reader.GetDecimal(3)
+                            });
+                        }
+                    }
+                }
+            }
+
+            return cart;
+        }
+
+        public async Task<IActionResult> Cart(Guid idOrder)
+        {
+            Console.WriteLine($"idOrder ricevuto: {idOrder}");
+
+            CartViewModel cart = await GetCartItems(idOrder);
+
+            return View(cart);
+        }
+
+        public IActionResult RemoveFromCart(Guid idProd)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string query = "DELETE FROM Cart WHERE id_prod = @idProd;";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@idProd", idProd);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            return RedirectToAction("Cart");
+        }
+
+        public IActionResult ClearCart(Guid idOrder)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string query = "DELETE FROM Cart WHERE id_order = @idOrder;";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@idOrder", idOrder);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            return RedirectToAction("Cart", new { idOrder });
+        }
+
+        public IActionResult Checkout(Guid idOrder)
+        {
+
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        string updateOrderQuery = @"
+                DECLARE @total DECIMAL(10,2) = (SELECT COALESCE(SUM(qt * price), 0) FROM Cart WHERE id_order = @idOrder);
+                UPDATE Orders SET total = @total WHERE id_order = @idOrder;";
+
+                        using (SqlCommand cmd = new SqlCommand(updateOrderQuery, conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        string clearCartQuery = "DELETE FROM Cart WHERE id_order = @idOrder;";
+                        using (SqlCommand cmd = new SqlCommand(clearCartQuery, conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            cmd.ExecuteNonQuery();
+                        }
+                        trans.Commit();
+                        return RedirectToAction("OrderSuccess");
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return StatusCode(500, "Errore durante il checkout: " + ex.Message);
+                    }
+                }
+            }
+        }
+
+        public IActionResult OrderSuccess()
+        {
+            return View();
+        }
+
+
         //ACTION DI FILTRO!
 
         public async Task<ProductListModel> GetProductFiltered()
