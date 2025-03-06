@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using BW1_E_commerce.Models;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 
 namespace BW1_E_commerce.Controllers;
 
@@ -16,6 +17,13 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         return View();
+    }
+
+    
+
+    public IActionResult AddDelete()
+    {
+        return View("~/ Views / Products / AddDelete.cshtml");
     }
 
     public IActionResult Privacy()

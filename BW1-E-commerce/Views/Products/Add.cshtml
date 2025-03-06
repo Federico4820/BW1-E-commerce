@@ -1,6 +1,7 @@
 ﻿@model ProductAddModel
 
 
+		
 @{
 	var cat = ViewBag.Categories as List<Category>;
 	var color = ViewBag.Color as List<Color>;
@@ -9,6 +10,7 @@
 
 	ViewData["Title"] = "Aggiungi Prodotto";
 }
+
 
 @if (TempData["Error"] != null)
 {
@@ -172,9 +174,8 @@
 	<div class="form-group mt-4">
 		<button type="submit" class="btn btn-primary">Inviaaaaaa</button>
 	</div>
-
 </form>
-
+    
 
 <script>
 
