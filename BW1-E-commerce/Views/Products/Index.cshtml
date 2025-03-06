@@ -23,9 +23,9 @@
         </div>
         <!-- Schede dei prodotti -->
     <div class="d-grid productContainer">
-      @if (Model.ProductList != null)
+            @if (productList.ProductList != null)
       {
-        @foreach (var item in Model.ProductList)
+                @foreach (var item in productList.ProductList)
         {
           <div class="productCard p-0">
         <a class="text-decoration-none">
