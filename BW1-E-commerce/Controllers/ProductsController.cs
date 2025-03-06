@@ -609,22 +609,47 @@ namespace BW1_E_commerce.Controllers
             }
         }
 
-        private async Task<CartViewModel> GetCartItems(Guid idOrder)
+        private async Task<CartViewModel> GetCartItems()
         {
-            CartViewModel cart = new CartViewModel { IdOrder = idOrder };
-
-            var checkGuid = Guid.NewGuid();
-
-
+            CartViewModel cart = new CartViewModel();
+            Guid idOrder;
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 await conn.OpenAsync();
+
+                string checkOrderQuery = @"
+                SELECT TOP 1 id_order FROM Orders ORDER BY id_order DESC;";
+
+                using (SqlCommand checkCmd = new SqlCommand(checkOrderQuery, conn))
+                {
+                    object result = await checkCmd.ExecuteScalarAsync();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        idOrder = (Guid)result;
+                    }
+                    else
+                    {
+                        idOrder = Guid.NewGuid();
+                        string insertOrderQuery = @"
+                        INSERT INTO Orders (id_order, total) 
+                        VALUES (@idOrder, 0);";
+
+                        using (SqlCommand insertCmd = new SqlCommand(insertOrderQuery, conn))
+                        {
+                            insertCmd.Parameters.AddWithValue("@idOrder", idOrder);
+                            await insertCmd.ExecuteNonQueryAsync();
+                        }
+                    }
+                }
+
+                cart.IdOrder = idOrder;
+
                 string query = @"
-            SELECT c.id_prod, p.nome, c.qt, c.price 
-            FROM Cart c
-            JOIN Products p ON c.id_prod = p.id_prod
-            WHERE c.id_order = @idOrder;";
+                SELECT c.id_prod, p.nome, c.qt, c.price 
+                FROM Cart c
+                JOIN Products p ON c.id_prod = p.id_prod
+                WHERE c.id_order = @idOrder;";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -649,14 +674,15 @@ namespace BW1_E_commerce.Controllers
             return cart;
         }
 
-        public async Task<IActionResult> Cart(Guid idOrder)
+        public async Task<IActionResult> Cart()
         {
-            Console.WriteLine($"idOrder ricevuto: {idOrder}");
-
-            CartViewModel cart = await GetCartItems(idOrder);
+            CartViewModel cart = await GetCartItems();
+            Console.WriteLine($"idOrder usato: {cart.IdOrder}");
 
             return View(cart);
         }
+
+
 
         public IActionResult RemoveFromCart(Guid idProd)
         {
@@ -675,22 +701,42 @@ namespace BW1_E_commerce.Controllers
             return RedirectToAction("Cart");
         }
 
-        public IActionResult ClearCart(Guid idOrder)
+        public async Task<IActionResult> ClearCart()
         {
+            Guid? idOrder = null;
+
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                conn.Open();
-                string query = "DELETE FROM Cart WHERE id_order = @idOrder;";
+                await conn.OpenAsync();
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                string checkOrderQuery = @"
+                SELECT TOP 1 id_order FROM Orders ORDER BY id_order DESC;";
+
+                using (SqlCommand checkCmd = new SqlCommand(checkOrderQuery, conn))
                 {
-                    cmd.Parameters.AddWithValue("@idOrder", idOrder);
-                    cmd.ExecuteNonQuery();
+                    object result = await checkCmd.ExecuteScalarAsync();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        idOrder = (Guid)result;
+                    }
+                }
+
+                if (idOrder.HasValue)
+                {
+                    string deleteQuery = "DELETE FROM Cart WHERE id_order = @idOrder;";
+
+                    using (SqlCommand deleteCmd = new SqlCommand(deleteQuery, conn))
+                    {
+                        deleteCmd.Parameters.AddWithValue("@idOrder", idOrder.Value);
+                        await deleteCmd.ExecuteNonQueryAsync();
+                    }
                 }
             }
 
-            return RedirectToAction("Cart", new { idOrder });
+            return RedirectToAction("Cart");
         }
+
+
 
         public IActionResult Checkout(Guid idOrder)
         {
@@ -704,8 +750,8 @@ namespace BW1_E_commerce.Controllers
                     try
                     {
                         string updateOrderQuery = @"
-                DECLARE @total DECIMAL(10,2) = (SELECT COALESCE(SUM(qt * price), 0) FROM Cart WHERE id_order = @idOrder);
-                UPDATE Orders SET total = @total WHERE id_order = @idOrder;";
+                        DECLARE @total DECIMAL(10,2) = (SELECT COALESCE(SUM(qt * price), 0) FROM Cart WHERE id_order = @idOrder);
+                        UPDATE Orders SET total = @total WHERE id_order = @idOrder;";
 
                         using (SqlCommand cmd = new SqlCommand(updateOrderQuery, conn, trans))
                         {
