@@ -1,35 +1,148 @@
-﻿@model BW1_E_commerce.Models.CartViewModel
+﻿@model CartViewModel
 
-<h2>Carrello</h2>
+<h2 class="text-center mb-4">Il Tuo Carrello</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Prodotto</th>
-            <th>Quantità</th>
-            <th>Prezzo</th>
-            <th>Totale</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Items)
-        {
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="thead-light">
             <tr>
-                <td>@item.ProductName</td>
-                <td>@item.Quantity</td>
-                <td>@item.Price.ToString("C")</td>
-                <td>@item.Total.ToString("C")</td>
-                <td>
-                    <a asp-action="RemoveFromCart" asp-route-idOrder="@Model.IdOrder" asp-route-idProd="@item.IdProd" class="btn btn-danger">Rimuovi</a>
-                </td>
+                <th>Prodotto</th>
+                <th>Taglia</th>
+                <th>Colore</th>
+                <th>Quantità</th>
+                <th>Prezzo Unitario</th>
+                <th>Prezzo Totale</th>
+                <th>Azioni</th>
             </tr>
-            <p> </p>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="@item.ImgUrl" alt="@item.ProductName" class="img-fluid" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 5px;" />
+                            <div>
+                                <strong>@item.ProductName</strong>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        @item.Size
+                    </td>
+                    <td>
+                        @item.Color
+                    </td>
+                    <td>
+                        <form asp-action="UpdateCartQuantity" method="post" class="d-flex align-items-center">
+                            <input type="hidden" name="idProd" value="@item.IdProd" />
+                            <input type="number" name="quantity" value="@item.Quantity" min="0" class="form-control form-control-sm" style="width: 60px; text-align: center; margin-right: 5px;" />
+                            <button type="submit" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-arrow-repeat"></i> Aggiorna
+                            </button>
+                        </form>
+                    </td>
+                    <td>@item.Price €</td>
+                    <td>@(item.Price * item.Quantity) €</td>
+                    <td>
+                        <form asp-action="RemoveFromCart" method="post">
+                            <input type="hidden" name="idProd" value="@item.IdProd" />
+                            <input type="hidden" name="quantity" value="0" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i> Rimuovi
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-between mt-3">
+    <div>
+        <strong>Totale: </strong>
+        <span class="h4 text-primary">@Model.Total €</span>
+    </div>
+    <div>
+        <a href="@Url.Action("OrderSuccess")" class="btn btn-success btn-lg">
+            Procedi al Checkout <i class="bi bi-arrow-right-circle"></i>
+        </a>
+    </div>
+</div>
+
+
+<!-- Optional: Add a summary section -->
+<div class="mt-4">
+    <h5>Hai bisogno di aiuto?</h5>
+    <p>Contattaci per assistenza con il tuo ordine.</p>
+</div>
+
+<style>
+    .table-responsive {
+        margin-bottom: 20px;
+    }
+
+    .table-bordered {
+        border: 1px solid #ddd;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .thead-light th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #ddd;
+    }
+
+    .btn-outline-primary {
+        color: #007bff;
+        border-color: #007bff;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: #fff;
         }
-    </tbody>
-</table>
 
-<h3>Totale: @Model.Total.ToString("C")</h3>
+    .btn-outline-danger {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
 
-<a asp-action="Checkout" asp-route-idOrder="@Model.IdOrder" class="btn btn-success">Checkout</a>
-<a asp-action="ClearCart" asp-route-idOrder="@Model.IdOrder" class="btn btn-warning">Svuota Carrello</a>
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+    .text-primary {
+        color: #007bff !important;
+    }
+
+    .h4 {
+        font-size: 1.5rem;
+    }
+
+    .mb-4 {
+        margin-bottom: 1.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 1rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem !important;
+    }
+</style>
