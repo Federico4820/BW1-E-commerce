@@ -68,13 +68,13 @@
 			<div id="materialContainer">
                 <div class="d-flex justify-content-between">
                     <p>Composizione</p>
-                    <a class="bottonepiccolo btn btn-sm btn-light" id="addMat"><i class="bi bi-plus-lg text-bolder"></i></a>
+                    <a class="bottonepiccolo btn btn-sm btn-primary" id="addMat"><i class="bi bi-plus-lg"></i></a>
 				</div>
 				
 				@for (int i = 0; i < mat.Count; i++)
 				{
 					<div class="matField" style="display:none">
-						<div class="row">
+						<div class="row align-items-baseline">
 							<div class="col-md-4 mb-2">
 								<select name="SelectedMaterials[@i].IdMaterial" class="form-control border border-black mb-3">
 									<option value="" selected disabled>Seleziona un materiale</option>
@@ -92,7 +92,7 @@
 							<div class="col-md-4">
 								<input type="number" name="SelectedMaterials[@i].Percentage" class="form-control border border-black" min="0" max="100" placeholder="percentuale del materiale" />
 							</div>
-							<a class="bottonepiccolo text-center btn btn-sm btn-light" id="removeMat" onclick="delete()"><i class="bi bi-x-lg"></i></a>
+							<a class="bottonepiccolo text-center btn btn-sm btn-danger" onclick="removeMat(this)"><i class="bi bi-x-lg text-light"></i></a>
 						</div>
 					</div>
 					
@@ -126,7 +126,7 @@
 	<fieldset>
 		<div class="d-flex justify-content-between">
 			<p class="mt-3">Colori Disponibili</p>
-			<a class="bottonepiccolo btn btn-sm btn-light" id="addColor"><i class="bi bi-plus-lg text-bolder"></i></a>
+			<a class="bottonepiccolo btn btn-sm bg-primary" id="addColor"><i class="bi bi-plus-lg text-light"></i></a>
 		</div>
 		
 		<div>
@@ -144,25 +144,30 @@
 
 							</select>
 						</div>
-						<div class="col-md-7">
+						<div class="col-md-8">
 							@for (int j = 1; j <= 4; j++)
 							{
 								<div class="extra-field" id="field-@i-@j" style="display: none;">
 									<div class="d-flex">
-
 										<div class="mb-3 form-floating flex-grow-1">
 											<input type="text" class="altezza form-control" id="image-@i-@j"
 												   autocomplete="off" name="SelectedColor[@i].ImgListModel">
 											<label for="ImgListModel-@i-@j" class=" text-secondary">URL dell'immagine</label>
 										</div>
-									</div>
+                                    </div>
+									
 								</div>
+								
 							}
 						</div>
 
-						<a class="btn btn-light mb-3 btn-sm add-btn col-md-3 border border-black" id="add-btn-@i">Aggiungi immagine</a>
+						<a class="btn btn-light mb-3 btn-sm add-btn col-md-1" id="add-btn-@i"><i class="bi bi-camera-fill fs-5"></i></a>
+                        <a class="bottonepiccolo text-center btn btn-sm btn-danger ms-2" onclick="removeColor(this)"><i class="bi bi-x-lg"></i></a>
+					
 					</div>
+                   
 				</div>
+				
 			}
 			
 		</div>
@@ -281,4 +286,18 @@
 			}
 		});
 	});
+
+		function removeColor(button) {
+		let row = button.closest('.colorField');
+		if (row) {
+			row.remove();
+		}
+	}
+
+	function removeMat(button) {
+		let row = button.closest('.matField');
+		if (row) {
+			row.remove();
+		}
+	}
 </script>
