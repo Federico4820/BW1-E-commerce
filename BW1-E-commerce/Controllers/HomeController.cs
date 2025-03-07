@@ -19,13 +19,10 @@ public class HomeController : Controller
         return View();
     }
 
-    
-
-    public IActionResult AddDelete()
+  public IActionResult AddDelete()
     {
-        return View("~/ Views / Products / AddDelete.cshtml");
+        return View();
     }
-
     public IActionResult Privacy()
     {
         return View();

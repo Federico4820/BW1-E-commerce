@@ -1,14 +1,29 @@
-﻿
-@{
-	
+﻿@{
+    var cat = ViewBag.Categories as List<Category>;
+    var color = ViewBag.Color as List<ColorModel>;
+    var sizes = ViewBag.Sizes as List<SizeModel>;
+    var mat = ViewBag.Material as List<MaterialModel>;
 }
 
-<div class="container">
-	<div class="row">
-		<div class="col-3">
-		@await Html.PartialAsync("_SidebarAdd")
-		</div>
-		<div class="col-9">
+
+<h1 class="title text-bolder ms-5 mb-4 mt-3">Dacci una mano</h1>
+
+<div class="container-fluid">
+    <div class="row">
+<div class="sidebar col-md-2 d-none d-md-block d-flex flex-column">
+
+    <a class="text-decoration-none text-dark mt-4 mx-3" asp-controller="" asp-action="Index" onclick="LoadPage('Add')">Aggiungi</a>
+    <hr class="text-secondary" />
+    <a class="text-decoration-none text-dark mx-3" asp-controller="" asp-action="Index  onclick=" LoadPage('Delete')>Elimina o modifica</a>
+
+</div>
+
+
+		<div class="col-md-10" >
+            @await Html.PartialAsync("_Add")
 </div>
 </div>
 </div>
+
+
+    

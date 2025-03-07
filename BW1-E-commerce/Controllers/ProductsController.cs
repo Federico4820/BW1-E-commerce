@@ -281,7 +281,7 @@ namespace BW1_E_commerce.Controllers
             return materials;
         }
         //ACTION PER FAR FUNZIONARE IL FORM DI AGGIUNTA PRODOTTO
-        public async Task<IActionResult> Add()
+        public async Task<IActionResult> AddDelete()
         {
             ViewBag.Categories = await GetCategories();
             ViewBag.Color = await GetColor();

@@ -1,0 +1,290 @@
+﻿@model ProductAddModel
+
+
+
+@{
+	var cat = ViewBag.Categories as List<Category>;
+	var color = ViewBag.Color as List<ColorModel>;
+	var sizes = ViewBag.Sizes as List<SizeModel>;
+	var mat = ViewBag.Material as List<MaterialModel>;
+
+	ViewData["Title"] = "Aggiungi Prodotto";
+}
+
+
+@if (TempData["Error"] != null)
+{
+	<span class="text-danger">@TempData["Error"]</span>
+}
+
+<form method="post" asp-controller="Products" asp-action="AddSave">
+	<fieldset class="">
+		<legend class="h1 text-bold">Caratteristiche generali</legend>
+		<p class="sottotitolo mb-3 ms-2">Carica anche te qualche articolo sul nostro sito per vendere abiti in modo semplice da casa</p>
+		<div class="row g-3">
+			<div class="form-group col-md-6">
+				<label asp-for="Name" class="control-label">Nome</label>
+				<input asp-for="Name" class="form-control border border-black" type="text" placeholder="Inserisci il nome del prodotto" required />
+			</div>
+
+			<div class="form-group col-md-6">
+				<label asp-for="Brand" class="control-label">Marca</label>
+				<input asp-for="Brand" class="form-control border border-black" type="text" placeholder="Inserisci la marca del tuo prodotto" required />
+			</div>
+
+			<div class="form-group col-md-2 mt-3">
+				<label asp-for="Gender" class="control-label">Genere</label>
+				<br/>
+				<select class="form-select border border-black p-2 rounded-1" asp-for="Gender" required>
+					<option selected disabled>Unisex</option>
+					<option value="F">Donna</option>
+					<option value="M">Uomo</option>
+					<option value="U">Unisex</option>
+				</select>
+			</div>
+
+			<div class="form-group col-md-5 mt-3">
+				<label asp-for="IdCategory" class="control-label">Categoria</label>
+				<select asp-for="IdCategory" class="form-control border border-black" required>
+					<option selected disabled>Seleziona un'opzione</option>
+					@if (cat != null)
+					{
+						@foreach (var item in cat)
+						{
+							<option value="@item.IdCategory">@item.Name</option>
+						}
+					}
+				</select>
+			</div>
+
+			<div class="form-group col-md-5 mt-3">
+				<label asp-for="Price" class="control-label">Prezzo</label>
+				<input asp-for="Price" class="form-control border border-black" type="number" placeholder="Inserisci il prezzo del tuo prodotto" step="0.01" required />
+			</div>
+
+			<div class="form-group col-12">
+				<label asp-for="Description" class="control-label">Descrizione</label>
+				<input asp-for="Description" class="form-control p-4 border border-black" type="text" placeholder="inserisci qui la descizione del tuo prodotto" required />
+			</div>
+
+			<div id="materialContainer">
+                <div class="d-flex justify-content-between">
+                    <p>Composizione</p>
+                    <a class="bottonepiccolo btn btn-sm btn-light" id="addMat"><i class="bi bi-plus-lg text-bolder"></i></a>
+				</div>
+				
+				@for (int i = 0; i < mat.Count; i++)
+				{
+					<div class="matField" style="display:none">
+						<div class="row">
+							<div class="col-md-4 mb-2">
+								<select name="SelectedMaterials[@i].IdMaterial" class="form-control border border-black mb-3">
+									<option value="" selected disabled>Seleziona un materiale</option>
+									@if (mat != null)
+									{
+										@foreach (var item in mat)
+										{
+											<option value="@item.IdMaterial">@item.Name</option>
+										}
+									}
+									
+								</select>
+							</div>
+
+							<div class="col-md-4">
+								<input type="number" name="SelectedMaterials[@i].Percentage" class="form-control border border-black" min="0" max="100" placeholder="percentuale del materiale" />
+							</div>
+							<a class="bottonepiccolo text-center btn btn-sm btn-light" id="removeMat" onclick="delete()"><i class="bi bi-x-lg"></i></a>
+						</div>
+					</div>
+					
+				}
+			</div>
+
+			
+
+		</div>
+
+	</fieldset>
+
+	<fieldset>
+		<p>Taglie Disponibili</p>
+		<div class="form-group">
+			<div class="d-flex justify-content-evenly">
+				@if (sizes != null)
+				{
+					@foreach (var item in sizes)
+					{
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input border border-black" id="@item.IdSize" name="SelectedSizes" value="@item.IdSize">
+							<label class="form-check-label" for="@item.IdSize">@item.Name</label>
+						</div>
+					}
+				}
+			</div>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<div class="d-flex justify-content-between">
+			<p class="mt-3">Colori Disponibili</p>
+			<a class="bottonepiccolo btn btn-sm btn-light" id="addColor"><i class="bi bi-plus-lg text-bolder"></i></a>
+		</div>
+		
+		<div>
+			@for (int i = 0; i < color.Count; i++)
+			{
+				<div class="colorField mb-3 " id="colorField-@i" style="display:none">
+					<div class="row align-items-start">
+						<div class="col-md-2">
+							<select name="SelectedColor[@i].IdColor" class="form-control border border-black">
+								<option value="" selected disabled>Seleziona un Colore</option>
+								@foreach (var item in color)
+								{
+									<option value="@item.IdColor">@item.Name</option>
+								}
+
+							</select>
+						</div>
+						<div class="col-md-7">
+							@for (int j = 1; j <= 4; j++)
+							{
+								<div class="extra-field" id="field-@i-@j" style="display: none;">
+									<div class="d-flex">
+
+										<div class="mb-3 form-floating flex-grow-1">
+											<input type="text" class="altezza form-control" id="image-@i-@j"
+												   autocomplete="off" name="SelectedColor[@i].ImgListModel">
+											<label for="ImgListModel-@i-@j" class=" text-secondary">URL dell'immagine</label>
+										</div>
+									</div>
+								</div>
+							}
+						</div>
+
+						<a class="btn btn-light mb-3 btn-sm add-btn col-md-3 border border-black" id="add-btn-@i">Aggiungi immagine</a>
+					</div>
+				</div>
+			}
+			
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<p>Dati Vendita</p>
+		<div class="row">
+			<div class="form-group col-md-10">
+				<label asp-for="Email" class="control-label">Email</label>
+				<input asp-for="Email" class="form-control" type="text" placeholder="vestiti@gmail.com" required />
+			</div>
+			<div class="form-group col-md-1">
+				<label asp-for="Stock" class="control-label">Quantità</label>
+				<input asp-for="Stock" class="form-control" type="number" placeholder="es.1" required />
+			</div>
+		</div>
+	</fieldset>
+
+	<div class="form-group mt-4">
+		<button type="submit" class="btn btn-primary">Aggiungi</button>
+	</div>
+</form>
+
+
+<script>
+
+	document.getElementById("addMat").addEventListener("click", function(){
+		let field = document.querySelectorAll(".matField");
+		for (let i=0; i<field.length; i++){
+			if(field[i].style.display ==="none"){
+				field[i].style.display="block"
+				return
+			}
+		}
+		alert("Hai raggiunto il limite massimo di materiali!")
+	});
+
+		document.getElementById("addColor").addEventListener("click", function(){
+		let field = document.querySelectorAll(".colorField");
+		for (let i=0; i<field.length; i++){
+			if(field[i].style.display ==="none"){
+				field[i].style.display="block"
+				return
+			}
+		}
+		alert("Hai raggiunto il limite massimo di materiali!")
+	});
+
+		document.addEventListener("DOMContentLoaded", function () {
+		const container = document.getElementById("materialContainer");
+
+		function updateSelectOptions() {
+			let selectedValues = new Set();
+			container.querySelectorAll("select[name^='SelectedMaterials']").forEach(select => {
+				if (select.value) {
+					selectedValues.add(select.value);
+				}
+			});
+			container.querySelectorAll("select[name^='SelectedMaterials']").forEach(select => {
+				let currentValue = select.value;
+				select.querySelectorAll("option").forEach(option => {
+					if (option.value !== "" && option.value !== currentValue) {
+						option.disabled = selectedValues.has(option.value);
+					} else {
+						option.disabled = false;
+					}
+				});
+			});
+		}
+
+		function validatePercentage() {
+			let total = 0;
+			container.querySelectorAll("input[name^='SelectedMaterials'][name$='Percentage']").forEach(input => {
+				total += parseFloat(input.value) || 0;
+			});
+			let warning = document.getElementById("percentageWarning");
+			if (!warning) {
+				warning = document.createElement("p");
+				warning.id = "percentageWarning";
+				warning.style.color = "red";
+				container.appendChild(warning);
+			}
+
+			if (total !== 100) {
+				warning.textContent = "La somma delle percentuali deve essere 100.";
+			} else {
+				warning.textContent = "";
+			}
+		}
+		container.addEventListener("change", function (event) {
+			if (event.target.tagName === "SELECT") {
+				updateSelectOptions();
+			}
+			if (event.target.tagName === "INPUT") {
+				validatePercentage();
+			}
+		});
+	});
+
+	document.querySelectorAll(".add-btn").forEach((e, index) => {
+		e.addEventListener("click", function () {
+			let colorField = document.getElementById("colorField-" + index);
+			let fields = colorField.querySelectorAll(".extra-field");
+			let visibleFields = Array.from(fields).filter(field => field.style.display !== "none");
+			const maxImages = 4;
+			if (visibleFields.length < maxImages) {
+				for (let i = 0; i < fields.length; i++) {
+					if (fields[i].style.display === "none") {
+						fields[i].style.display = "block";
+						break;
+					}
+				}
+			} else {
+				alert("Hai raggiunto il limite massimo di 4 immagini per questo colore.");
+			}
+		});
+	});
+
+	//elimina quello in piu
+
+
+</script>
