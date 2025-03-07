@@ -4,7 +4,7 @@
 	var productList = ViewBag.Prod as ProductListModel;
 	var commentList = ViewBag.Comments as CommentListModel;
 	var singleComment = ViewBag.Comment as SingleCommentModel;
-	var gender = ViewBag.gender as string;
+	var gender = ViewBag.Gender as string;
 	ViewData["Title"] = "Pagina Dettagli";
 }
 
@@ -22,7 +22,7 @@
 			</li>
 			<li class="breadcrumbCust-item">
 				<span aria-hidden="true">›</span><a class="nav-link"
-				asp-controller="Products" asp-action="Index" asp-route-filter=@Model.IdCategory asp-route-gender=gender>@Model.Category</a>
+				asp-controller="Products" asp-action="Index" asp-route-filter=@Model.IdCategory asp-route-gender=@gender>@Model.Category</a>
 			</li>
 			<li class="breadcrumbCust-item active" aria-current="page" id="dataPage">
 				<span aria-hidden="true">›</span>@Model.Name
@@ -66,7 +66,7 @@
 						</div>
 
 						<p class="fw-bold">Colori disponibili: <span class="fw-normal" id="color-name"></span></p>
-						<form asp-action="AddToCart" method="post">
+						<form asp-controller="Products" asp-action="AddToCart" method="post">
 							<!-- Parametri nascosti -->
 							<input type="hidden" name="idProd" value="@Model.Id" />
 							<input type="hidden" name="price" value="@Model.Price" />
@@ -103,6 +103,8 @@
 								}
 							</select>
 
+
+							<p class="fw-bold m-0 p-0">Quantità -------</p>
 							<!-- Selezione della quantità (da 1 a 10) -->
 							<select name="quantity" class="mb-4 customSelect">
 								@for (int i = 1; i <= 10; i++)
@@ -111,19 +113,19 @@
 								}
 							</select>
 
-							<button type="submit" class="btn btn-primary">Aggiungi al Carrello</button>
+							<div class="mb-3 d-flex align-items-center">
+								<button type="submit" class="btn btn-success btn-lg rounded-0 fw-bolder me-4 flex-grow-1">
+									AGGIUNGI AL
+									CARRELLO
+								</button>
+								<button class="favorite-detail" type="button">
+									<i class="bi bi-heart"></i>
+								</button>
+							</div>
 						</form>
 
 
-						<div class="mb-3 d-flex align-items-center">
-							<a class="btn btn-success btn-lg rounded-0 fw-bolder me-4 flex-grow-1" asp-controller="Products" asp-action="AddToCart" asp-route-idProd=@Model.Id asp-route-quantity=1 asp-route-price=@Model.Price>
-								AGGIUNGI AL
-								CARRELLO
-							</a>
-							<button class="favorite-detail">
-								<i class="bi bi-heart"></i>
-							</button>
-						</div>
+						
 
 
 						<div class="borderCustom p-2 ps-3 mb-3">
@@ -232,7 +234,7 @@
 								<button class="btn-custom mb-3" id="scriviForm"> Scrivi una recensione!</button>
 							</div>
 							<div style="display: none" id="recensioneForm">
-								<form asp-controller="Products" asp-action="WriteComment" method="post" class="d-flex flex-column" >
+								<form asp-controller="Products" asp-action="WriteComment" asp-route-gender=@Model.Gender method="post" class="d-flex flex-column" >
 									<input type="hidden" name="IdProd" value="@Model.Id" />
 
 		
@@ -309,6 +311,7 @@
 								}
 							</div>
 						}
+						</div>
 				</div>
 			</section>
 		</div>

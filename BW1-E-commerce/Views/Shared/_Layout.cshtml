@@ -32,10 +32,18 @@
                 </div>
                
                 <!-- RICERCA -->
-                <div class="search-container col-sm-2 col-md-5 col-lg-6">
-                    <input class="form-control search-bar d-none d-lg-block" id="search-input" type="search" placeholder="Ricerca per articoli e brand" aria-label="Search">
-                    <button class="btn search-btn" type="submit"><i class="bi bi-search"></i></button>
-                </div>
+                <form asp-action="Index" method="get" class="search-container col-sm-2 col-md-5 col-lg-6">
+                    <input type="hidden" name="gender" value=@ViewBag.Gender />
+                    <input class="form-control search-bar d-none d-lg-block"
+                           id="search-input"
+                           type="search"
+                           name="search"
+                    placeholder="Ricerca per articoli e brand"
+                    aria-label="Search">
+                    <button class="btn search-btn" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
                
                 <!-- ICONE-->
                 <div class="col-sm-5 col-md-3 col-lg-3 d-flex grid gap-2 justify-content-end pe-5">
@@ -45,7 +53,7 @@
                             <i class="bi bi-person fs-5"></i>
                         </span>
                         <ul class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="dropdownMenuButton">
-                            <li><a class="dropdown-item text-light" asp-area="" asp-controller="account" asp-action="Index">Il mio account</a></li>
+                            <li><a class="dropdown-item text-light" asp-area="" asp-controller="account" asp-action="Index" >Il mio account</a></li>
                             <li><a class="dropdown-item text-light" href="">Logout</a></li>
                         </ul>
                     </div>

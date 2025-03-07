@@ -22,7 +22,7 @@ namespace BW1_E_commerce.Controllers
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task<ProductListModel> GetProducts(string gender)
+        public async Task<ProductListModel> GetProducts(string gender, string search = null)
         {
             var prodList = new ProductListModel()
             {
@@ -32,10 +32,34 @@ namespace BW1_E_commerce.Controllers
             await using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                var query = @" WITH ImageSelection AS (SELECT PC.id_prod, PCI.img_URL, ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn FROM ProdColorImages PCI JOIN ProdColor PC ON PCI.id_prodColor = PC.id_prodColor) SELECT P.id_prod, P.nome, P.brand, P.price, P.descr, P.id_category, C.nome as category_name, P.gender, ISel.img_URL FROM Products P LEFT JOIN Category as C ON P.id_category = C.id_category LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1 WHERE P.gender IN (@gender, 'U');";
+
+                var query = @"WITH ImageSelection AS (
+                        SELECT PC.id_prod, PCI.img_URL, 
+                               ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn
+                        FROM ProdColorImages PCI 
+                        JOIN ProdColor PC ON PCI.id_prodColor = PC.id_prodColor
+                      ) 
+                      SELECT P.id_prod, P.nome, P.brand, P.price, P.descr, 
+                             P.id_category, C.nome as category_name, P.gender, ISel.img_URL
+                      FROM Products P 
+                      LEFT JOIN Category as C ON P.id_category = C.id_category
+                      LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1
+                      WHERE P.gender IN (@gender, 'U')";
+
+                // Se la ricerca non è vuota, aggiungiamo il filtro LIKE
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    query += " AND (P.nome LIKE @search OR P.brand LIKE @search)";
+                }
+
                 await using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@gender", gender);
+                    if (!string.IsNullOrWhiteSpace(search))
+                    {
+                        command.Parameters.AddWithValue("@search", $"%{search}%");
+                    }
+
                     await using (SqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
@@ -56,9 +80,7 @@ namespace BW1_E_commerce.Controllers
                             );
                         }
                     }
-
                 }
-
             }
             return prodList;
         }
@@ -69,9 +91,9 @@ namespace BW1_E_commerce.Controllers
         }
 
 
-        public async Task<IActionResult> Index(int? filter, string gender)
+        public async Task<IActionResult> Index(int? filter, string gender, string? search)
         {
-            ViewBag.Prod = await GetProducts(gender);
+            ViewBag.Prod = await GetProducts(gender, search);
             ViewBag.Categories = await GetCategories();
             if (filter.HasValue)
             {
@@ -466,8 +488,8 @@ namespace BW1_E_commerce.Controllers
 
 
         //ACTION PER ADD DEL COMMENTO
-        [HttpPost]
-        public async Task<IActionResult> WriteComment(SingleCommentModel model)
+        [HttpPost("products/write-comment")]
+        public async Task<IActionResult> WriteComment(SingleCommentModel model, string gender)
         {
             if (!ModelState.IsValid)
             {
@@ -547,7 +569,7 @@ namespace BW1_E_commerce.Controllers
                 TempData["Error"] = $"Si è verificato un errore durante l'inserimento dei dati. Riprova più tardi. Errore: {ex.Message}";
                 return RedirectToAction("Add");
             }
-            return RedirectToAction("Details", new { id = model.idProd });
+            return RedirectToAction("Details", new { id = model.idProd, gender });
         }
 
 
