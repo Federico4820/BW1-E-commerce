@@ -20,6 +20,8 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Products}/{action=Intro}/{id?}");

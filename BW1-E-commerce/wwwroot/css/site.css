@@ -738,3 +738,7 @@ filter: grayscale(5);
 .altezza{
     height:30.6px;
 }
+
+iframe{
+    width: 100vw;
+}
