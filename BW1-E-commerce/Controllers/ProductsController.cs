@@ -323,7 +323,7 @@ namespace BW1_E_commerce.Controllers
         }
 
         //ACTION PER FAR FUNZIONARE IL FORM DI AGGIUNTA PRODOTTO
-        public async Task<IActionResult> AddDelete()
+        public async Task<IActionResult> AddDelete(Guid? id)
         {
             ViewBag.Categories = await GetCategories();
             ViewBag.Color = await GetColor();
@@ -331,8 +331,14 @@ namespace BW1_E_commerce.Controllers
             ViewBag.Material = await GetMaterials();
             ViewBag.Prod = await GetProducts();
             ViewBag.AddProd = new ProductAddModel();
+            if (id != null)
+            {
+                ViewBag.EditProd = await GetEditProductModel(id.Value);
+            }
             return View();
         }
+
+
         [HttpPost]
         public async Task<IActionResult> AddSave(ProductAddModel model)
         {
@@ -1006,14 +1012,9 @@ namespace BW1_E_commerce.Controllers
             return RedirectToAction("AddDelete");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Edit(Guid id)
+        private async Task<EditProduct> GetEditProductModel(Guid id)
         {
             var model = new EditProduct();
-            ViewBag.Categories = await GetCategories();
-            ViewBag.Color = await GetColor();
-            ViewBag.Sizes = await GetSizes();
-            ViewBag.Material = await GetMaterials();
 
             try
             {
@@ -1021,11 +1022,12 @@ namespace BW1_E_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    //Recupero dei dati principali del prodotto
+                    // Recupero dati principali del prodotto
                     var queryProd = @"
-        SELECT id_prod, nome, brand, price, descr, id_category, gender, stock 
-        FROM Products 
-        WHERE id_prod = @id_prod";
+SELECT id_prod, nome, brand, price, descr, id_category, gender, stock 
+FROM Products 
+WHERE id_prod = @id_prod";
+
                     using (var cmdProd = new SqlCommand(queryProd, connection))
                     {
                         cmdProd.Parameters.AddWithValue("@id_prod", id);
@@ -1042,14 +1044,11 @@ namespace BW1_E_commerce.Controllers
                                 model.Gender = reader["gender"].ToString();
                                 model.Stock = Convert.ToInt32(reader["stock"]);
                             }
-                            else
-                            {
-                                return NotFound();
-                            }
                         }
                     }
 
-                    //Recupero delle dimensioni (ProdSize)
+                    // Recupero delle dimensioni (ProdSize)
+                    model.SelectedSizes = new List<int>();
                     var querySizes = "SELECT id_size FROM ProdSize WHERE id_prod = @id_prod";
                     using (var cmdSizes = new SqlCommand(querySizes, connection))
                     {
@@ -1063,19 +1062,19 @@ namespace BW1_E_commerce.Controllers
                         }
                     }
 
-                    // Recupero dei colori e relative immagini (ProdColor e ProdColorImages)
+                    // Recupero dei colori e immagini
                     model.SelectedColors = new List<ColorEditModel>();
                     var queryColors = @"
-        SELECT PC.id_prodColor, PC.id_color, PCI.img_URL 
-        FROM ProdColor PC 
-        LEFT JOIN ProdColorImages PCI ON PC.id_prodColor = PCI.id_prodColor 
-        WHERE PC.id_prod = @id_prod";
+SELECT PC.id_prodColor, PC.id_color, PCI.img_URL 
+FROM ProdColor PC 
+LEFT JOIN ProdColorImages PCI ON PC.id_prodColor = PCI.id_prodColor 
+WHERE PC.id_prod = @id_prod";
+
                     using (var cmdColors = new SqlCommand(queryColors, connection))
                     {
                         cmdColors.Parameters.AddWithValue("@id_prod", id);
                         using (var reader = await cmdColors.ExecuteReaderAsync())
                         {
-                            // Raggruppa i colori per id_prodColor per raccogliere tutte le immagini associate
                             var colorsDict = new Dictionary<Guid, ColorEditModel>();
                             while (await reader.ReadAsync())
                             {
@@ -1105,7 +1104,7 @@ namespace BW1_E_commerce.Controllers
                         }
                     }
 
-                    //Recupero dei materiali (ProdMaterial)
+                    // Recupero dei materiali (ProdMaterial)
                     model.SelectedMaterials = new List<MaterialEditModel>();
                     var queryMaterials = "SELECT id_material, percentage_mat FROM ProdMaterial WHERE id_prod = @id_prod";
                     using (var cmdMat = new SqlCommand(queryMaterials, connection))
@@ -1125,14 +1124,15 @@ namespace BW1_E_commerce.Controllers
                         }
                     }
                 }
-                return View(model);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Errore durante il caricamento del prodotto: " + ex.Message;
-                return RedirectToAction("Index");
+                throw new Exception("Errore durante il caricamento del prodotto: " + ex.Message);
             }
+
+            return model;
         }
+
 
         public async Task<IActionResult> EditSave(EditProduct model)
         {

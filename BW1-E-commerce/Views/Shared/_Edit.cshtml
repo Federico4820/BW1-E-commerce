@@ -1,68 +1,61 @@
-﻿@model BW1_E_commerce.Models.EditProduct
-
-@{
+﻿@{
     var cat = ViewBag.Categories as List<Category>;
     var color = ViewBag.Color as List<ColorModel>;
     var sizes = ViewBag.Sizes as List<SizeModel>;
     var mat = ViewBag.Material as List<MaterialModel>;
     var productEdit = ViewBag.EditProd as EditProduct;
-
-    ViewData["Title"] = "Modifica Prodotto";
-}
-
-@if (TempData["Error"] != null)
-{
-    <span class="text-danger">@TempData["Error"]</span>
 }
 
 <form method="post" asp-controller="Products" asp-action="EditSave">
-    <input type="hidden" asp-for="IdProd" />
+    <input type="hidden" name="IdProd" value="@productEdit?.IdProd" />
 
     <fieldset>
         <legend>Caratteristiche generali</legend>
         <div class="row g-3">
             <div class="form-group col-md-4">
-                <label asp-for="Name" class="control-label">Nome</label>
-                <input asp-for="Name" class="form-control" type="text" required />
+                <label class="control-label">Nome</label>
+                <input name="Name" class="form-control" type="text" value="@productEdit?.Name" required />
             </div>
 
             <div class="form-group col-md-3">
-                <label asp-for="Brand" class="control-label">Marca</label>
-                <input asp-for="Brand" class="form-control" type="text" required />
+                <label class="control-label">Marca</label>
+                <input name="Brand" class="form-control" type="text" value="@productEdit?.Brand" required />
             </div>
 
             <div class="form-group col-md-2">
-                <label asp-for="Gender" class="control-label">Genere</label>
-                <select class="form-select" asp-for="Gender" required>
+                <label class="control-label">Genere</label>
+                <select class="form-select" name="Gender" required>
                     <option selected disabled>Seleziona un'opzione</option>
-                    <option value="F">Donna</option>
-                    <option value="M">Uomo</option>
-                    <option value="U">Unisex</option>
+                    <option value="F" selected="@(productEdit?.Gender == "F" ? "selected" : null)">Donna</option>
+                    <option value="M" selected="@(productEdit?.Gender == "M" ? "selected" : null)">Uomo</option>
+                    <option value="U" selected="@(productEdit?.Gender == "U" ? "selected" : null)">Unisex</option>
                 </select>
             </div>
 
             <div class="form-group col-md-2">
-                <label asp-for="IdCategory" class="control-label">Categoria</label>
-                <select asp-for="IdCategory" class="form-control" required>
+                <label class="control-label">Categoria</label>
+                <select name="IdCategory" class="form-control" required>
                     <option selected disabled>Seleziona un'opzione</option>
                     @if (cat != null)
                     {
                         @foreach (var item in cat)
                         {
-                            <option value="@item.IdCategory">@item.Name</option>
+                            <option value="@item.IdCategory" selected="@(productEdit?.IdCategory == item.IdCategory ? "selected" : null)">
+                                @item.Name
+                            </option>
                         }
                     }
                 </select>
             </div>
 
             <div class="form-group col-md-1">
-                <label asp-for="Price" class="control-label">Prezzo</label>
-                <input asp-for="Price" class="form-control" type="number" step="0.01" required />
+                <label class="control-label">Prezzo</label>
+                <input name="Price" class="form-control" type="number" step="0.01" value="@productEdit?.Price" required />
             </div>
 
             <div class="form-group col-12">
-                <label asp-for="Description" class="control-label">Descrizione</label>
-                <textarea asp-for="Description" class="form-control" required></textarea>
+                <label class="control-label">Descrizione</label>
+                <textarea name="Description" class="form-control" required>@productEdit?.Description</textarea>
             </div>
         </div>
     </fieldset>
@@ -77,7 +70,7 @@
                     {
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="@item.IdSize" name="SelectedSizes" value="@item.IdSize"
-                            @(Model.SelectedSizes.Contains(item.IdSize) ? "checked" : "")>
+                            @(productEdit?.SelectedSizes?.Contains(item.IdSize) == true ? "checked" : "")>
                             <label class="form-check-label" for="@item.IdSize">@item.Name</label>
                         </div>
                     }
@@ -88,50 +81,51 @@
 
     <fieldset>
         <legend>Colori Disponibili</legend>
-        @* Pulsante per aggiungere un nuovo colore *@
         <button type="button" class="btn btn-primary mb-3" id="add-color-btn">Aggiungi Colore</button>
 
-        @* Form per i colori e le immagini *@
         <div id="color-fields-container">
-            @for (int i = 0; i < color.Count; i++)
+            @if (productEdit?.SelectedColors != null)
             {
-                <div class="colorField mb-3" id="colorField-@i" style="display: @(Model.SelectedColors != null && Model.SelectedColors.Count > i ? "block" : "none")">
-                    <div class="row align-items-start">
-                        <div class="col-md-2">
-                            <select name="SelectedColors[@i].IdColor" class="form-control">
-                                <option value="" selected disabled>Seleziona un Colore</option>
-                                @foreach (var item in color)
+                for (int i = 0; i < productEdit.SelectedColors.Count; i++)
+                {
+                    var selectedColor = productEdit.SelectedColors[i];
+                    <div class="colorField mb-3" id="colorField-@i">
+                        <div class="row align-items-start">
+                            <div class="col-md-2">
+                                <select name="SelectedColors[@i].IdColor" class="form-control">
+                                    <option value="" selected disabled>Seleziona un Colore</option>
+                                    @foreach (var item in color)
+                                    {
+                                        <option value="@item.IdColor" selected="@(selectedColor.IdColor == item.IdColor ? "selected" : null)">
+                                            @item.Name
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-9">
+                                @for (int j = 0; j < 4; j++)
                                 {
-                                    var isSelected = Model.SelectedColors != null && Model.SelectedColors.Count > i && Model.SelectedColors[i].IdColor == item.IdColor;
-                                    <option value="@item.IdColor" selected="@(isSelected ? "selected" : null)">
-                                        @item.Name
-                                    </option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-9">
-                            @for (int j = 0; j < 4; j++)
-                            {
-                                var imgValue = Model.SelectedColors != null && Model.SelectedColors.Count > i && Model.SelectedColors[i].ImgListModel != null && Model.SelectedColors[i].ImgListModel.Count > j
-                                ? Model.SelectedColors[i].ImgListModel[j]
-                                : "";
-                                <div class="extra-field mb-3" id="field-@i-@j" style="display: @(!string.IsNullOrEmpty(imgValue) ? "block" : "none")">
-                                    <div class="d-flex">
-                                        <span class="input-group-text" id="basic-addon3">https://example.com/photo.jpg</span>
-                                        <div class="form-floating flex-grow-1">
-                                            <input type="text" class="form-control" id="image-@i-@j" placeholder="Inserisci l'URL dell'immagine"
-                                                   autocomplete="off" name="SelectedColors[@i].ImgListModel[@j]" value="@imgValue">
-                                            <label for="image-@i-@j" class="text-secondary">Product ImageURL</label>
+                                    var imgValue = selectedColor.ImgListModel != null && selectedColor.ImgListModel.Count > j
+                                    ? selectedColor.ImgListModel[j]
+                                    : "";
+                                    <div class="extra-field mb-3" id="field-@i-@j" style="display: @(string.IsNullOrEmpty(imgValue) ? "none" : "block")">
+                                        <div class="d-flex">
+                                            <span class="input-group-text">https://example.com/photo.jpg</span>
+                                            <div class="form-floating flex-grow-1">
+                                                <input type="text" class="form-control" id="image-@i-@j"
+                                                       name="SelectedColors[@i].ImgListModel[@j]" value="@imgValue">
+                                                <label class="text-secondary">Product ImageURL</label>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            }
-                        </div>
-                        <div class="col-md-1">
-                            <button type="button" class="btn btn-light btn-sm add-image-btn" data-color-index="@i">Aggiungi immagine</button>
+                                }
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-light btn-sm add-image-btn" data-color-index="@i">Aggiungi immagine</button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             }
         </div>
     </fieldset>
@@ -140,12 +134,12 @@
         <legend>Dati Vendita</legend>
         <div class="row">
             <div class="form-group col-md-10">
-                <label asp-for="Email" class="control-label">Email</label>
-                <input asp-for="Email" class="form-control" type="email" required />
+                <label class="control-label">Email</label>
+                <input name="Email" class="form-control" type="email" value="@productEdit?.Email" required />
             </div>
             <div class="form-group col-md-1">
-                <label asp-for="Stock" class="control-label">Quantità</label>
-                <input asp-for="Stock" class="form-control" type="number" required />
+                <label class="control-label">Quantità</label>
+                <input name="Stock" class="form-control" type="number" value="@productEdit?.Stock" required />
             </div>
         </div>
     </fieldset>
@@ -154,6 +148,7 @@
         <button type="submit" class="btn btn-primary">Salva Modifiche</button>
     </div>
 </form>
+
 
 <script>
     function addField(containerId, className, maxLimit, alertMessage) {
