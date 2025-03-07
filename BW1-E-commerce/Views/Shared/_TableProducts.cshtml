@@ -25,7 +25,7 @@
                     <td>@product.IdCategory</td>
                     <td>@product.Price.ToString()</td>
                     <td>
-                        <a class="btn btn-warning m-2" asp-controller="Products" asp-action="Edit" asp-route-id="@product.IdProd">Edit</a>
+                        <a class="btn btn-warning m-2" asp-controller="Products" asp-action="AddDelete" asp-route-id="@product.IdProd" id="EditForm-btn">Edit</a>
                         <a class="btn btn-danger m-2" asp-controller="Products" asp-action="Delete" asp-route-id="@product.IdProd">Delete</a>
                     </td>
                 </tr>

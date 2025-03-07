@@ -5,7 +5,10 @@
 	var mat = ViewBag.Material as List<MaterialModel>;
 	var productList = ViewBag.Prod as ProductListModel;
 	var productListAdd = ViewBag.AddProd as ProductAddModel;
+	var productEdit = ViewBag.EditProd as EditProduct;
 }
+
+
 
 
 <h1 class="title text-bolder ms-5 mb-4 mt-3">Dacci una mano</h1>
@@ -27,6 +30,9 @@
 			</div>
 			<div id="manageForm" style="display: none;">
 				@await Html.PartialAsync("_TableProducts")
+			</div>
+			<div id="editProd" style="display: @(ViewBag.EditProd != null ? "block" : "none");">
+				@await Html.PartialAsync("_Edit")
 			</div>
 		</div>
 
@@ -54,6 +60,20 @@
 			addForm.style.display = 'none';
 		} else {
 			manageForm.style.display = 'none';
+		}
+	});
+
+	document.getElementById('EditForm-btn').addEventListener('click', function() {
+		var manageForm = document.getElementById('manageForm')
+		var addForm = document.getElementById('addForm');
+		var EditForm = document.getElementById('editProd');
+		
+
+		if (EditForm.style.display === 'none') {
+			EditForm.style.display = 'block';
+			addForm.style.display = 'none';
+		} else {
+			EditForm.style.display = 'none';
 		}
 	});
 
