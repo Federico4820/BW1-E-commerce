@@ -606,7 +606,6 @@ namespace BW1_E_commerce.Controllers
                         }
                     }
 
-                    // Controlla se il prodotto con la specifica combinazione di colore e taglia è già nel carrello
                     string checkCartQuery = @"
                 SELECT qt 
                 FROM Cart 
@@ -625,7 +624,6 @@ namespace BW1_E_commerce.Controllers
 
                         if (cartResult != null)
                         {
-                            // Se il prodotto (con la combinazione colore/taglia) è già nel carrello, aggiorna la quantità
                             string updateCartQuery = @"
                         UPDATE Cart 
                         SET qt = qt + @quantity 
@@ -645,7 +643,6 @@ namespace BW1_E_commerce.Controllers
                         }
                         else
                         {
-                            // Se il prodotto non è presente, lo inserisce nel carrello con il colore e la taglia selezionati
                             string insertCartQuery = @"
                         INSERT INTO Cart (id_order, id_prod, qt, price, id_color, id_size) 
                         VALUES (@id_order, @idProd, @quantity, @price, @id_color, @id_size);";
@@ -662,7 +659,6 @@ namespace BW1_E_commerce.Controllers
                         }
                     }
 
-                    // Commit della transazione
                     await transaction.CommitAsync();
                 }
             }
@@ -707,36 +703,36 @@ namespace BW1_E_commerce.Controllers
 
                 string query = @"
                 WITH ImageSelection AS (
-    SELECT 
-        PC.id_prod, 
-        PCI.img_URL, 
-        ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn
-    FROM 
-        ProdColorImages PCI
-    JOIN 
-        ProdColor PC ON PCI.id_prodColor = PC.id_prodColor
-)
-SELECT 
-    c.id_prod, 
-    p.nome, 
-    c.qt, 
-    c.price,
-    ISel.img_URL,
-    k.nome AS Color,
-    k.id_color,
-    s.nome AS Size,
-    s.id_size 
-FROM 
-    Cart c
-JOIN 
-    Products p ON c.id_prod = p.id_prod
-LEFT JOIN 
-    ImageSelection ISel ON p.id_prod = ISel.id_prod AND ISel.rn = 1
-LEFT JOIN Colors AS k ON k.id_color = c.id_color
-LEFT JOIN Sizes AS s ON s.id_size = c.id_size
-WHERE 
-    c.id_order = @idOrder;
-";
+                SELECT 
+                PC.id_prod, 
+                PCI.img_URL, 
+                ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn
+                FROM 
+                ProdColorImages PCI
+                JOIN 
+                ProdColor PC ON PCI.id_prodColor = PC.id_prodColor
+                )
+                SELECT 
+                c.id_prod, 
+                p.nome, 
+                c.qt, 
+                c.price,
+                ISel.img_URL,
+                k.nome AS Color,
+                k.id_color,
+                s.nome AS Size,
+                s.id_size 
+                FROM 
+                Cart c
+                JOIN 
+                Products p ON c.id_prod = p.id_prod
+                LEFT JOIN 
+                ImageSelection ISel ON p.id_prod = ISel.id_prod AND ISel.rn = 1
+                LEFT JOIN Colors AS k ON k.id_color = c.id_color
+                LEFT JOIN Sizes AS s ON s.id_size = c.id_size
+                WHERE 
+                c.id_order = @idOrder;
+                ";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -772,12 +768,11 @@ WHERE
 
             return View(cart);
         }
-        [HttpPost] // Ensure this action only accepts POST requests
+        [HttpPost] 
         public IActionResult RemoveFromCart(Guid idProd, int idColor, int idSize)
         {
             try
             {
-                // SQL query to delete the cart item
                 string query = @"
                 DELETE FROM Cart 
                 WHERE id_prod = @IdProd 
@@ -793,7 +788,6 @@ WHERE
                         command.Parameters.AddWithValue("@IdColor", idColor);
                         command.Parameters.AddWithValue("@IdSize", idSize);
 
-                        // Execute the query
                         int rowsAffected = command.ExecuteNonQuery();
 
                         if (rowsAffected == 0)
@@ -810,7 +804,6 @@ WHERE
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = "An error occurred while removing the item from the cart.";
-                // Log the exception (ex) here
             }
 
             return RedirectToAction("Cart");
@@ -860,7 +853,6 @@ WHERE
                 {
                     Guid? idOrder = null;
 
-                    // Recupera l'ID dell'ultimo ordine esistente
                     string checkOrderQuery = "SELECT TOP 1 id_order FROM Orders ORDER BY id_order DESC;";
                     await using (SqlCommand checkOrderCmd = new SqlCommand(checkOrderQuery, conn, (SqlTransaction)transaction))
                     {
@@ -871,7 +863,6 @@ WHERE
                         }
                     }
 
-                    // Se non esiste un ordine, interrompe l'operazione
                     if (!idOrder.HasValue)
                     {
                         TempData["Error"] = "Nessun ordine esistente.";
@@ -880,7 +871,6 @@ WHERE
 
                     if (quantity > 0)
                     {
-                        // Aggiorna la quantità del prodotto nel carrello
                         string updateCartQuery = "UPDATE Cart SET qt = @quantity WHERE id_order = @id_order AND id_prod = @idProd;";
                         await using (SqlCommand updateCartCmd = new SqlCommand(updateCartQuery, conn, (SqlTransaction)transaction))
                         {
@@ -892,7 +882,6 @@ WHERE
                     }
                     else
                     {
-                        // Se la quantità è 0 o negativa, rimuove il prodotto dal carrello
                         string deleteCartQuery = "DELETE FROM Cart WHERE id_order = @id_order AND id_prod = @idProd;";
                         await using (SqlCommand deleteCartCmd = new SqlCommand(deleteCartQuery, conn, (SqlTransaction)transaction))
                         {
@@ -902,7 +891,6 @@ WHERE
                         }
                     }
 
-                    // Commit della transazione
                     await transaction.CommitAsync();
                 }
             }
@@ -1053,7 +1041,6 @@ WHERE
                 {
                     await connection.OpenAsync();
 
-                    //Recupero dei dati principali del prodotto
                     var queryProd = @"
         SELECT id_prod, nome, brand, price, descr, id_category, gender, stock 
         FROM Products 
@@ -1081,7 +1068,6 @@ WHERE
                         }
                     }
 
-                    //Recupero delle dimensioni (ProdSize)
                     var querySizes = "SELECT id_size FROM ProdSize WHERE id_prod = @id_prod";
                     using (var cmdSizes = new SqlCommand(querySizes, connection))
                     {
@@ -1095,7 +1081,6 @@ WHERE
                         }
                     }
 
-                    // Recupero dei colori e relative immagini (ProdColor e ProdColorImages)
                     model.SelectedColors = new List<ColorEditModel>();
                     var queryColors = @"
         SELECT PC.id_prodColor, PC.id_color, PCI.img_URL 
@@ -1107,7 +1092,6 @@ WHERE
                         cmdColors.Parameters.AddWithValue("@id_prod", id);
                         using (var reader = await cmdColors.ExecuteReaderAsync())
                         {
-                            // Raggruppa i colori per id_prodColor per raccogliere tutte le immagini associate
                             var colorsDict = new Dictionary<Guid, ColorEditModel>();
                             while (await reader.ReadAsync())
                             {
@@ -1137,7 +1121,6 @@ WHERE
                         }
                     }
 
-                    //Recupero dei materiali (ProdMaterial)
                     model.SelectedMaterials = new List<MaterialEditModel>();
                     var queryMaterials = "SELECT id_material, percentage_mat FROM ProdMaterial WHERE id_prod = @id_prod";
                     using (var cmdMat = new SqlCommand(queryMaterials, connection))
@@ -1175,7 +1158,6 @@ WHERE
                     await connection.OpenAsync();
                     using (var transaction = await connection.BeginTransactionAsync())
                     {
-                        //Aggiornamento del record principale in Products
                         var queryUpdateProd = @"
             UPDATE Products 
             SET brand = @brand,

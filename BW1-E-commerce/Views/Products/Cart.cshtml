@@ -1,6 +1,5 @@
 ﻿@model CartViewModel
 
-<!-- Banner promozione / Codice sconto -->
 <div class="container-fluid bg-light py-3 mb-4">
     <div class="container text-center">
         <strong>Inserisci il codice <span class="text-uppercase">CIAO</span></strong> al momento del checkout per ricevere lo sconto.<br />
@@ -12,7 +11,6 @@
 </div>
 
 <div class="container">
-    <!-- Intestazione e Subtotale (come da screenshot) -->
     <div class="row align-items-center mb-3">
         <div class="col-md-6 col-12">
             <small class="text-muted">Venduto e Spedito da OOSC CLOTHING LIMITED</small>
@@ -24,14 +22,12 @@
         </div>
     </div>
 
-    <!-- Tabella prodotti -->
     <div class="table-responsive border rounded p-3">
         <table class="table align-middle mb-0">
             <tbody>
                 @foreach (var item in Model.Items)
                 {
                     <tr>
-                        <!-- Immagine prodotto -->
                         <td style="width: 90px;">
                             <img src="@item.ImgUrl"
                                  alt="@item.ProductName"
@@ -39,7 +35,6 @@
                                  style="max-height: 80px; object-fit: cover;" />
                         </td>
 
-                        <!-- Dettagli prodotto: nome, colore, taglia, ecc. -->
                         <td>
                             <div class="fw-bold">@item.ProductName</div>
                             <div class="text-muted">@item.Color</div>
@@ -47,7 +42,6 @@
                             <div class="text-success small">POCHI PEZZI</div>
                         </td>
 
-                        <!-- Quantità e pulsante aggiorna -->
                         <td>
                             <form asp-action="UpdateCartQuantity" method="post" class="d-flex align-items-center">
                                 <input type="hidden" name="idProd" value="@item.IdProd" />
@@ -63,16 +57,13 @@
                             </form>
                         </td>
 
-                        <!-- Prezzo unitario e totale parziale -->
                         <td class="text-end">
                             <div class="fw-semibold">@item.Price €</div>
                             <small class="text-muted">Totale: @(item.Price * item.Quantity) €</small>
                         </td>
 
-                        <!-- Rimuovi prodotto -->
                         <td class="text-end">
                             <form asp-action="RemoveFromCart" method="post">
-                                <!-- Passa i parametri necessari per identificare il prodotto da rimuovere -->
                                 <input type="hidden" name="idProd" value="@item.IdProd" />
                                 <input type="hidden" name="idColor" value="@item.IdColor" />
                                 <input type="hidden" name="idSize" value="@item.IdSize" />
@@ -87,7 +78,6 @@
         </table>
     </div>
 
-    <!-- Spedizione -->
     <div class="row mt-4">
         <div class="col-md-6 col-12">
             <p class="mb-1 fw-bold">Spedizione</p>
@@ -100,7 +90,6 @@
 
     <hr />
 
-    <!-- Totale carrello e pulsante checkout -->
     <div class="row mb-4">
         <div class="col-md-6 col-12">
             <h4 class="mb-3">Totale Carrello</h4>
@@ -117,23 +106,16 @@
         </div>
     </div>
 
-    <!-- Metodi di pagamento accettati -->
     <div class="border-top pt-3">
         <p class="fw-bold">Accettiamo:</p>
-        <!-- Sostituisci src con i loghi reali dei metodi di pagamento -->
         <i class="bi bi-credit-card-2-front" style="font-size: 24px; margin-right: 8px;" alt="CreditCard"></i>
 
-        <!-- MasterCard -->
         <i class="bi bi-credit-card" style="font-size: 24px; margin-right: 8px;"></i>
 
-        <!-- PayPal -->
         <i class="bi bi-paypal" style="font-size: 24px; margin-right: 8px;"></i>
 
-        <!-- Apple Pay -->
         <i class="bi bi-apple" style="font-size: 24px; margin-right: 8px;"></i>
 
-        <!-- Google Pay -->
         <i class="bi bi-google" style="font-size: 24px; margin-right: 8px;"></i>
-        <!-- Aggiungi eventuali altri metodi di pagamento -->
     </div>
 </div>
