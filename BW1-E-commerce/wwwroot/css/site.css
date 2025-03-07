@@ -14,7 +14,7 @@ html {
 
 html {
     position: relative;
-    min-height: 100%;
+    height: 100%;
     width: 100%;
 }
 
@@ -738,3 +738,6 @@ filter: grayscale(5);
 .altezza{
     height:30.6px;
 }
+
+/*FOOTER*/
+

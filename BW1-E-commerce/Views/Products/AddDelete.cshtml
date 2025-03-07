@@ -12,18 +12,21 @@
     <div class="row">
 <div class="sidebar col-md-2 d-none d-md-block d-flex flex-column">
 
-    <a class="text-decoration-none text-dark mt-4 mx-3" asp-controller="" asp-action="Index" onclick="LoadPage('Add')">Aggiungi</a>
+    <a class="text-decoration-none text-dark mt-4 mx-3" asp-controller="" asp-action="Index" id="Add">Aggiungi</a>
     <hr class="text-secondary" />
-    <a class="text-decoration-none text-dark mx-3" asp-controller="" asp-action="Index  onclick=" LoadPage('Delete')>Elimina o modifica</a>
+    <a class="text-decoration-none text-dark mx-3" asp-controller="" asp-action="Index  onclick=">Elimina o modifica</a>
 
 </div>
 
 
-		<div class="col-md-10" >
-            @await Html.PartialAsync("_Add")
+		<div class="col-md-10" id="formContainer" >
+            
 </div>
 </div>
 </div>
 
+<script>
+
+</script>
 
     
