@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System.Data;
+using System.Data.Common;
 using System.Drawing;
 using System.Reflection;
 using System.Transactions;
@@ -738,23 +739,56 @@ namespace BW1_E_commerce.Controllers
             return View(cart);
         }
 
-
-
-        public IActionResult RemoveFromCart(Guid idProd)
+        [HttpPost]
+        public IActionResult RemoveFromCart(Guid idProd, int idColor, int idSize)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            Console.WriteLine($"idProd: {idProd}, idColor: {idColor}, idSize: {idSize}");
+
+            string query = @"
+            DELETE FROM Cart
+            WHERE id_prod = @idProd
+            AND id_color = @idColor
+            AND id_size = @idSize;";
+
+            try
             {
-                conn.Open();
-                string query = "DELETE FROM Cart WHERE id_prod = @idProd;";
-
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlConnection conn = new SqlConnection(_connectionString))
                 {
-                    cmd.Parameters.AddWithValue("@idProd", idProd);
-                    cmd.ExecuteNonQuery();
-                }
-            }
+                    conn.Open();
 
-            return RedirectToAction("Cart");
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@idProd", idProd);
+                        cmd.Parameters.AddWithValue("@idColor", idColor);
+                        cmd.Parameters.AddWithValue("@idSize", idSize);
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                        if (rowsAffected > 0)
+                        {
+                            TempData["Message"] = "Prodotto rimosso dal carrello!";
+                        }
+                        else
+                        {
+                            TempData["ErrorMessage"] = "Il prodotto non è stato trovato nel carrello.";
+                        }
+                    }
+                }
+
+                return RedirectToAction("Cart");
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"Errore SQL: {ex.Message}");
+                TempData["ErrorMessage"] = "Si è verificato un errore durante la rimozione del prodotto.";
+                return RedirectToAction("Cart");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Errore: {ex.Message}");
+                TempData["ErrorMessage"] = "Si è verificato un errore.";
+                return RedirectToAction("Cart");
+            }
         }
 
         public async Task<IActionResult> ClearCart()
@@ -802,7 +836,6 @@ namespace BW1_E_commerce.Controllers
                 {
                     Guid? idOrder = null;
 
-                    // Recupera l'ID dell'ultimo ordine esistente
                     string checkOrderQuery = "SELECT TOP 1 id_order FROM Orders ORDER BY id_order DESC;";
                     await using (SqlCommand checkOrderCmd = new SqlCommand(checkOrderQuery, conn, (SqlTransaction)transaction))
                     {
@@ -813,7 +846,6 @@ namespace BW1_E_commerce.Controllers
                         }
                     }
 
-                    // Se non esiste un ordine, interrompe l'operazione
                     if (!idOrder.HasValue)
                     {
                         TempData["Error"] = "Nessun ordine esistente.";
@@ -822,7 +854,6 @@ namespace BW1_E_commerce.Controllers
 
                     if (quantity > 0)
                     {
-                        // Aggiorna la quantità del prodotto nel carrello
                         string updateCartQuery = "UPDATE Cart SET qt = @quantity WHERE id_order = @id_order AND id_prod = @idProd;";
                         await using (SqlCommand updateCartCmd = new SqlCommand(updateCartQuery, conn, (SqlTransaction)transaction))
                         {
@@ -834,7 +865,6 @@ namespace BW1_E_commerce.Controllers
                     }
                     else
                     {
-                        // Se la quantità è 0 o negativa, rimuove il prodotto dal carrello
                         string deleteCartQuery = "DELETE FROM Cart WHERE id_order = @id_order AND id_prod = @idProd;";
                         await using (SqlCommand deleteCartCmd = new SqlCommand(deleteCartQuery, conn, (SqlTransaction)transaction))
                         {
@@ -844,7 +874,6 @@ namespace BW1_E_commerce.Controllers
                         }
                     }
 
-                    // Commit della transazione
                     await transaction.CommitAsync();
                 }
             }
@@ -855,8 +884,6 @@ namespace BW1_E_commerce.Controllers
 
         public IActionResult Checkout(Guid idOrder)
         {
-
-
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -871,21 +898,31 @@ namespace BW1_E_commerce.Controllers
                         using (SqlCommand cmd = new SqlCommand(updateOrderQuery, conn, trans))
                         {
                             cmd.Parameters.AddWithValue("@idOrder", idOrder);
-                            cmd.ExecuteNonQuery();
+                            var rowsAffected = cmd.ExecuteNonQuery();
+                            if (rowsAffected == 0)
+                            {
+                                throw new Exception("L'ordine non è stato trovato.");
+                            }
                         }
 
                         string clearCartQuery = "DELETE FROM Cart WHERE id_order = @idOrder;";
                         using (SqlCommand cmd = new SqlCommand(clearCartQuery, conn, trans))
                         {
                             cmd.Parameters.AddWithValue("@idOrder", idOrder);
-                            cmd.ExecuteNonQuery();
+                            var rowsDeleted = cmd.ExecuteNonQuery();
+                            if (rowsDeleted == 0)
+                            {
+                                throw new Exception("Nessun prodotto trovato nel carrello per questo ordine.");
+                            }
                         }
+
                         trans.Commit();
                         return RedirectToAction("OrderSuccess");
                     }
                     catch (Exception ex)
                     {
                         trans.Rollback();
+                        Console.WriteLine("Errore durante il checkout: " + ex.Message);
                         return StatusCode(500, "Errore durante il checkout: " + ex.Message);
                     }
                 }
@@ -896,6 +933,7 @@ namespace BW1_E_commerce.Controllers
         {
             return View();
         }
+
 
 
         //ACTION DI FILTRO!

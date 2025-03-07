@@ -1,148 +1,121 @@
 ﻿@model CartViewModel
 
-<h2 class="text-center mb-4">Il Tuo Carrello</h2>
-
-<div class="table-responsive">
-    <table class="table table-bordered table-striped">
-        <thead class="thead-light">
-            <tr>
-                <th>Prodotto</th>
-                <th>Taglia</th>
-                <th>Colore</th>
-                <th>Quantità</th>
-                <th>Prezzo Unitario</th>
-                <th>Prezzo Totale</th>
-                <th>Azioni</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Items)
-            {
-                <tr>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <img src="@item.ImgUrl" alt="@item.ProductName" class="img-fluid" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 5px;" />
-                            <div>
-                                <strong>@item.ProductName</strong>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        @item.Size
-                    </td>
-                    <td>
-                        @item.Color
-                    </td>
-                    <td>
-                        <form asp-action="UpdateCartQuantity" method="post" class="d-flex align-items-center">
-                            <input type="hidden" name="idProd" value="@item.IdProd" />
-                            <input type="number" name="quantity" value="@item.Quantity" min="0" class="form-control form-control-sm" style="width: 60px; text-align: center; margin-right: 5px;" />
-                            <button type="submit" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-arrow-repeat"></i> Aggiorna
-                            </button>
-                        </form>
-                    </td>
-                    <td>@item.Price €</td>
-                    <td>@(item.Price * item.Quantity) €</td>
-                    <td>
-                        <form asp-action="RemoveFromCart" method="post">
-                            <input type="hidden" name="idProd" value="@item.IdProd" />
-                            <input type="hidden" name="quantity" value="0" />
-                            <button type="submit" class="btn btn-outline-danger btn-sm">
-                                <i class="bi bi-trash"></i> Rimuovi
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
-<div class="d-flex justify-content-between mt-3">
-    <div>
-        <strong>Totale: </strong>
-        <span class="h4 text-primary">@Model.Total €</span>
-    </div>
-    <div>
-        <a href="@Url.Action("OrderSuccess")" class="btn btn-success btn-lg">
-            Procedi al Checkout <i class="bi bi-arrow-right-circle"></i>
-        </a>
+<div class="container-fluid bg-light py-3 mb-4">
+    <div class="container text-center">
+        <strong>Inserisci il codice <span class="text-uppercase">CIAO</span></strong> al momento del checkout per ricevere lo sconto.<br />
+        <small>
+            Termina alle 08:00 del 31/08/2025. Lo sconto si applica solo al primo ordine, fino a un negozio partner pre-sconto di 99€ o 119€.
+            Non utilizzabile con altre promozioni in corso. Alcuni prodotti contrassegnati sono esclusi dalla promozione.
+        </small>
     </div>
 </div>
 
+<div class="container">
+    <div class="row align-items-center mb-3">
+        <div class="col-md-6 col-12">
+            <small class="text-muted">Venduto e Spedito da OOSC CLOTHING LIMITED</small>
+        </div>
+        <div class="col-md-6 col-12 text-md-end mt-2 mt-md-0">
+            <a href="@Url.Action("ClearCart")" class="btn btn-warning px-5 my-1">
+                ClearCart
+            </a>
+        </div>
+    </div>
 
-<!-- Optional: Add a summary section -->
-<div class="mt-4">
-    <h5>Hai bisogno di aiuto?</h5>
-    <p>Contattaci per assistenza con il tuo ordine.</p>
+    <div class="table-responsive border rounded p-3">
+        <table class="table align-middle mb-0">
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td style="width: 90px;">
+                            <img src="@item.ImgUrl"
+                                 alt="@item.ProductName"
+                                 class="img-fluid rounded"
+                                 style="max-height: 80px; object-fit: cover;" />
+                        </td>
+
+                        <td>
+                            <div class="fw-bold">@item.ProductName</div>
+                            <div class="text-muted">@item.Color</div>
+                            <div class="text-muted">Taglia: @item.Size</div>
+                            <div class="text-success small">POCHI PEZZI</div>
+                        </td>
+
+                        <td>
+                            <form asp-action="UpdateCartQuantity" method="post" class="d-flex align-items-center">
+                                <input type="hidden" name="idProd" value="@item.IdProd" />
+                                <input type="number"
+                                       name="quantity"
+                                       value="@item.Quantity"
+                                       min="0"
+                                       class="form-control form-control-sm me-2"
+                                       style="width: 60px; text-align: center;" />
+                                <button type="submit" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-arrow-repeat"></i> Aggiorna
+                                </button>
+                            </form>
+                        </td>
+
+                        <td class="text-end">
+                            <div class="fw-semibold">@item.Price €</div>
+                            <small class="text-muted">Totale: @(item.Price * item.Quantity) €</small>
+                        </td>
+
+                        <td class="text-end">
+                            <form asp-action="RemoveFromCart" method="post">
+                                <input type="hidden" name="idProd" value="@item.IdProd" />
+                                <input type="hidden" name="idColor" value="@item.IdColor" />
+                                <input type="hidden" name="idSize" value="@item.IdSize" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash"></i> Rimuovi
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6 col-12">
+            <p class="mb-1 fw-bold">Spedizione</p>
+            <p class="mb-1"><small>Spedizione Premier e ASOS Marketplace</small></p>
+        </div>
+        <div class="col-md-6 col-12 text-md-end">
+            <p class="mb-0 fs-6">Spedizione: <span class="text-primary fw-bold">GRATUITA</span></p>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row mb-4">
+        <div class="col-md-6 col-12">
+            <h4 class="mb-3">Totale Carrello</h4>
+            <p class="fs-5">
+                <strong>@Model.Total €</strong>
+            </p>
+        </div>
+        <div class="col-md-6 col-12 text-md-end">
+            <p class="mb-1">Hai un codice sconto? <span class="text-muted">Aggiungilo nella fase finale</span></p>
+            <form asp-action="Checkout" method="get">
+                <input type="hidden" name="idOrder" value="@Model.IdOrder" />
+                <button type="submit" class="btn btn-success btn-lg px-5">Acquista Ora</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="border-top pt-3">
+        <p class="fw-bold">Accettiamo:</p>
+        <i class="bi bi-credit-card-2-front" style="font-size: 24px; margin-right: 8px;" alt="CreditCard"></i>
+
+        <i class="bi bi-credit-card" style="font-size: 24px; margin-right: 8px;"></i>
+
+        <i class="bi bi-paypal" style="font-size: 24px; margin-right: 8px;"></i>
+
+        <i class="bi bi-apple" style="font-size: 24px; margin-right: 8px;"></i>
+
+        <i class="bi bi-google" style="font-size: 24px; margin-right: 8px;"></i>
+    </div>
 </div>
-
-<style>
-    .table-responsive {
-        margin-bottom: 20px;
-    }
-
-    .table-bordered {
-        border: 1px solid #ddd;
-    }
-
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: rgba(0, 0, 0, 0.05);
-    }
-
-    .thead-light th {
-        background-color: #f8f9fa;
-        border-bottom: 2px solid #ddd;
-    }
-
-    .btn-outline-primary {
-        color: #007bff;
-        border-color: #007bff;
-    }
-
-        .btn-outline-primary:hover {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-    .btn-outline-danger {
-        color: #dc3545;
-        border-color: #dc3545;
-    }
-
-        .btn-outline-danger:hover {
-            background-color: #dc3545;
-            color: #fff;
-        }
-
-    .btn-success {
-        background-color: #28a745;
-        border-color: #28a745;
-    }
-
-        .btn-success:hover {
-            background-color: #218838;
-            border-color: #1e7e34;
-        }
-
-    .text-primary {
-        color: #007bff !important;
-    }
-
-    .h4 {
-        font-size: 1.5rem;
-    }
-
-    .mb-4 {
-        margin-bottom: 1.5rem !important;
-    }
-
-    .mt-3 {
-        margin-top: 1rem !important;
-    }
-
-    .mt-4 {
-        margin-top: 1.5rem !important;
-    }
-</style>
