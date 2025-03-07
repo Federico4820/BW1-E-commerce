@@ -1,0 +1,91 @@
+﻿@model string
+
+@{
+    var productList = ViewBag.Prod as ProductListModel;
+    var gender = ViewBag.gender as string;
+    var filteredProducts = productList!.ProductList!.Where(p => p.NameCategory == Model).ToList();
+}
+
+
+@if (filteredProducts.Any())
+{
+    <div id="multiItemCarousel" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            @{
+                var itemsPerSlide = 4;
+                var totalSlides = (int)Math.Ceiling((double)filteredProducts.Count / itemsPerSlide);
+            }
+            @for (int i = 0; i < totalSlides; i++)
+            {
+                <div class="carousel-item @(i == 0 ? "active" : "")">
+                    <div class="row">
+                        @foreach (var item in filteredProducts.Skip(i * itemsPerSlide).Take(itemsPerSlide))
+                        {
+                            <div class="col-md-3">
+                                <div class="productCard p-0">
+                                    <a class="text-decoration-none" asp-controller="Products" asp-action="Details" asp-route-id="@item.IdProd" asp-route-gender=@gender>
+                                        <div class="imgContainer">
+                                            <img src="@item.ImgURL" class="card-img-home imgProd" alt="@item.Name">
+                                        </div>
+                                        <div class="productInfo">
+                                            <h2 class="productDescription">@item.Name</h2>
+                                            <p class="fw-bold text-danger">@item.Price €</p>
+                                        </div>
+                                    </a>
+                                    <button class="favorite-btn">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <a class="carousel-control-prev" href="#multiItemCarousel" role="button" data-slide="prev">
+            <i class="bi bi-chevron-left"></i> 
+        </a>
+        <a class="carousel-control-next" href="#multiItemCarousel" role="button" data-slide="next">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        Non ci sono prodotti disponibili per questa categoria.
+    </div>
+}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var carousel = document.querySelector('#multiItemCarousel');
+        var items = carousel.querySelectorAll('.carousel-item');
+        var currentIndex = 0;
+
+        function moveCarousel(direction) {
+            if (direction === 'next') {
+                currentIndex = (currentIndex + 1) % items.length;
+            } else {
+                currentIndex = (currentIndex - 1 + items.length) % items.length;
+            }
+
+            items.forEach((item, index) => {
+                item.classList.remove('active');
+                if (index === currentIndex) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        carousel.querySelector('.carousel-control-prev').addEventListener('click', function (e) {
+            e.preventDefault();
+            moveCarousel('prev');
+        });
+
+        carousel.querySelector('.carousel-control-next').addEventListener('click', function (e) {
+            e.preventDefault();
+            moveCarousel('next');
+        });
+    });
+</script>

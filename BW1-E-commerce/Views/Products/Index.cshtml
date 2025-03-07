@@ -1,0 +1,58 @@
+﻿
+@model ProductListModel
+
+@{
+	var productList = ViewBag.Filtered ??  ViewBag.Prod as ProductListModel;
+	var cat = ViewBag.Categories as List<Category>;
+	var gender = ViewBag.gender as string;
+	var currentCategory = (ViewBag.Filtered != null && ViewBag.Filtered.ProductList.Count > 0)
+	? cat.FirstOrDefault(c => c.IdCategory == ViewBag.Filtered.ProductList[0].IdCategory)
+	: null;
+	ViewData["Title"] = "HomePage";
+}
+
+<nav aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumbCust-item">
+			<a class="nav-link" asp-controller="Products" asp-action="Index" asp-route-gender =@gender>Home</a>
+		</li>
+		@if (currentCategory != null)
+		{
+
+			<li class="breadcrumbCust-item active" aria-current="page">
+				<span aria-hidden="true">›</span>
+				<a class="nav-link" asp-controller="Products" asp-action="Index" asp-route-filter=@currentCategory.IdCategory asp-route-gender=@gender>@currentCategory.Name</a>
+			</li>
+		}
+	</ol>
+</nav>
+<div class="row">
+	@await Html.PartialAsync("_SidabarPartial")
+	<!--MAIN CONTENT-->
+	<div class="col-md-10">
+		<!-- Schede dei prodotti -->
+		<div class="d-grid productContainer">
+			@if (productList!.ProductList != null)
+			{
+				@foreach (var item in productList.ProductList)
+				{
+					<div class="productCard p-0">
+						<a class="text-decoration-none" asp-controller="Products" asp-action="Details" asp-route-id="@item.IdProd" asp-route-gender=@item.Gender>
+							<div class="imgContainer">
+								<img src=@item.ImgURL class="card-img-home imgProd" alt=@item.Name>
+							</div>
+							<div class="productInfo">
+								<h2 class="productDescription">@item.Name</h2>
+								<p class="fw-bold text-danger"> @item.Price €</p>
+
+							</div>						
+						</a>
+						<button class="favorite-btn">
+							<i class="bi bi-heart"></i>
+						</button>
+					</div>
+				}
+			}
+		</div>
+	</div>
+</div>

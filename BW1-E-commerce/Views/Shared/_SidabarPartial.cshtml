@@ -1,0 +1,32 @@
+﻿@{
+	var cat = ViewBag.Categories as List<Category>;
+	var gender = ViewBag.gender as string;
+}
+
+
+<div class="sidebar col-md-2 d-none d-md-block d-flex flex-column">
+	<h3 class="mt-1 mb-3 ">Cosa cerchi?</h3>
+	@if (cat != null)
+	{
+		@foreach (var item in cat)
+		{
+			<a class="text-decoration-none text-dark mt-4 mx-3" asp-controller="Products" asp-action="Index" asp-route-filter=@item.IdCategory asp-route-gender=@gender>@item.Name</a>
+			<hr class="text-secondary" />
+		}
+	}
+</div>
+<div class="btn-group dropend col-1 d-md-none d-xs-block">
+	<button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+	</button>
+	<ul class="dropdown-menu">
+		@if (cat != null)
+		{
+			@foreach (var item in cat)
+			{
+				<li><a class="dropdown-item mb-3" asp-controller="Products" asp-action="Index" asp-route-filter=@item.IdCategory asp-route-gender=@gender>@item.Name</a></li>
+			}
+		}
+	</ul>
+</div>
+
+
