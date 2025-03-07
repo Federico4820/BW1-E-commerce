@@ -75,7 +75,8 @@
                     @foreach (var item in sizes)
                     {
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="@item.IdSize" name="SelectedSizes" value="@item.IdSize">
+                            <input type="checkbox" class="form-check-input" id="@item.IdSize" name="SelectedSizes" value="@item.IdSize"
+                            @(Model.SelectedSizes.Contains(item.IdSize) ? "checked" : "")>
                             <label class="form-check-label" for="@item.IdSize">@item.Name</label>
                         </div>
                     }
@@ -96,14 +97,23 @@
                                 <option value="" selected disabled>Seleziona un Colore</option>
                                 @foreach (var item in color)
                                 {
-                                    <option value="@item.IdColor">@item.Name</option>
+                                    var isSelected = Model.SelectedColors != null && Model.SelectedColors.Count > i && Model.SelectedColors[i].IdColor == item.IdColor;
+                                    <option value="@item.IdColor" selected="@(isSelected ? "selected" : null)">
+                                        @item.Name
+                                    </option>
                                 }
                             </select>
                         </div>
                         <div class="col-md-9">
                             @for (int j = 0; j < 3; j++)
                             {
-                                <input type="text" class="form-control" name="SelectedColors[@i].ImgListModel[@j]" placeholder="URL immagine" />
+                                var imgValue = Model.SelectedColors != null && Model.SelectedColors.Count > i && Model.SelectedColors[i].ImgListModel != null && Model.SelectedColors[i].ImgListModel.Count > j
+                                ? Model.SelectedColors[i].ImgListModel[j]
+                                : "";
+                                <input type="text" class="form-control"
+                                       name="SelectedColors[@i].ImgListModel[@j]"
+                                       value="@imgValue"
+                                       placeholder="URL immagine" />
                             }
                         </div>
                     </div>
