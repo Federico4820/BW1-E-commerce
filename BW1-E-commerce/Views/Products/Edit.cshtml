@@ -1,0 +1,264 @@
+﻿@model BW1_E_commerce.Models.EditProduct
+
+@{
+    var cat = ViewBag.Categories as List<Category>;
+    var color = ViewBag.Color as List<ColorModel>;
+    var sizes = ViewBag.Sizes as List<SizeModel>;
+    var mat = ViewBag.Material as List<MaterialModel>;
+
+    ViewData["Title"] = "Modifica Prodotto";
+}
+
+@if (TempData["Error"] != null)
+{
+    <span class="text-danger">@TempData["Error"]</span>
+}
+
+<form method="post" asp-controller="Products" asp-action="EditSave">
+    <input type="hidden" asp-for="IdProd" />
+
+    <fieldset>
+        <legend>Caratteristiche generali</legend>
+        <div class="row g-3">
+            <div class="form-group col-md-4">
+                <label asp-for="Name" class="control-label">Nome</label>
+                <input asp-for="Name" class="form-control" type="text" required />
+            </div>
+
+            <div class="form-group col-md-3">
+                <label asp-for="Brand" class="control-label">Marca</label>
+                <input asp-for="Brand" class="form-control" type="text" required />
+            </div>
+
+            <div class="form-group col-md-2">
+                <label asp-for="Gender" class="control-label">Genere</label>
+                <select class="form-select" asp-for="Gender" required>
+                    <option selected disabled>Seleziona un'opzione</option>
+                    <option value="F">Donna</option>
+                    <option value="M">Uomo</option>
+                    <option value="U">Unisex</option>
+                </select>
+            </div>
+
+            <div class="form-group col-md-2">
+                <label asp-for="IdCategory" class="control-label">Categoria</label>
+                <select asp-for="IdCategory" class="form-control" required>
+                    <option selected disabled>Seleziona un'opzione</option>
+                    @if (cat != null)
+                    {
+                        @foreach (var item in cat)
+                        {
+                            <option value="@item.IdCategory">@item.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group col-md-1">
+                <label asp-for="Price" class="control-label">Prezzo</label>
+                <input asp-for="Price" class="form-control" type="number" step="0.01" required />
+            </div>
+
+            <div class="form-group col-12">
+                <label asp-for="Description" class="control-label">Descrizione</label>
+                <textarea asp-for="Description" class="form-control" required></textarea>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Taglie Disponibili</legend>
+        <div class="form-group">
+            <div class="d-flex justify-content-evenly">
+                @if (sizes != null)
+                {
+                    @foreach (var item in sizes)
+                    {
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="@item.IdSize" name="SelectedSizes" value="@item.IdSize"
+                            @(Model.SelectedSizes.Contains(item.IdSize) ? "checked" : "")>
+                            <label class="form-check-label" for="@item.IdSize">@item.Name</label>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Colori Disponibili</legend>
+        @* Pulsante per aggiungere un nuovo colore *@
+        <button type="button" class="btn btn-primary mb-3" id="add-color-btn">Aggiungi Colore</button>
+
+        @* Form per i colori e le immagini *@
+        <div id="color-fields-container">
+            @for (int i = 0; i < color.Count; i++)
+            {
+                <div class="colorField mb-3" id="colorField-@i" style="display: @(Model.SelectedColors != null && Model.SelectedColors.Count > i ? "block" : "none")">
+                    <div class="row align-items-start">
+                        <div class="col-md-2">
+                            <select name="SelectedColors[@i].IdColor" class="form-control">
+                                <option value="" selected disabled>Seleziona un Colore</option>
+                                @foreach (var item in color)
+                                {
+                                    var isSelected = Model.SelectedColors != null && Model.SelectedColors.Count > i && Model.SelectedColors[i].IdColor == item.IdColor;
+                                    <option value="@item.IdColor" selected="@(isSelected ? "selected" : null)">
+                                        @item.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-9">
+                            @for (int j = 0; j < 4; j++)
+                            {
+                                var imgValue = Model.SelectedColors != null && Model.SelectedColors.Count > i && Model.SelectedColors[i].ImgListModel != null && Model.SelectedColors[i].ImgListModel.Count > j
+                                ? Model.SelectedColors[i].ImgListModel[j]
+                                : "";
+                                <div class="extra-field mb-3" id="field-@i-@j" style="display: @(!string.IsNullOrEmpty(imgValue) ? "block" : "none")">
+                                    <div class="d-flex">
+                                        <span class="input-group-text" id="basic-addon3">https://example.com/photo.jpg</span>
+                                        <div class="form-floating flex-grow-1">
+                                            <input type="text" class="form-control" id="image-@i-@j" placeholder="Inserisci l'URL dell'immagine"
+                                                   autocomplete="off" name="SelectedColors[@i].ImgListModel[@j]" value="@imgValue">
+                                            <label for="image-@i-@j" class="text-secondary">Product ImageURL</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-light btn-sm add-image-btn" data-color-index="@i">Aggiungi immagine</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Dati Vendita</legend>
+        <div class="row">
+            <div class="form-group col-md-10">
+                <label asp-for="Email" class="control-label">Email</label>
+                <input asp-for="Email" class="form-control" type="email" required />
+            </div>
+            <div class="form-group col-md-1">
+                <label asp-for="Stock" class="control-label">Quantità</label>
+                <input asp-for="Stock" class="form-control" type="number" required />
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="form-group mt-4">
+        <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+    </div>
+</form>
+
+<script>
+    function addField(containerId, className, maxLimit, alertMessage) {
+        let container = document.querySelectorAll(containerId);
+        for (let i = 0; i < container.length; i++) {
+            if (container[i].style.display === "none") {
+                container[i].style.display = "block";
+                return;
+            }
+        }
+        alert(alertMessage);
+    }
+
+    document.getElementById("addMat").addEventListener("click", function () {
+        addField(".matField", "matField", 5, "Hai raggiunto il limite massimo di materiali!");
+    });
+
+    document.getElementById("addColor").addEventListener("click", function () {
+        addField(".colorField", "colorField", 4, "Hai raggiunto il limite massimo di colori!");
+    });
+
+    document.querySelectorAll(".add-btn").forEach((e, index) => {
+        e.addEventListener("click", function () {
+            let colorField = document.getElementById("colorField-" + index);
+            let fields = colorField.querySelectorAll(".extra-field");
+            let visibleFields = Array.from(fields).filter(field => field.style.display !== "none");
+            const maxImages = 4;
+            if (visibleFields.length < maxImages) {
+                for (let i = 0; i < fields.length; i++) {
+                    if (fields[i].style.display === "none") {
+                        fields[i].style.display = "block";
+                        break;
+                    }
+                }
+            } else {
+                alert("Hai raggiunto il limite massimo di 4 immagini per questo colore.");
+            }
+        });
+    });
+
+
+       // Aggiungi un nuovo colore
+    document.getElementById('add-color-btn').addEventListener('click', function () {
+        const container = document.getElementById('color-fields-container');
+        const colorIndex = document.querySelectorAll('.colorField').length;
+
+        // Crea un nuovo campo colore
+        const newColorField = `
+            <div class="colorField mb-3" id="colorField-${colorIndex}" style="display: block;">
+                <div class="row align-items-start">
+                    <div class="col-md-2">
+                        <select name="SelectedColors[${colorIndex}].IdColor" class="form-control">
+                            <option value="" selected disabled>Seleziona un Colore</option>
+    @foreach (var item in color)
+    {
+                                    <option value="@item.IdColor">@item.Name</option>
+    }
+                        </select>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="extra-field mb-3" id="field-${colorIndex}-0" style="display: block;">
+                            <div class="d-flex">
+                                <span class="input-group-text" id="basic-addon3">https://example.com/photo.jpg</span>
+                                <div class="form-floating flex-grow-1">
+                                    <input type="text" class="form-control" id="image-${colorIndex}-0" placeholder="Inserisci l'URL dell'immagine"
+                                           autocomplete="off" name="SelectedColors[${colorIndex}].ImgListModel[0]">
+                                    <label for="image-${colorIndex}-0" class="text-secondary">Product ImageURL</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-light btn-sm add-image-btn" data-color-index="${colorIndex}">Aggiungi immagine</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Aggiungi il nuovo campo al contenitore
+        container.insertAdjacentHTML('beforeend', newColorField);
+    });
+
+    // Aggiungi una nuova immagine a un colore esistente
+    document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('add-image-btn')) {
+            const colorIndex = event.target.getAttribute('data-color-index');
+            const colorField = document.getElementById(`colorField-${colorIndex}`);
+            const imageCount = colorField.querySelectorAll('.extra-field').length;
+
+            // Crea un nuovo campo immagine
+            const newImageField = `
+                <div class="extra-field mb-3" id="field-${colorIndex}-${imageCount}" style="display: block;">
+                    <div class="d-flex">
+                        <span class="input-group-text" id="basic-addon3">https://example.com/photo.jpg</span>
+                        <div class="form-floating flex-grow-1">
+                            <input type="text" class="form-control" id="image-${colorIndex}-${imageCount}" placeholder="Inserisci l'URL dell'immagine"
+                                   autocomplete="off" name="SelectedColors[${colorIndex}].ImgListModel[${imageCount}]">
+                            <label for="image-${colorIndex}-${imageCount}" class="text-secondary">Product ImageURL</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Aggiungi il nuovo campo al colore
+            colorField.querySelector('.col-md-9').insertAdjacentHTML('beforeend', newImageField);
+        }
+    });
+
+</script>

@@ -16,26 +16,34 @@
                 
                 <!-- LOGO -->
                 <div class="col-sm-2 col-md-1 col-lg-1">
-                <a class="navbar-brand fw-bold text-uppercase text-light" asp-area="" asp-controller="Products" asp-action="Index">Vestiti</a>
+                <a class="navbar-brand fw-bold text-uppercase text-light" asp-controller="Products" asp-action="Intro">Vestiti</a>
                 </div>
                 <!--UOMO E DONNA -->
                 <div class="col-sm-3 col-md-3 col-lg-2">                
                     <ul class="navbar-nav d-flex flex-row justify-content-evenly">
                         <li class="nav-item">
-                            <a class="nav-link text-uppercase fw-bold active category-btn" asp-area="" asp-controller="Donna" asp-action="Index">DONNA</a>
+                            <a class="nav-link text-uppercase fw-bold category-btn" asp-controller="Products" asp-action="Index" asp-route-gender="F">DONNA</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-uppercase fw-bold category-btn" asp-area="" asp-controller="Uomo" asp-action="Index">UOMO</a>
+                            <a class="nav-link text-uppercase fw-bold category-btn" asp-controller="Products" asp-action="Index" asp-route-gender="M">UOMO</a>
                         </li>
                     </ul>
                
                 </div>
                
                 <!-- RICERCA -->
-                <div class="search-container col-sm-2 col-md-5 col-lg-6">
-                    <input class="form-control search-bar d-none d-lg-block" id="search-input" type="search" placeholder="Ricerca per articoli e brand" aria-label="Search">
-                    <button class="btn search-btn" type="submit"><i class="bi bi-search"></i></button>
-                </div>
+                <form asp-action="Index" method="get" class="search-container col-sm-2 col-md-5 col-lg-6">
+                    <input type="hidden" name="gender" value=@ViewBag.Gender />
+                    <input class="form-control search-bar d-none d-lg-block"
+                           id="search-input"
+                           type="search"
+                           name="search"
+                    placeholder="Ricerca per articoli e brand"
+                    aria-label="Search">
+                    <button class="btn search-btn" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
                
                 <!-- ICONE-->
                 <div class="col-sm-5 col-md-3 col-lg-3 d-flex grid gap-2 justify-content-end pe-5">
@@ -45,65 +53,66 @@
                             <i class="bi bi-person fs-5"></i>
                         </span>
                         <ul class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="dropdownMenuButton">
-                            <li><a class="dropdown-item text-light" asp-area="" asp-controller="account" asp-action="Index">Il mio account</a></li>
-                            <li><a class="dropdown-item text-light" asp-area="" asp-controller="Aggiungi" asp-action="Index">aggiungi</a></li>
+                            <li><a class="dropdown-item text-light" asp-area="" asp-controller="account" asp-action="Index" >Il mio account</a></li>
                             <li><a class="dropdown-item text-light" href="">Logout</a></li>
                         </ul>
                     </div>
 
                     <!-- le altre icone -->
                     <a class="text-light me-5" asp-area="" asp-controller="lista preferiti" asp-action="Index"><i class="bi bi-heart fs-5"></i></a>
-                    <a  class=" text-light" asp-area="" asp-controller="Uomo" asp-action="Index"><i class="bi bi-bag fs-5"></i></a>
-                </div>
-                
-            </div>
-            <a class="nav-link text-uppercase fw-bold category-btn text-white" asp-controller="Products" asp-action="Add">Aggiungi</a>
+                    <a  class=" text-light me-5" asp-area="" asp-controller="Products" asp-action="Cart"><i class="bi bi-bag fs-5"></i></a>
+                    <a class=" text-light" asp-area="" asp-controller="Products" asp-action="AddDelete"><i class="bi bi-plus-lg fs-5"></i></a>
+                </div>                
+            </div>            
         </nav>
-
-
     </header>
     <div class="container-fluid">
+        
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="text-center">
+    <!--FOOTER-->
+    <footer class="bg-dark text-light py-4">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5>Chi siamo</h5>
-                    <p>Offriamo prodotti di alta qualità a prezzi competitivi. Scopri il nostro catalogo e approfitta delle offerte!</p>
+            <div class="row text-center text-md-start align-items-center">
+                <div class="col-md-4 mb-4">
+                    <h5 class="fw-bold">Chi siamo</h5>
+                    <p class="small">Offriamo prodotti di alta qualità a prezzi competitivi. Scopri il nostro catalogo e approfitta delle offerte!</p>
                 </div>
-
-                <div class="col-md-4">
-                    <h5>Link utili</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#">Termini e Condizioni</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Assistenza clienti</a></li>
-                        <li><a href="#">Contattaci</a></li>
-                    </ul>
+                <!--social-->
+                <div class="col-md-4 mb-4 text-center">
+                    <h5 class="fw-bold">Seguici anche qui</h5>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="#" class="text-light fs-3"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-light fs-3"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-light fs-3"><i class="bi bi-twitter-x"></i></a>
+                    </div>
                 </div>
-
-                <div class="col-md-4">
-                    <h5>Seleziona lingua</h5>
-                    <select class="form-control w-50 mx-auto">
+                <div class="col-md-4  text-md-end">
+                    <!--lingua -->
+                    <h5 class="fw-bold">Seleziona lingua</h5>
+                    <select class="d-inline form-control w-75 mx-md-0">
                         <option value="it">🇮🇹 Italiano</option>
                         <option value="en">🇬🇧 English</option>
                         <option value="es">🇪🇸 Español</option>
                         <option value="fr">🇫🇷 Français</option>
                         <option value="de">🇩🇪 Deutsch</option>
                     </select>
+                    <!--link-->
+                    <h5 class="fw-bold mt-3">Link utili</h5>
+                    <ul class="list-unstyled small">
+                        <li><a href="#" class="text-light text-decoration-none">Termini e Condizioni</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Privacy Policy</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Assistenza clienti</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Contattaci</a></li>
+                    </ul>
                 </div>
             </div>
-
-            <hr>
-
-            <div class="row">
-                <div class="col-12">
-                    <p>&copy; 2025 E-Commerce Demo.</p>
-                </div>
+            <hr class="border-secondary mb-3">
+            <div class="text-center">
+                <p class="mb-0 small">&copy; 2025 Tutti i diritti riservati | <strong>VESTITI</strong></p>
             </div>
         </div>
     </footer>

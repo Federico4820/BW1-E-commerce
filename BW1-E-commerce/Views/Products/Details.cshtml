@@ -1,0 +1,371 @@
+﻿@model ProductDetailModel
+
+@{
+	var productList = ViewBag.Prod as ProductListModel;
+	var commentList = ViewBag.Comments as CommentListModel;
+	var singleComment = ViewBag.Comment as SingleCommentModel;
+	var gender = ViewBag.Gender as string;
+	ViewData["Title"] = "Pagina Dettagli";
+}
+
+@if (TempData["Error"] != null)
+{
+	<div class="alert alert-danger">
+		@TempData["Error"]
+	</div>
+}
+<div class="container-fluid">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumbCust-item">
+				<a class="nav-link" asp-controller="Products" asp-action="Index" asp-route-gender=gender>Home</a>
+			</li>
+			<li class="breadcrumbCust-item">
+				<span aria-hidden="true">›</span><a class="nav-link"
+				asp-controller="Products" asp-action="Index" asp-route-filter=@Model.IdCategory asp-route-gender=@gender>@Model.Category</a>
+			</li>
+			<li class="breadcrumbCust-item active" aria-current="page" id="dataPage">
+				<span aria-hidden="true">›</span>@Model.Name
+			</li>
+		</ol>
+	</nav>
+	<div class="row">
+		@await Html.PartialAsync("_SidabarPartial")
+		<div class=" col-sm-11  col-md-10">
+			<section class="w-100 mb-5">
+				<div class="containerShorter">
+					<div class="imagesContainerIn">
+						<div class="asideImgContainer d-flex flex-column">
+							@foreach (var color in Model.Colors)
+							{
+								@foreach (var img in color.ImgListModel)
+								{
+									<div class="p-2 thumbnail" data-target="@img">
+										<img src="@img" alt="Thumbnail">
+									</div>
+								}
+							}
+						</div>
+						<div class="mainImgContainer">
+							<div class="p-2">
+								<img src="@Model.Colors[0].ImgListModel[0]" alt="Main Image" id="mainImg">
+							</div>
+						</div>
+					</div>
+
+					<div class="detailAside">
+						<h2 class="prodTitle mb-2"> @Model.Name</h2>
+						<p class="fw-bold">@Model.Price €</p>
+
+						<div class="p-2 discountSpan mb-3 rounded-2">
+							<i class="bi bi-tag"></i>
+							<p>
+								SEI NUOVO QUI? Ricevi il -10% su una selezione di stili! Con il codice:
+								<strong>EPICODE</strong>
+							</p>
+						</div>
+
+						<p class="fw-bold">Colori disponibili: <span class="fw-normal" id="color-name"></span></p>
+						<form asp-controller="Products" asp-action="AddToCart" method="post">
+							<!-- Parametri nascosti -->
+							<input type="hidden" name="idProd" value="@Model.Id" />
+							<input type="hidden" name="price" value="@Model.Price" />
+
+							<!-- Selezione del colore -->
+							<div class="colorsContainer mb-3">
+								@foreach (var color in Model.Colors)
+								{
+									<label class="color-option" data-color="@color.Name">
+										<input type="radio" name="id_color" value="@color.IdColor" class="color-radio" />
+										<span class="color-box @color.Name"></span>
+									</label>
+								}
+							</div>
+
+							<!-- Selezione della taglia -->
+							<div class="d-flex justify-content-between align-items-center mb-2">
+								<p class="fw-bold m-0 p-0">Taglie disponibili -------</p>
+								<button type="button" class="nav-link text-decoration-underline" data-bs-toggle="modal"
+										data-bs-target="#sizeChart">
+									Guida alle taglie
+								</button>
+								<div class="modal fade" id="sizeChart" tabindex="-1" aria-labelledby="exampleModalLabel"
+									 aria-hidden="true">
+									@await Html.PartialAsync("_TaglieDonna")
+								</div>
+							</div>
+
+							<select name="id_size" class="mb-4 customSelect">
+								<option selected disabled>Seleziona un'opzione</option>
+								@foreach (var item in Model.Sizes)
+								{
+									<option value="@item.IdSize">@item.Name</option>
+								}
+							</select>
+
+
+							<p class="fw-bold m-0 p-0">Quantità -------</p>
+							<!-- Selezione della quantità (da 1 a 10) -->
+							<select name="quantity" class="mb-4 customSelect">
+								@for (int i = 1; i <= 10; i++)
+								{
+									<option value="@i">@i</option>
+								}
+							</select>
+
+							<div class="mb-3 d-flex align-items-center">
+								<button type="submit" class="btn btn-success btn-lg rounded-0 fw-bolder me-4 flex-grow-1">
+									AGGIUNGI AL
+									CARRELLO
+								</button>
+								<button class="favorite-detail" type="button">
+									<i class="bi bi-heart"></i>
+								</button>
+							</div>
+						</form>
+
+
+						
+
+
+						<div class="borderCustom p-2 ps-3 mb-3">
+							<div class="d-flex align-items-center">
+								<i class="bi bi-truck"></i>
+								<p class="p-0 m-0">Consegna gratuita sugli ordini idonei</p>
+							</div>
+							<div class="d-flex align-items-center">
+								<i class="bi bi-box-seam"></i>
+								<p class="p-0 m-0">Resi gratuiti</p>
+							</div>
+							<div class="">
+								<a>
+									<p class="m-auto w-75">Guarda le nostre politiche sulle spedizione e dui resi</p>
+								</a>
+							</div>
+
+						</div>
+						<div class="accordion">
+							<div class="accordion-item">
+								<h2 class="accordion-header">
+									<button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse"
+											data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+										Dettagli del prodotto
+									</button>
+								</h2>
+								<div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#Detail">
+									<ul class="accordion-body">
+										@foreach (var detail in Model.Description)
+										{
+											<li class="ms-3">@detail</li>
+										}
+									</ul>
+								</div>
+							</div>
+							<div class="accordion-item">
+								<h2 class="accordion-header">
+									<button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse"
+											data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapseOne">
+										Composizione
+									</button>
+								</h2>
+								<div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#Detail">
+									<p class="ms-3">
+										@string.Join(", ", Model.Materials.Select(detail =>
+																						$"{detail.Percentage}% {detail.Name}")));</ p >
+
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+
+
+			</section>
+			<section class="px-5">
+				<h4>ALTRI CLIENTI HANNO ACQUISTATO ANCHE</h4>
+				<div class="multiItemCustom d-flex justify-content-center">
+					@await Html.PartialAsync("_MultiItemCarousel", Model.Category)
+				</div>
+
+			</section>
+
+			<section>
+				<div class="commentSection container-fluid">
+					<div class="row px-5 text-center ">
+						<div class="col">
+							<h2>@commentList.TotalComment Commenti</h2>
+							<p class="p-0 m-0"><small>Overall rating</small></p>
+							@{
+								decimal rating = commentList.AvgRating;
+								int fullStars = (int)rating;
+								bool hasHalfStar = (rating - fullStars) >= 0.5m;
+								int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+							}
+
+							<div class="star-rating mb-3">
+								<span>
+									@fullStars@if (fullStars > 0)
+									{@if (hasHalfStar)
+										{
+											<span>.5</span>
+										}
+										else
+										{
+											<span>.0</span>
+										}}
+								</span>
+								@for (int i = 0; i < fullStars; i++)
+								{
+									<span><i class="bi bi-star-fill"></i></span>
+								}
+								@if (hasHalfStar)
+								{
+									<span><i class="bi bi-star-half"></i></span>
+								}
+								@for (int i = 0; i < emptyStars; i++)
+								{
+									<span><i class="bi bi-star"></i></span>
+								}
+							</div>
+
+							<div>
+								<button class="btn-custom mb-3" id="scriviForm"> Scrivi una recensione!</button>
+							</div>
+							<div style="display: none" id="recensioneForm">
+								<form asp-controller="Products" asp-action="WriteComment" asp-route-gender=@Model.Gender method="post" class="d-flex flex-column" >
+									<input type="hidden" name="IdProd" value="@Model.Id" />
+
+		
+									<div class="stars">
+										<input type="radio" id="star5" name="Rating" value="5"><label for="star5">★</label>
+										<input type="radio" id="star4" name="Rating" value="4"><label for="star4">★</label>
+										<input type="radio" id="star3" name="Rating" value="3"><label for="star3">★</label>
+										<input type="radio" id="star2" name="Rating" value="2"><label for="star2">★</label>
+										<input type="radio" id="star1" name="Rating" value="1"><label for="star1">★</label>
+									</div>
+
+									<div class="form-group">
+										<label for="Email">Email</label>
+										<input name="Email" type="email" class="form-control" required />
+									</div>
+
+									<div class="form-group mb-3">
+										<label for="Comment">Commento</label>
+										<textarea name="Comment" class="form-control" required></textarea>
+									</div>
+									<button type="submit" class="btn-review ms-auto">Invia Commento</button>
+								</form>
+							</div>
+							
+
+						</div>
+
+						@if (commentList != null && commentList.TotalComment > 0)
+						{
+							<div class="col-md-8">
+								@{
+									var allComments = commentList.CommentList.ToList();
+								}
+
+								@for (int i = 0; i < allComments.Count; i++)
+								{
+									var comment = allComments[i];
+									<div class="row comment-item @(i >= 6 ? "d-none" : "")">
+										<div class="col-md-2">
+											<p><strong>@comment.Email.Split('@')[0]</strong></p>
+										</div>
+										<div class="col-md-10 text-start">
+											<div class="d-flex justify-content-between">
+												@{
+													decimal rating2 = comment.Rating;
+													int fullStars2 = (int)rating2;
+													bool hasHalfStar2 = (rating2 - fullStars2) >= 0.5m;
+													int emptyStars2 = 5 - fullStars2 - (hasHalfStar2 ? 1 : 0);
+												}
+												<div class="star-rating2 mb-3">
+													@for (int j = 0; j < fullStars2; j++)
+													{
+														<span><i class="bi bi-star-fill"></i></span>
+													}
+													@if (hasHalfStar2)
+													{
+														<span><i class="bi bi-star-half"></i></span>
+													}
+													@for (int j = 0; j < emptyStars2; j++)
+													{
+														<span><i class="bi bi-star"></i></span>
+													}
+												</div>
+												<p>@comment.CreatedAt.ToShortDateString()</p>
+											</div>
+											<p class="text-start">@comment.Comment</p>
+										</div>
+									</div>
+								}
+
+								@if (allComments.Count > 6)
+								{
+									<button id="showMoreButton" class="btn btn-link mt-3">Mostra altro</button>
+								}
+							</div>
+						}
+						</div>
+				</div>
+			</section>
+		</div>
+	</div>
+</div>
+
+<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const thumbnails = document.querySelectorAll('.thumbnail');
+			const mainImg = document.getElementById('mainImg');
+
+			thumbnails.forEach(thumbnail => {
+				thumbnail.addEventListener('click', function () {
+					const targetImg = this.getAttribute('data-target');
+					mainImg.setAttribute('src', targetImg);
+					thumbnails.forEach(t => t.style.borderColor = 'transparent');
+					this.style.borderColor = '#c0c0c0';
+				});
+			});
+		});
+
+		document.addEventListener('DOMContentLoaded', function () {
+		const colorOptions = document.querySelectorAll('.color-option');
+		const colorName = document.getElementById('color-name');
+
+		colorOptions.forEach(option => {
+			option.addEventListener('mouseover', function () {
+				colorName.innerText = this.getAttribute('data-color');
+			});
+
+			option.addEventListener('mouseout', function () {
+				colorName.textContent = '';
+			});
+		});
+	});
+
+			document.getElementById('showMoreButton')?.addEventListener('click', function () {
+		const hiddenComments = document.querySelectorAll('.comment-item.d-none');
+		for (let i = 0; i < 6 && i < hiddenComments.length; i++) {
+			hiddenComments[i].classList.remove('d-none');
+		}
+		if (document.querySelectorAll('.comment-item.d-none').length === 0) {
+			this.style.display = 'none';
+		}
+
+	});
+
+
+	document.getElementById('scriviForm').addEventListener('click', function () {
+			const form = document.getElementById('recensioneForm');
+			if(form.style.display ==='none' || form.style.display === ''){
+				form.style.display = 'block'
+			} else {
+				form.style.display = 'none'
+			}
+		})
+</script>

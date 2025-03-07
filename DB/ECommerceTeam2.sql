@@ -84,27 +84,30 @@ CREATE TABLE ProdMaterial (
 
 
 CREATE TABLE Orders (
-	id_order INT IDENTITY (1,1) PRIMARY KEY,
-	id_user UNIQUEIDENTIFIER NOT NULL,
-	date_order DATETIME DEFAULT GETDATE(),
-	total DECIMAL(10,2) not null,
-	stateOrder NVARCHAR(50) NOT NULL,
-	CONSTRAINT CK_totale CHECK (total >= 0),
-	CONSTRAINT CK_stato CHECK (stateOrder IN ('in elaborazione','spedito','consegnato')),
-	CONSTRAINT FK_Ordini_Utenti FOREIGN KEY (id_user) REFERENCES Users (id_user),
+    id_order UNIQUEIDENTIFIER PRIMARY KEY,
+    total DECIMAL(10,2) not null,
+    CONSTRAINT CK_totale CHECK (total >= 0),
 )
 
 CREATE TABLE Cart (
-	id_order INT IDENTITY (1,1) NOT NULL,
-	id_prod UNIQUEIDENTIFIER NOT NULL,
-	qt INT NOT NULL,
-	price DECIMAL (10,2) NOT NULL,
-	CONSTRAINT PK_ordineprodotto PRIMARY KEY (id_order, id_prod), 
-	CONSTRAINT CK_quantita CHECK (qt >0),
-	CONSTRAINT CK_prezzo_unitario CHECK (price >0),
-	CONSTRAINT FK_OrdineProdotto_Ordine FOREIGN KEY (id_order) REFERENCES Orders (id_order),
-	CONSTRAINT FK_OrdineProdotto_Prodotto FOREIGN KEY (id_prod) REFERENCES Products (id_prod) 
+    id_order UNIQUEIDENTIFIER NOT NULL,
+    id_prod UNIQUEIDENTIFIER NOT NULL,
+    id_color INT NOT NULL,
+    id_size INT NOT NULL,
+    qt INT NOT NULL,
+    price DECIMAL (10,2) NOT NULL,
+    CONSTRAINT PK_ordineprodotto PRIMARY KEY (id_order, id_prod, id_color, id_size),
+    CONSTRAINT CK_quantita CHECK (qt >0),
+    CONSTRAINT CK_prezzo_unitario CHECK (price >0),
+    CONSTRAINT FK_OrdineProdotto_Ordine FOREIGN KEY (id_order) REFERENCES Orders (id_order),
+    CONSTRAINT FK_OrdineProdotto_Prodotto FOREIGN KEY (id_prod) REFERENCES Products (id_prod),
+    CONSTRAINT FK_OrdineProdotto_Color FOREIGN KEY (id_color) REFERENCES Colors(id_color),
+    CONSTRAINT FK_OrdineProdotto_Size FOREIGN KEY (id_size) REFERENCES Sizes(id_size)
 )
+
+DROP TABLE Cart 
+DROP TABLE Orders
+
 
 CREATE TABLE Ratings(
 	id_rating UNIQUEIDENTIFIER PRIMARY KEY,
@@ -460,14 +463,12 @@ JOIN
         (@2m, 1, 'https://img01.ztat.net/article/spp-media-p1/d5fc0c9248fd492b9fedd7be136b73e2/3d7305af864b48dcb3dcf6336c51d9b0.jpg?imwidth=1800'),
 
         (@3m, 6, 'https://img01.ztat.net/article/spp-media-p1/394526c3f9d4413da06c2a6644df5418/74cef7094a7f4ff197e1d07e3fe3e1e0.jpg?imwidth=1800'),
-        (@3m, 9, 'https://img01.ztat.net/article/spp-media-p1/7b42c884ef354f34b580e0840c81d6b7/764d9d778ad647f895a5de25e8200ed8.jpg?imwidth=1800'),
         (@3m, 5, 'https://img01.ztat.net/article/spp-media-p1/bfec421b29a344c7aaf03f5c7c368a46/dab4b7ea2ba54b24abbbb0e84c7cdc6e.jpg?imwidth=1800'),
         (@3m, 11, 'https://img01.ztat.net/article/spp-media-p1/3055b43bf71546aa9891e7383f7a8a63/2a4f0880f5f4476aa0448030db29e4fb.jpg?imwidth=1800'),
         (@3m, 3, 'https://img01.ztat.net/article/spp-media-p1/9fd19f0a91cb41c69b520664f974332b/0937528670c74c1993da1fe386c82411.jpg?imwidth=1800'),
 
         (@4m, 13, 'https://img01.ztat.net/article/spp-media-p1/4e2617982ae34f2b8eea7b9ecc9c8e85/95f8707e2a894c27af76e17f5403feb3.jpg?imwidth=1800'),
         (@4m, 1, 'https://img01.ztat.net/article/spp-media-p1/7b932e2e82fa44d59bedefcb2a63316f/f1f0e004c44c4c0f9eef4bff7e52c23a.jpg?imwidth=1800'),
-        (@4m, 9, 'https://img01.ztat.net/article/spp-media-p1/382c281a522a47a0a052e6a2f69ecfc7/520fa9289b5b48838eafeb1d6aad7725.jpg?imwidth=1800'),
         (@4m, 2, 'https://img01.ztat.net/article/spp-media-p1/13847dccd115463bad8109b6ccd75342/ef329fabf61949abbabef7ddf7762b0d.jpg?imwidth=1800'),
         (@4m, 3, 'https://img01.ztat.net/article/spp-media-p1/dfc6d49cef8c4abc9321369cd7d4d243/993a7933fa814600a48a0680f808e9b9.jpg?imwidth=1800'),
         (@4m, 5, 'https://img01.ztat.net/article/spp-media-p1/932c51a6dcb1445a9fe2a73c806e2875/f6a545a340504b19919aa1281a10da9e.jpg?imwidth=1800'),
@@ -499,11 +500,11 @@ INSERT INTO ProdSize (id_prod, id_size) VALUES
 -- Categoria 5: Gonne
   INSERT INTO Products (brand, gender, nome, id_category, descr, price, stock) 
 VALUES 
-  ('Calliope', 'F', 'UNITA - Gonna a campana', 6, 'Chiusura: Cerniera/ Fantasia: Monocromo/ Avvertenze: Lavaggio a macchina a 30 gradi/ Vestibilità: Regolare/ Linea: Dritta/ Lunghezza: Extra corto', 69.99, 70),
-  ('Stradivarius', 'F', 'Stradivarius - Minigonna', 6, 'Chiusura: Cerniera/ Fantasia: Monocromo/ Avvertenze: Lavaggio a macchina a 30 gradi/ Vestibilità: Regolare/ Linea: Dritta/ Lunghezza: Extra corto', 59.90, 60),
-  ('Guess', 'F', 'LANGER DRAPIERTER - Gonna lunga', 6, 'Vita: Normale/ Fantasia: Monocromo/ Avvertenze: Lavaggio a mano/ Vestibilità:  Regolare/ Linea: Aderente/ Lunghezza: Lungo/', 89.99, 30),
-  ('Calliope', 'F', 'Calliope - Gonna a pieghe ', 6, 'Chiusura: Lacci/ Fantasia: Monocromatico/ Avvertenze: Lavaggio a macchina a 30 gradi/ Vestibilità:  Regolare/ Linea: Svasata/ Lunghezza: Corto', 109.99, 30),
-  ('Moschino', 'F', 'MOSCHINO - Gonna a campana - white', 6, 'Chiusura: Cerniera/ Fantasia: Monocromo/ Avvertenze: Lavaggio a macchina a 30 gradi, non candeggiare, Non asciugare in asciugatrice/ Vestibilità:  Regolare/ Linea: Svasata/ Lunghezza: Al polpaccio', 999.99, 15);
+  ('Calliope', 'F', 'UNITA - Gonna a campana', 5, 'Chiusura: Cerniera/ Fantasia: Monocromo/ Avvertenze: Lavaggio a macchina a 30 gradi/ Vestibilità: Regolare/ Linea: Dritta/ Lunghezza: Extra corto', 69.99, 70),
+  ('Stradivarius', 'F', 'Stradivarius - Minigonna', 5, 'Chiusura: Cerniera/ Fantasia: Monocromo/ Avvertenze: Lavaggio a macchina a 30 gradi/ Vestibilità: Regolare/ Linea: Dritta/ Lunghezza: Extra corto', 59.90, 60),
+  ('Guess', 'F', 'LANGER DRAPIERTER - Gonna lunga', 5, 'Vita: Normale/ Fantasia: Monocromo/ Avvertenze: Lavaggio a mano/ Vestibilità:  Regolare/ Linea: Aderente/ Lunghezza: Lungo/', 89.99, 30),
+  ('Calliope', 'F', 'Calliope - Gonna a pieghe ', 5, 'Chiusura: Lacci/ Fantasia: Monocromatico/ Avvertenze: Lavaggio a macchina a 30 gradi/ Vestibilità:  Regolare/ Linea: Svasata/ Lunghezza: Corto', 109.99, 30),
+  ('Moschino', 'F', 'MOSCHINO - Gonna a campana - white', 5, 'Chiusura: Cerniera/ Fantasia: Monocromo/ Avvertenze: Lavaggio a macchina a 30 gradi, non candeggiare, Non asciugare in asciugatrice/ Vestibilità:  Regolare/ Linea: Svasata/ Lunghezza: Al polpaccio', 999.99, 15);
 
 DECLARE @1sk UNIQUEIDENTIFIER, @2sk UNIQUEIDENTIFIER, @3sk UNIQUEIDENTIFIER, @4sk UNIQUEIDENTIFIER, @5sk UNIQUEIDENTIFIER
 
@@ -605,7 +606,7 @@ JOIN
         (@2g, 13, 'https://img01.ztat.net/article/spp-media-p1/357deb031e104714b38350268aa218ed/d8cd16a0afd64b11914ae7dba65bfd33.jpg?imwidth=1800'),
         (@2g, 2,  'https://img01.ztat.net/article/spp-media-p1/1498708cb13247e8aba6548d1f61cb6c/bb6161c74bc7458d96dae3a24d5fce03.jpg?imwidth=1800'),
         (@3g,1, 'https://img01.ztat.net/article/spp-media-p1/1167dc858ed2474eaef917dcf720fbcb/385846db17f247b69ef5b6f561656be3.jpg?imwidth=1800'),
-        (@4g,1, 'https://img01.ztat.net/article/spp-media-p1/767c00e6f47748f797d9f63d7ee1539a/c23aaff71566412fba6790696d47a33c.jpg?imwidth=1800'),
+        (@4g,1, 'https://img01.ztat.net/article/spp-media-p1/2dbc898cd1404981ac2c436aee2aabea/552ac756832440bfbbb891e30312dd3e.jpg?imwidth=1800'),
         (@5g,1, 'https://img01.ztat.net/article/spp-media-p1/f7533a57a1ae44a198922e2a2b73b5b5/6deff79992cf452eb9f79e2064d60af8.jpg?imwidth=1800'),
         (@5g,2, 'https://img01.ztat.net/article/spp-media-p1/90dc977e2c6f45f2b01b298a1337304d/d4dda8666523423f864447ba75f14924.jpg?imwidth=1800'),
         (@5g,13, 'https://img01.ztat.net/article/spp-media-p1/a92ae3176e52473c9e632f9b4daa864e/d00219b6856446fba2eb4a0bc1f24cd6.jpg?imwidth=1800'),
