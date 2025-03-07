@@ -363,9 +363,9 @@ namespace BW1_E_commerce.Controllers
 
                         var queryProdSize = @"INSERT INTO ProdSize (id_prod, id_size) VALUES (@id_prod, @id_size)";
 
-                        if (model.SelectedSizes != null && model.SelectedSizes.Count > 0)
+                        if (model.Sizes != null && model.Sizes.Count > 0)
                         {
-                            foreach (var size in model.SelectedSizes)
+                            foreach (var size in model.Sizes)
                             {
                                 await using (SqlCommand prodSize = new SqlCommand(queryProdSize, connection, (SqlTransaction)transaction))
                                 {
