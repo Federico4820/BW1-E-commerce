@@ -1,5 +1,5 @@
 ﻿
-using System.Collections.Generic;
+using BW1_E_commerce.Models;
 
 namespace BW1_E_commerce.Models
 {

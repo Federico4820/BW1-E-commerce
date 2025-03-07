@@ -554,7 +554,7 @@ namespace BW1_E_commerce.Controllers
 
         //ACTION PER AGGIUNTA AL CARRELLO
 
-        public async Task<IActionResult> AddToCart(Guid idProd, int quantity, string price)
+        public async Task<IActionResult> AddToCart(Guid idProd, int quantity, string price, int id_color, int id_size)
         {
             await using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -582,42 +582,69 @@ namespace BW1_E_commerce.Controllers
                             }
                         }
                     }
-                    string checkCartQuery = "SELECT qt FROM Cart WHERE id_order = @id_order AND id_prod = @idProd;";
+
+                    // Controlla se il prodotto con la specifica combinazione di colore e taglia è già nel carrello
+                    string checkCartQuery = @"
+                SELECT qt 
+                FROM Cart 
+                WHERE id_order = @id_order 
+                  AND id_prod = @idProd 
+                  AND id_color = @id_color 
+                  AND id_size = @id_size;";
                     await using (SqlCommand checkCartCmd = new SqlCommand(checkCartQuery, conn, (SqlTransaction)transaction))
                     {
-                        checkCartCmd.Parameters.AddWithValue("@idProd", idProd);
                         checkCartCmd.Parameters.AddWithValue("@id_order", idOrder);
-                        var result = checkCartCmd.ExecuteScalar();
+                        checkCartCmd.Parameters.AddWithValue("@idProd", idProd);
+                        checkCartCmd.Parameters.AddWithValue("@id_color", id_color);
+                        checkCartCmd.Parameters.AddWithValue("@id_size", id_size);
 
-                        if (result != null)
+                        object cartResult = await checkCartCmd.ExecuteScalarAsync();
+
+                        if (cartResult != null)
                         {
-                            string updateCartQuery = "UPDATE Cart SET qt = qt + @quantity WHERE id_order = @id_order AND id_prod = @idProd;";
+                            // Se il prodotto (con la combinazione colore/taglia) è già nel carrello, aggiorna la quantità
+                            string updateCartQuery = @"
+                        UPDATE Cart 
+                        SET qt = qt + @quantity 
+                        WHERE id_order = @id_order 
+                          AND id_prod = @idProd 
+                          AND id_color = @id_color 
+                          AND id_size = @id_size;";
                             await using (SqlCommand updateCartCmd = new SqlCommand(updateCartQuery, conn, (SqlTransaction)transaction))
                             {
                                 updateCartCmd.Parameters.AddWithValue("@id_order", idOrder);
                                 updateCartCmd.Parameters.AddWithValue("@idProd", idProd);
+                                updateCartCmd.Parameters.AddWithValue("@id_color", id_color);
+                                updateCartCmd.Parameters.AddWithValue("@id_size", id_size);
                                 updateCartCmd.Parameters.AddWithValue("@quantity", quantity);
                                 await updateCartCmd.ExecuteNonQueryAsync();
                             }
                         }
                         else
                         {
-                            string insertCartQuery = "INSERT INTO Cart (id_order, id_prod, qt, price) VALUES (@id_order, @idProd, @quantity, @price);";
+                            // Se il prodotto non è presente, lo inserisce nel carrello con il colore e la taglia selezionati
+                            string insertCartQuery = @"
+                        INSERT INTO Cart (id_order, id_prod, qt, price, id_color, id_size) 
+                        VALUES (@id_order, @idProd, @quantity, @price, @id_color, @id_size);";
                             await using (SqlCommand insertCartCmd = new SqlCommand(insertCartQuery, conn, (SqlTransaction)transaction))
                             {
                                 insertCartCmd.Parameters.AddWithValue("@id_order", idOrder);
                                 insertCartCmd.Parameters.AddWithValue("@idProd", idProd);
                                 insertCartCmd.Parameters.AddWithValue("@quantity", quantity);
                                 insertCartCmd.Parameters.AddWithValue("@price", decimal.Parse(price));
+                                insertCartCmd.Parameters.AddWithValue("@id_color", id_color);
+                                insertCartCmd.Parameters.AddWithValue("@id_size", id_size);
                                 await insertCartCmd.ExecuteNonQueryAsync();
                             }
                         }
                     }
-                    await transaction.CommitAsync();
-                    return RedirectToAction("Index");
 
+                    // Commit della transazione
+                    await transaction.CommitAsync();
                 }
             }
+
+            return RedirectToAction("Cart");
         }
         private async Task<CartViewModel> GetCartItems()
         {
@@ -629,7 +656,7 @@ namespace BW1_E_commerce.Controllers
                 await conn.OpenAsync();
 
                 string checkOrderQuery = @"
-                SELECT TOP 1 id_order FROM Orders ORDER BY id_order DESC;";
+        SELECT TOP 1 id_order FROM Orders ORDER BY id_order DESC;";
 
                 using (SqlCommand checkCmd = new SqlCommand(checkOrderQuery, conn))
                 {
@@ -642,8 +669,8 @@ namespace BW1_E_commerce.Controllers
                     {
                         idOrder = Guid.NewGuid();
                         string insertOrderQuery = @"
-                        INSERT INTO Orders (id_order, total) 
-                        VALUES (@idOrder, 0);";
+                INSERT INTO Orders (id_order, total) 
+                VALUES (@idOrder, 0);";
 
                         using (SqlCommand insertCmd = new SqlCommand(insertOrderQuery, conn))
                         {
@@ -656,10 +683,34 @@ namespace BW1_E_commerce.Controllers
                 cart.IdOrder = idOrder;
 
                 string query = @"
-                SELECT c.id_prod, p.nome, c.qt, c.price 
-                FROM Cart c
-                JOIN Products p ON c.id_prod = p.id_prod
-                WHERE c.id_order = @idOrder;";
+        WITH ImageSelection AS (
+            SELECT 
+                PC.id_prod, 
+                PCI.img_URL, 
+                ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn
+            FROM 
+                ProdColorImages PCI
+            JOIN 
+                ProdColor PC ON PCI.id_prodColor = PC.id_prodColor
+        )
+        SELECT 
+            c.id_prod, 
+            p.nome, 
+            c.qt, 
+            c.price,
+            ISel.img_URL,
+            k.nome AS Color,
+            s.nome AS Size
+        FROM 
+            Cart c
+        JOIN 
+            Products p ON c.id_prod = p.id_prod
+        LEFT JOIN 
+            ImageSelection ISel ON p.id_prod = ISel.id_prod AND ISel.rn = 1
+        LEFT JOIN Colors AS k ON k.id_color = c.id_color
+        LEFT JOIN Sizes AS s ON s.id_size = c.id_size
+        WHERE 
+            c.id_order = @idOrder;";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -674,7 +725,10 @@ namespace BW1_E_commerce.Controllers
                                 IdProd = reader.GetGuid(0),
                                 ProductName = reader.GetString(1),
                                 Quantity = reader.GetInt32(2),
-                                Price = reader.GetDecimal(3)
+                                Price = reader.GetDecimal(3),
+                                ImgUrl = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                Color = reader.GetString(5),
+                                Size = reader.GetString(6)
                             });
                         }
                     }
@@ -740,6 +794,68 @@ namespace BW1_E_commerce.Controllers
 
             return RedirectToAction("Cart");
         }
+
+        public async Task<IActionResult> UpdateCartQuantity(Guid idProd, int quantity)
+        {
+            await using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                await conn.OpenAsync();
+
+                using (var transaction = await conn.BeginTransactionAsync())
+                {
+                    Guid? idOrder = null;
+
+                    // Recupera l'ID dell'ultimo ordine esistente
+                    string checkOrderQuery = "SELECT TOP 1 id_order FROM Orders ORDER BY id_order DESC;";
+                    await using (SqlCommand checkOrderCmd = new SqlCommand(checkOrderQuery, conn, (SqlTransaction)transaction))
+                    {
+                        object result = await checkOrderCmd.ExecuteScalarAsync();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            idOrder = (Guid)result;
+                        }
+                    }
+
+                    // Se non esiste un ordine, interrompe l'operazione
+                    if (!idOrder.HasValue)
+                    {
+                        TempData["Error"] = "Nessun ordine esistente.";
+                        return RedirectToAction("Cart");
+                    }
+
+                    if (quantity > 0)
+                    {
+                        // Aggiorna la quantità del prodotto nel carrello
+                        string updateCartQuery = "UPDATE Cart SET qt = @quantity WHERE id_order = @id_order AND id_prod = @idProd;";
+                        await using (SqlCommand updateCartCmd = new SqlCommand(updateCartQuery, conn, (SqlTransaction)transaction))
+                        {
+                            updateCartCmd.Parameters.AddWithValue("@id_order", idOrder.Value);
+                            updateCartCmd.Parameters.AddWithValue("@idProd", idProd);
+                            updateCartCmd.Parameters.AddWithValue("@quantity", quantity);
+                            await updateCartCmd.ExecuteNonQueryAsync();
+                        }
+                    }
+                    else
+                    {
+                        // Se la quantità è 0 o negativa, rimuove il prodotto dal carrello
+                        string deleteCartQuery = "DELETE FROM Cart WHERE id_order = @id_order AND id_prod = @idProd;";
+                        await using (SqlCommand deleteCartCmd = new SqlCommand(deleteCartQuery, conn, (SqlTransaction)transaction))
+                        {
+                            deleteCartCmd.Parameters.AddWithValue("@id_order", idOrder.Value);
+                            deleteCartCmd.Parameters.AddWithValue("@idProd", idProd);
+                            await deleteCartCmd.ExecuteNonQueryAsync();
+                        }
+                    }
+
+                    // Commit della transazione
+                    await transaction.CommitAsync();
+                }
+            }
+
+            return RedirectToAction("Cart");
+        }
+
+
         public IActionResult Checkout(Guid idOrder)
         {
 

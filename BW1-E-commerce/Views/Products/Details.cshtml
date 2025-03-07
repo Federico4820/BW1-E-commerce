@@ -66,34 +66,54 @@
 						</div>
 
 						<p class="fw-bold">Colori disponibili: <span class="fw-normal" id="color-name"></span></p>
-						<div class="colorsContainer mb-3">
-							@foreach (var color in Model.Colors)
-							{
-								<label class="color-option" data-color="@color.Name">
-									<input type="radio" name="color" value="@color.IdColor" class="color-radio" />
-									<span class="color-box @color.Name"></span>
-								</label>
-							}
-						</div>
-						<div class="d-flex justify-content-between align-items-center mb-2">
-							<p class="fw-bold m-0 p-0">Taglie disponibili</p>
-							<button type="button" class="nav-link text-decoration-underline" data-bs-toggle="modal"
-									data-bs-target="#sizeChart">
-								Guida alle taglie
-							</button>
-							<div class="modal fade" id="sizeChart" tabindex="-1" aria-labelledby="exampleModalLabel"
-								 aria-hidden="true">
-								@await Html.PartialAsync("_TaglieDonna")
-							</div>
-						</div>
+						<form asp-action="AddToCart" method="post">
+							<!-- Parametri nascosti -->
+							<input type="hidden" name="idProd" value="@Model.Id" />
+							<input type="hidden" name="price" value="@Model.Price" />
 
-						<select class="mb-4 customSelect">
-							<option selected disabled>Seleziona un'opzione</option>
-							@foreach (var item in Model.Sizes)
-							{
-								<option value="@item.IdSize">@item.Name</option>
-							}
-						</select>
+							<!-- Selezione del colore -->
+							<div class="colorsContainer mb-3">
+								@foreach (var color in Model.Colors)
+								{
+									<label class="color-option" data-color="@color.Name">
+										<input type="radio" name="id_color" value="@color.IdColor" class="color-radio" />
+										<span class="color-box @color.Name"></span>
+									</label>
+								}
+							</div>
+
+							<!-- Selezione della taglia -->
+							<div class="d-flex justify-content-between align-items-center mb-2">
+								<p class="fw-bold m-0 p-0">Taglie disponibili -------</p>
+								<button type="button" class="nav-link text-decoration-underline" data-bs-toggle="modal"
+										data-bs-target="#sizeChart">
+									Guida alle taglie
+								</button>
+								<div class="modal fade" id="sizeChart" tabindex="-1" aria-labelledby="exampleModalLabel"
+									 aria-hidden="true">
+									@await Html.PartialAsync("_TaglieDonna")
+								</div>
+							</div>
+
+							<select name="id_size" class="mb-4 customSelect">
+								<option selected disabled>Seleziona un'opzione</option>
+								@foreach (var item in Model.Sizes)
+								{
+									<option value="@item.IdSize">@item.Name</option>
+								}
+							</select>
+
+							<!-- Selezione della quantità (da 1 a 10) -->
+							<select name="quantity" class="mb-4 customSelect">
+								@for (int i = 1; i <= 10; i++)
+								{
+									<option value="@i">@i</option>
+								}
+							</select>
+
+							<button type="submit" class="btn btn-primary">Aggiungi al Carrello</button>
+						</form>
+
 
 						<div class="mb-3 d-flex align-items-center">
 							<a class="btn btn-success btn-lg rounded-0 fw-bolder me-4 flex-grow-1" asp-controller="Products" asp-action="AddToCart" asp-route-idProd=@Model.Id asp-route-quantity=1 asp-route-price=@Model.Price>
