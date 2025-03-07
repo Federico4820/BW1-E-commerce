@@ -15,9 +15,9 @@ namespace BW1_E_commerce.Models
         public string? Email { get; set; }
 
         // Liste di opzioni disponibili (da popolare nella GET action)
-        public List<Size> Sizes { get; set; } = new List<Size>();
+        public List<SizeModel> Sizes { get; set; } = new List<SizeModel>();
         public List<ColorEditModel> Colors { get; set; } = new List<ColorEditModel>();
-        public List<Material> Materials { get; set; } = new List<Material>(); 
+        public List<MaterialModel> Materials { get; set; } = new List<MaterialModel>();
 
         // Valori selezionati dall'utente (per l'aggiornamento)
         public List<int> SelectedSizes { get; set; } = new List<int>();

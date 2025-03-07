@@ -110,9 +110,10 @@
         </div>
         <div class="col-md-6 col-12 text-md-end">
             <p class="mb-1">Hai un codice sconto? <span class="text-muted">Aggiungilo nella fase finale</span></p>
-            <a href="@Url.Action("Checkout")" class="btn btn-success btn-lg px-5">
-                Acquista Ora
-            </a>
+            <form asp-action="Checkout" method="get">
+                <input type="hidden" name="idOrder" value="@Model.IdOrder" />
+                <button type="submit" class="btn btn-success btn-lg px-5">Acquista Ora</button>
+            </form>
         </div>
     </div>
 

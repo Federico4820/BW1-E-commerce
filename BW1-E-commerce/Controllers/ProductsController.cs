@@ -22,7 +22,7 @@ namespace BW1_E_commerce.Controllers
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task<ProductListModel> GetProducts(string gender, string search = null)
+        public async Task<ProductListModel> GetProducts(string gender = null, string search = null)
         {
             var prodList = new ProductListModel()
             {
@@ -43,8 +43,12 @@ namespace BW1_E_commerce.Controllers
                              P.id_category, C.nome as category_name, P.gender, ISel.img_URL
                       FROM Products P 
                       LEFT JOIN Category as C ON P.id_category = C.id_category
-                      LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1
-                      WHERE P.gender IN (@gender, 'U')";
+                      LEFT JOIN ImageSelection ISel ON P.id_prod = ISel.id_prod AND ISel.rn = 1";
+
+                if (!string.IsNullOrWhiteSpace(gender))
+                {
+                    query += " WHERE P.gender IN (@gender, 'U')";
+                }
 
                 // Se la ricerca non è vuota, aggiungiamo il filtro LIKE
                 if (!string.IsNullOrWhiteSpace(search))
@@ -54,7 +58,12 @@ namespace BW1_E_commerce.Controllers
 
                 await using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@gender", gender);
+
+                    if (!string.IsNullOrWhiteSpace(gender))
+                    {
+                        command.Parameters.AddWithValue("@gender", gender);
+                    }
+
                     if (!string.IsNullOrWhiteSpace(search))
                     {
                         command.Parameters.AddWithValue("@search", $"%{search}%");
@@ -89,8 +98,6 @@ namespace BW1_E_commerce.Controllers
         {
             return View();
         }
-
-
         public async Task<IActionResult> Index(int? filter, string gender, string? search)
         {
             ViewBag.Prod = await GetProducts(gender, search);
@@ -214,7 +221,6 @@ namespace BW1_E_commerce.Controllers
         }
 
         //4 SELECT: Category, Color, Sizes e Materials
-
         private async Task<List<Category>> GetCategories()
         {
             List<Category> categories = new List<Category>();
@@ -240,7 +246,6 @@ namespace BW1_E_commerce.Controllers
             }
             return categories;
         }
-
         private async Task<List<ColorModel>> GetColor()
         {
             List<Models.ColorModel> colors = new List<Models.ColorModel>();
@@ -266,7 +271,6 @@ namespace BW1_E_commerce.Controllers
             }
             return colors;
         }
-
         private async Task<List<SizeModel>> GetSizes()
         {
             List<Models.SizeModel> sizes = new List<Models.SizeModel>();
@@ -292,7 +296,6 @@ namespace BW1_E_commerce.Controllers
             }
             return sizes;
         }
-
         private async Task<List<MaterialModel>> GetMaterials()
         {
             List<MaterialModel> materials = new List<MaterialModel>();
@@ -318,6 +321,7 @@ namespace BW1_E_commerce.Controllers
             }
             return materials;
         }
+
         //ACTION PER FAR FUNZIONARE IL FORM DI AGGIUNTA PRODOTTO
         public async Task<IActionResult> AddDelete()
         {
@@ -325,8 +329,9 @@ namespace BW1_E_commerce.Controllers
             ViewBag.Color = await GetColor();
             ViewBag.Sizes = await GetSizes();
             ViewBag.Material = await GetMaterials();
-            var model = new ProductAddModel();
-            return View(model);
+            ViewBag.Prod = await GetProducts();
+            ViewBag.AddProd = new ProductAddModel();
+            return View();
         }
         [HttpPost]
         public async Task<IActionResult> AddSave(ProductAddModel model)
@@ -430,7 +435,7 @@ namespace BW1_E_commerce.Controllers
                         await transaction.CommitAsync();
                     }
                 }
-                return RedirectToAction("Add");
+                return RedirectToAction("AddDelete");
             }
             catch (Exception ex)
             {
@@ -440,7 +445,6 @@ namespace BW1_E_commerce.Controllers
         }
 
         //ACTION PER RECUPERARE I COMMENTI DI UN PRODOTTO
-
         public async Task<CommentListModel> GetComments(Guid id)
         {
             var commentList = new CommentListModel()
@@ -485,7 +489,6 @@ namespace BW1_E_commerce.Controllers
             }
             return commentList;
         }
-
 
         //ACTION PER ADD DEL COMMENTO
         [HttpPost("products/write-comment")]
@@ -574,7 +577,6 @@ namespace BW1_E_commerce.Controllers
 
 
         //ACTION PER AGGIUNTA AL CARRELLO
-
         public async Task<IActionResult> AddToCart(Guid idProd, int quantity, string price, int id_color, int id_size)
         {
             await using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -875,12 +877,8 @@ namespace BW1_E_commerce.Controllers
 
             return RedirectToAction("Cart");
         }
-
-
         public IActionResult Checkout(Guid idOrder)
         {
-
-
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -889,27 +887,37 @@ namespace BW1_E_commerce.Controllers
                     try
                     {
                         string updateOrderQuery = @"
-                        DECLARE @total DECIMAL(10,2) = (SELECT COALESCE(SUM(qt * price), 0) FROM Cart WHERE id_order = @idOrder);
-                        UPDATE Orders SET total = @total WHERE id_order = @idOrder;";
+                DECLARE @total DECIMAL(10,2) = (SELECT COALESCE(SUM(qt * price), 0) FROM Cart WHERE id_order = @idOrder);
+                UPDATE Orders SET total = @total WHERE id_order = @idOrder;";
 
                         using (SqlCommand cmd = new SqlCommand(updateOrderQuery, conn, trans))
                         {
                             cmd.Parameters.AddWithValue("@idOrder", idOrder);
-                            cmd.ExecuteNonQuery();
+                            var rowsAffected = cmd.ExecuteNonQuery();
+                            if (rowsAffected == 0)
+                            {
+                                throw new Exception("L'ordine non è stato trovato.");
+                            }
                         }
 
                         string clearCartQuery = "DELETE FROM Cart WHERE id_order = @idOrder;";
                         using (SqlCommand cmd = new SqlCommand(clearCartQuery, conn, trans))
                         {
                             cmd.Parameters.AddWithValue("@idOrder", idOrder);
-                            cmd.ExecuteNonQuery();
+                            var rowsDeleted = cmd.ExecuteNonQuery();
+                            if (rowsDeleted == 0)
+                            {
+                                throw new Exception("Nessun prodotto trovato nel carrello per questo ordine.");
+                            }
                         }
+
                         trans.Commit();
                         return RedirectToAction("OrderSuccess");
                     }
                     catch (Exception ex)
                     {
                         trans.Rollback();
+                        Console.WriteLine("Errore durante il checkout: " + ex.Message);
                         return StatusCode(500, "Errore durante il checkout: " + ex.Message);
                     }
                 }
@@ -922,7 +930,7 @@ namespace BW1_E_commerce.Controllers
 
         //ACTION DI FILTRO!
 
-        public async Task<ProductListModel> GetProductFiltered(int filter , string gender)
+        public async Task<ProductListModel> GetProductFiltered(int filter, string gender)
         {
             var prodList = new ProductListModel()
             {
@@ -964,6 +972,311 @@ namespace BW1_E_commerce.Controllers
             return prodList;
         }
 
+
+        //ACTION PER EDIT E DELETE + GRIGLIA ADMIN
+
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var query = @"DELETE FROM ProdColorImages WHERE id_prodColor IN (SELECT id_prodColor FROM ProdColor WHERE id_prod = @id);
+        DELETE FROM ProdMaterial WHERE id_prod = @id;
+        DELETE FROM ProdColor WHERE id_prod = @id;
+		DELETE FROM ProdSize WHERE id_prod = @id;
+        DELETE FROM Products WHERE id_prod = @id";
+
+                await using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    int rowsAffected = await command.ExecuteNonQueryAsync();
+
+                    if (rowsAffected > 0)
+                    {
+                        TempData["Success"] = "Prodotto eliminato con successo.";
+                    }
+                    else
+                    {
+                        TempData["Error"] = "Errore nell'eliminazione del prodotto.";
+                    }
+                }
+            }
+
+            return RedirectToAction("AddDelete");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var model = new EditProduct();
+            ViewBag.Categories = await GetCategories();
+            ViewBag.Color = await GetColor();
+            ViewBag.Sizes = await GetSizes();
+            ViewBag.Material = await GetMaterials();
+
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    //Recupero dei dati principali del prodotto
+                    var queryProd = @"
+        SELECT id_prod, nome, brand, price, descr, id_category, gender, stock 
+        FROM Products 
+        WHERE id_prod = @id_prod";
+                    using (var cmdProd = new SqlCommand(queryProd, connection))
+                    {
+                        cmdProd.Parameters.AddWithValue("@id_prod", id);
+                        using (var reader = await cmdProd.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                model.IdProd = (Guid)reader["id_prod"];
+                                model.Name = reader["nome"].ToString();
+                                model.Brand = reader["brand"].ToString();
+                                model.Price = (decimal)reader["price"];
+                                model.Description = reader["descr"].ToString();
+                                model.IdCategory = Convert.ToInt32(reader["id_category"]);
+                                model.Gender = reader["gender"].ToString();
+                                model.Stock = Convert.ToInt32(reader["stock"]);
+                            }
+                            else
+                            {
+                                return NotFound();
+                            }
+                        }
+                    }
+
+                    //Recupero delle dimensioni (ProdSize)
+                    var querySizes = "SELECT id_size FROM ProdSize WHERE id_prod = @id_prod";
+                    using (var cmdSizes = new SqlCommand(querySizes, connection))
+                    {
+                        cmdSizes.Parameters.AddWithValue("@id_prod", id);
+                        using (var reader = await cmdSizes.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                model.SelectedSizes.Add(Convert.ToInt32(reader["id_size"]));
+                            }
+                        }
+                    }
+
+                    // Recupero dei colori e relative immagini (ProdColor e ProdColorImages)
+                    model.SelectedColors = new List<ColorEditModel>();
+                    var queryColors = @"
+        SELECT PC.id_prodColor, PC.id_color, PCI.img_URL 
+        FROM ProdColor PC 
+        LEFT JOIN ProdColorImages PCI ON PC.id_prodColor = PCI.id_prodColor 
+        WHERE PC.id_prod = @id_prod";
+                    using (var cmdColors = new SqlCommand(queryColors, connection))
+                    {
+                        cmdColors.Parameters.AddWithValue("@id_prod", id);
+                        using (var reader = await cmdColors.ExecuteReaderAsync())
+                        {
+                            // Raggruppa i colori per id_prodColor per raccogliere tutte le immagini associate
+                            var colorsDict = new Dictionary<Guid, ColorEditModel>();
+                            while (await reader.ReadAsync())
+                            {
+                                var prodColorId = (Guid)reader["id_prodColor"];
+                                var idColor = Convert.ToInt32(reader["id_color"]);
+                                var imgUrl = reader["img_URL"] != DBNull.Value ? reader["img_URL"].ToString() : null;
+
+                                if (!colorsDict.ContainsKey(prodColorId))
+                                {
+                                    var colorModel = new ColorEditModel
+                                    {
+                                        IdColor = idColor,
+                                        ImgListModel = new List<string>()
+                                    };
+                                    if (!string.IsNullOrEmpty(imgUrl))
+                                        colorModel.ImgListModel.Add(imgUrl);
+
+                                    colorsDict.Add(prodColorId, colorModel);
+                                }
+                                else
+                                {
+                                    if (!string.IsNullOrEmpty(imgUrl))
+                                        colorsDict[prodColorId].ImgListModel.Add(imgUrl);
+                                }
+                            }
+                            model.SelectedColors = colorsDict.Values.ToList();
+                        }
+                    }
+
+                    //Recupero dei materiali (ProdMaterial)
+                    model.SelectedMaterials = new List<MaterialEditModel>();
+                    var queryMaterials = "SELECT id_material, percentage_mat FROM ProdMaterial WHERE id_prod = @id_prod";
+                    using (var cmdMat = new SqlCommand(queryMaterials, connection))
+                    {
+                        cmdMat.Parameters.AddWithValue("@id_prod", id);
+                        using (var reader = await cmdMat.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var material = new MaterialEditModel
+                                {
+                                    IdMaterial = Convert.ToInt32(reader["id_material"]),
+                                    Percentage = (decimal)reader["percentage_mat"]
+                                };
+                                model.SelectedMaterials.Add(material);
+                            }
+                        }
+                    }
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Errore durante il caricamento del prodotto: " + ex.Message;
+                return RedirectToAction("Index");
+            }
+        }
+
+        public async Task<IActionResult> EditSave(EditProduct model)
+        {
+            try
+            {
+                await using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+                    using (var transaction = await connection.BeginTransactionAsync())
+                    {
+                        //Aggiornamento del record principale in Products
+                        var queryUpdateProd = @"
+            UPDATE Products 
+            SET brand = @brand,
+                gender = @gender,
+                nome = @nome,
+                id_category = @id_category,
+                descr = @descr,
+                price = @price,
+                stock = @stock
+            WHERE id_prod = @id_prod";
+
+                        await using (SqlCommand cmdUpdateProd = new SqlCommand(queryUpdateProd, connection, (SqlTransaction)transaction))
+                        {
+                            cmdUpdateProd.Parameters.AddWithValue("@brand", model.Brand);
+                            cmdUpdateProd.Parameters.AddWithValue("@gender", model.Gender);
+                            cmdUpdateProd.Parameters.AddWithValue("@nome", model.Name);
+                            cmdUpdateProd.Parameters.AddWithValue("@id_category", model.IdCategory);
+                            cmdUpdateProd.Parameters.AddWithValue("@descr", model.Description);
+                            cmdUpdateProd.Parameters.AddWithValue("@price", model.Price);
+                            cmdUpdateProd.Parameters.AddWithValue("@stock", model.Stock);
+                            cmdUpdateProd.Parameters.AddWithValue("@id_prod", model.IdProd);
+
+                            await cmdUpdateProd.ExecuteNonQueryAsync();
+                        }
+
+                        // Gestione delle tabelle figlie:
+                        //dimensioni
+                        var deleteProdSize = "DELETE FROM ProdSize WHERE id_prod = @id_prod";
+                        await using (SqlCommand cmdDelSize = new SqlCommand(deleteProdSize, connection, (SqlTransaction)transaction))
+                        {
+                            cmdDelSize.Parameters.AddWithValue("@id_prod", model.IdProd);
+                            await cmdDelSize.ExecuteNonQueryAsync();
+                        }
+
+                        if (model.SelectedSizes != null && model.SelectedSizes.Count > 0)
+                        {
+                            var queryProdSize = "INSERT INTO ProdSize (id_prod, id_size) VALUES (@id_prod, @id_size)";
+                            foreach (var size in model.SelectedSizes)
+                            {
+                                await using (SqlCommand prodSize = new SqlCommand(queryProdSize, connection, (SqlTransaction)transaction))
+                                {
+                                    prodSize.Parameters.AddWithValue("@id_prod", model.IdProd);
+                                    prodSize.Parameters.AddWithValue("@id_size", size);
+                                    await prodSize.ExecuteNonQueryAsync();
+                                }
+                            }
+                        }
+
+                        // colori e  relative immagini
+                        var deleteColorImages = "DELETE FROM ProdColorImages WHERE id_prodColor IN (SELECT id_prodColor FROM ProdColor WHERE id_prod = @id_prod)";
+                        await using (SqlCommand cmdDelColorImages = new SqlCommand(deleteColorImages, connection, (SqlTransaction)transaction))
+                        {
+                            cmdDelColorImages.Parameters.AddWithValue("@id_prod", model.IdProd);
+                            await cmdDelColorImages.ExecuteNonQueryAsync();
+                        }
+                        var deleteProdColor = "DELETE FROM ProdColor WHERE id_prod = @id_prod";
+                        await using (SqlCommand cmdDelColor = new SqlCommand(deleteProdColor, connection, (SqlTransaction)transaction))
+                        {
+                            cmdDelColor.Parameters.AddWithValue("@id_prod", model.IdProd);
+                            await cmdDelColor.ExecuteNonQueryAsync();
+                        }
+
+                        var queryPrdColor = "INSERT INTO ProdColor(id_prod, id_color) OUTPUT INSERTED.id_prodColor VALUES (@id_prod, @id_color)";
+                        var queryColorImg = "INSERT INTO ProdColorImages(id_prodColor, img_URL) VALUES (@id_prodColor, @img_URL)";
+
+                        var validColor = model.SelectedColors
+                        .Where(m => m != null && m.IdColor > 0 && m.ImgListModel != null && m.ImgListModel.Any(item => !string.IsNullOrEmpty(item)))
+                        .ToList();
+
+
+                        foreach (var color in validColor)
+                        {
+                            Guid prodColorId;
+                            await using (SqlCommand prdColor = new SqlCommand(queryPrdColor, connection, (SqlTransaction)transaction))
+                            {
+                                prdColor.Parameters.AddWithValue("@id_prod", model.IdProd);
+                                prdColor.Parameters.AddWithValue("@id_color", color.IdColor);
+                                var result = await prdColor.ExecuteScalarAsync();
+
+                                if (result == DBNull.Value || result == null)
+                                {
+                                    throw new Exception("Errore nell'aggiornamento del colore del prodotto.");
+                                }
+
+                                prodColorId = (Guid)result;
+                            }
+
+                            var validImg = color.ImgListModel.Where(m => m != null && !string.IsNullOrEmpty(m)).ToList();
+                            foreach (var img in validImg)
+                            {
+                                await using (SqlCommand prdImg = new SqlCommand(queryColorImg, connection, (SqlTransaction)transaction))
+                                {
+                                    prdImg.Parameters.AddWithValue("@id_prodColor", prodColorId);
+                                    prdImg.Parameters.AddWithValue("@img_URL", img);
+                                    await prdImg.ExecuteNonQueryAsync();
+                                }
+                            }
+                        }
+
+                        //Gestione dei materiali
+                        var deleteProdMat = "DELETE FROM ProdMaterial WHERE id_prod = @id_prod";
+                        await using (SqlCommand cmdDelMat = new SqlCommand(deleteProdMat, connection, (SqlTransaction)transaction))
+                        {
+                            cmdDelMat.Parameters.AddWithValue("@id_prod", model.IdProd);
+                            await cmdDelMat.ExecuteNonQueryAsync();
+                        }
+
+                        var queryMat = "INSERT INTO ProdMaterial (id_prod, id_material, percentage_mat) VALUES (@id_prod, @id_material, @percentage_mat)";
+                        var validMaterials = model.SelectedMaterials
+                            .Where(m => m.IdMaterial > 0 && m.Percentage > 0)
+                            .ToList();
+                        foreach (var mat in validMaterials)
+                        {
+                            await using (SqlCommand prdMat = new SqlCommand(queryMat, connection, (SqlTransaction)transaction))
+                            {
+                                prdMat.Parameters.AddWithValue("@id_prod", model.IdProd);
+                                prdMat.Parameters.AddWithValue("@id_material", mat.IdMaterial);
+                                prdMat.Parameters.AddWithValue("@percentage_mat", mat.Percentage);
+                                await prdMat.ExecuteNonQueryAsync();
+                            }
+                        }
+
+                        await transaction.CommitAsync();
+                    }
+                }
+                return RedirectToAction("TableProducts", new { id = model.IdProd });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Si è verificato un errore durante l'aggiornamento del prodotto. Errore: " + ex.Message;
+                return RedirectToAction("Edit", new { id = model.IdProd });
+            }
+        }
 
 
     }

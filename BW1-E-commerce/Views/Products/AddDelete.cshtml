@@ -3,6 +3,8 @@
 	var color = ViewBag.Color as List<ColorModel>;
 	var sizes = ViewBag.Sizes as List<SizeModel>;
 	var mat = ViewBag.Material as List<MaterialModel>;
+	var productList = ViewBag.Prod as ProductListModel;
+	var productListAdd = ViewBag.AddProd as ProductAddModel;
 }
 
 
@@ -14,7 +16,7 @@
 
 			<a class="text-decoration-none text-dark mt-4 mx-3" id="Add" style="cursor:pointer">Aggiungi</a>
 			<hr class="text-secondary" />
-			<a class="text-decoration-none text-dark mx-3" id="manageForm" style="cursor:pointer">Elimina o modifica</a>
+			<a class="text-decoration-none text-dark mx-3" id="manageFormBtn" style="cursor:pointer">Elimina o modifica</a>
 
 		</div>
 
@@ -23,18 +25,35 @@
 			<div id="addForm" style="display: none;">
 				@await Html.PartialAsync("_Add")
 			</div>
+			<div id="manageForm" style="display: none;">
+				@await Html.PartialAsync("_TableProducts")
+			</div>
 		</div>
+
+		
 	</div>
 </div>
 
 <script>
 	document.getElementById('Add').addEventListener('click', function() {
 		var addForm = document.getElementById('addForm');
-		var manageForm = document.getElementById('manageForm')
+		var manageForm = document.getElementById('manageForm');
 		if (addForm.style.display === 'none') {
 			addForm.style.display = 'block';
+			manageForm.style.display = 'none';
 		} else {
 			addForm.style.display = 'none';
+		}
+	});
+
+	document.getElementById('manageFormBtn').addEventListener('click', function() {
+		var manageForm = document.getElementById('manageForm')
+		var addForm = document.getElementById('addForm');
+		if (manageForm.style.display === 'none') {
+			manageForm.style.display = 'block';
+			addForm.style.display = 'none';
+		} else {
+			manageForm.style.display = 'none';
 		}
 	});
 
