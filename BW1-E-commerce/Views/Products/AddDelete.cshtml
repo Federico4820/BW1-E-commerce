@@ -1,36 +1,29 @@
 ﻿@{
-	var cat = ViewBag.Categories as List<Category>;
-	var color = ViewBag.Color as List<ColorModel>;
-	var sizes = ViewBag.Sizes as List<SizeModel>;
-	var mat = ViewBag.Material as List<MaterialModel>;
-	string a = "a";
+    var cat = ViewBag.Categories as List<Category>;
+    var color = ViewBag.Color as List<ColorModel>;
+    var sizes = ViewBag.Sizes as List<SizeModel>;
+    var mat = ViewBag.Material as List<MaterialModel>;
 }
 
+
+<h1 class="title text-bolder ms-5 mb-4 mt-3">Dacci una mano</h1>
+
 <div class="container-fluid">
+    <div class="row">
+<div class="sidebar col-md-2 d-none d-md-block d-flex flex-column">
 
-	<div class="row">
-			<div class="sidebar col-md-2 d-none d-md-block d-flex flex-column">
+    <a class="text-decoration-none text-dark mt-4 mx-3" asp-controller="" asp-action="Index" onclick="LoadPage('Add')">Aggiungi</a>
+    <hr class="text-secondary" />
+    <a class="text-decoration-none text-dark mx-3" asp-controller="" asp-action="Index  onclick=" LoadPage('Delete')>Elimina o modifica</a>
 
-				<a class="text-decoration-none text-dark mt-4 mx-3" asp-controller="Products" asp-action="Index">Aggiungi</a>
-				<hr class="text-secondary" />
-			<a class="text-decoration-none text-dark mx-3" asp-controller="Products" asp-action="Index">Elimina o modifica</a>
-
-			</div>
-			<div class="btn-group dropend col-1 d-md-none d-xs-block">
-				<button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-				</button>
-				<ul class="dropdown-menu">
-					<li><a class="dropdown-item mb-3" asp-area="" asp-controller="" asp-action="Index">Aggiungi</a></li>
-					<li>
-						<a class="dropdown-item mb-3" asp-area="" asp-controller="" asp-action="Index">
-							Elimina o modifica
-						</a>
-					</li>
-
-				</ul>
-			</div>
-		<div class="col-9">
-			@await Html.PartialAsync("_Add")
-		</div>
-	</div>
 </div>
+
+
+		<div class="col-md-10" >
+            @await Html.PartialAsync("_Add")
+</div>
+</div>
+</div>
+
+
+    

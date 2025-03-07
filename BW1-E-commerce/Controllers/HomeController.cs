@@ -14,13 +14,15 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-   
-
-    public IActionResult AddDelete()
+    public IActionResult Index()
     {
-        return View("~/ Views / Products / AddDelete.cshtml");
+        return View();
     }
 
+  public IActionResult AddDelete()
+    {
+        return View();
+    }
     public IActionResult Privacy()
     {
         return View();

@@ -712,3 +712,29 @@ filter: grayscale(5);
     height:100%;    
 }
         
+    /*dettagli*/
+
+.form-select{
+    height:37.6px;
+}
+
+.form-select placeholder {
+    top:50%;
+}
+
+.sottotitolo{
+    font-size:10px;
+   }
+
+.title{
+    margin-left:100px !important;
+}
+
+.bottonepiccolo{
+    width:31.6px;
+    height:30.6px;
+}
+
+.altezza{
+    height:30.6px;
+}
