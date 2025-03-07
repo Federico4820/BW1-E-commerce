@@ -706,34 +706,37 @@ namespace BW1_E_commerce.Controllers
                 cart.IdOrder = idOrder;
 
                 string query = @"
-        WITH ImageSelection AS (
-            SELECT 
-                PC.id_prod, 
-                PCI.img_URL, 
-                ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn
-            FROM 
-                ProdColorImages PCI
-            JOIN 
-                ProdColor PC ON PCI.id_prodColor = PC.id_prodColor
-        )
-        SELECT 
-            c.id_prod, 
-            p.nome, 
-            c.qt, 
-            c.price,
-            ISel.img_URL,
-            k.nome AS Color,
-            s.nome AS Size
-        FROM 
-            Cart c
-        JOIN 
-            Products p ON c.id_prod = p.id_prod
-        LEFT JOIN 
-            ImageSelection ISel ON p.id_prod = ISel.id_prod AND ISel.rn = 1
-        LEFT JOIN Colors AS k ON k.id_color = c.id_color
-        LEFT JOIN Sizes AS s ON s.id_size = c.id_size
-        WHERE 
-            c.id_order = @idOrder;";
+                WITH ImageSelection AS (
+    SELECT 
+        PC.id_prod, 
+        PCI.img_URL, 
+        ROW_NUMBER() OVER (PARTITION BY PC.id_prod ORDER BY PCI.id_prodColorImage) AS rn
+    FROM 
+        ProdColorImages PCI
+    JOIN 
+        ProdColor PC ON PCI.id_prodColor = PC.id_prodColor
+)
+SELECT 
+    c.id_prod, 
+    p.nome, 
+    c.qt, 
+    c.price,
+    ISel.img_URL,
+    k.nome AS Color,
+    k.id_color,
+    s.nome AS Size,
+    s.id_size 
+FROM 
+    Cart c
+JOIN 
+    Products p ON c.id_prod = p.id_prod
+LEFT JOIN 
+    ImageSelection ISel ON p.id_prod = ISel.id_prod AND ISel.rn = 1
+LEFT JOIN Colors AS k ON k.id_color = c.id_color
+LEFT JOIN Sizes AS s ON s.id_size = c.id_size
+WHERE 
+    c.id_order = @idOrder;
+";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -751,7 +754,9 @@ namespace BW1_E_commerce.Controllers
                                 Price = reader.GetDecimal(3),
                                 ImgUrl = reader.IsDBNull(4) ? null : reader.GetString(4),
                                 Color = reader.GetString(5),
-                                Size = reader.GetString(6)
+                                IdColor = reader.GetInt32(6),
+                                Size = reader.GetString(7),
+                                IdSize = reader.GetInt32(8)
                             });
                         }
                     }
@@ -767,18 +772,45 @@ namespace BW1_E_commerce.Controllers
 
             return View(cart);
         }
-        public IActionResult RemoveFromCart(Guid idProd)
+        [HttpPost] // Ensure this action only accepts POST requests
+        public IActionResult RemoveFromCart(Guid idProd, int idColor, int idSize)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            try
             {
-                conn.Open();
-                string query = "DELETE FROM Cart WHERE id_prod = @idProd;";
+                // SQL query to delete the cart item
+                string query = @"
+                DELETE FROM Cart 
+                WHERE id_prod = @IdProd 
+                AND id_color = @IdColor 
+                AND id_size = @IdSize";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    cmd.Parameters.AddWithValue("@idProd", idProd);
-                    cmd.ExecuteNonQuery();
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@IdProd", idProd);
+                        command.Parameters.AddWithValue("@IdColor", idColor);
+                        command.Parameters.AddWithValue("@IdSize", idSize);
+
+                        // Execute the query
+                        int rowsAffected = command.ExecuteNonQuery();
+
+                        if (rowsAffected == 0)
+                        {
+                            TempData["ErrorMessage"] = "Item not found in the cart.";
+                        }
+                        else
+                        {
+                            TempData["SuccessMessage"] = "Item removed from the cart successfully.";
+                        }
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occurred while removing the item from the cart.";
+                // Log the exception (ex) here
             }
 
             return RedirectToAction("Cart");
