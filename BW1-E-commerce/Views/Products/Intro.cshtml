@@ -1,13 +1,18 @@
 ﻿<div class="row d-md-flex justify-content-center mt-3">
 	<div class="custom-w d-lg-flex gap-3">
-		<a class="image imgIntro col-6 p-1" asp-controller="Products" asp-action="Index" asp-route-gender="F">
-			<img class="image-fluid" id="donna" alt="donna" src="https://img01.ztat.net/banner/dbbbff261095422eb0a21dbf3f2aaf87/a5e1564accaf441ea2c2e9c7276b324b.jpg?imwidth=693" />
-			<p class="hover-text text-white" style="cursor: pointer" >DONNA</p>
-		</a>
-		<a class="image imgIntro col-6 p-1" asp-controller="Products" asp-action="Index" asp-route-gender="M">
-			<img class="image-fluid" src="https://content.asos-media.com/-/media/homepages/mw/2025/march/03-gbl/wk27_28/wk27_28/cat-trays/2024_homepage_mw_cat_tray_02_870x700_tommy.jpg" alt="uomo" />
-			<p class="hover-text text-white" style="cursor: pointer" >UOMO</p>
-		</a>
+		<div>
+			<a class="image imgIntro col-6 p-1 d-block w-100" asp-controller="Products" asp-action="Index" asp-route-gender="F">
+				<img class="image-fluid" id="donna" alt="donna" src="https://img01.ztat.net/banner/dbbbff261095422eb0a21dbf3f2aaf87/a5e1564accaf441ea2c2e9c7276b324b.jpg?imwidth=693" />
+				<p class="hover-text text-white" style="cursor: pointer">DONNA</p>
+			</a>
+		</div>
+		<div>
+			<a class="image imgIntro col-6 p-1 d-block w-100" asp-controller="Products" asp-action="Index" asp-route-gender="M">
+				<img class="image-fluid" src="https://content.asos-media.com/-/media/homepages/mw/2025/march/03-gbl/wk27_28/wk27_28/cat-trays/2024_homepage_mw_cat_tray_02_870x700_tommy.jpg" alt="uomo" />
+				<p class="hover-text text-white" style="cursor: pointer">UOMO</p>
+			</a>
+		</div>
+		
 	</div>
 </div>
 

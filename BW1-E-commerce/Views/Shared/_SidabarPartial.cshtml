@@ -19,23 +19,13 @@
 	<button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 	</button>
 	<ul class="dropdown-menu">
-		<li><a class="dropdown-item mb-3" asp-area="" asp-controller="Gonna" asp-action="Index">Gonna</a></li>
-		<li>
-			<a class="dropdown-item mb-3" asp-area="" asp-controller="Jeans e pantaloni" asp-action="Index">
-				Jeans e
-				pantaloni
-			</a>
-		</li>
-		<li><a class="dropdown-item mb-3" asp-area="" asp-controller="Maglieria" asp-action="Index">Maglieria</a></li>
-		<li>
-			<a class="dropdown-item mb-3" asp-area="" asp-controller="Pantaloncini" asp-action="Index">Pantaloncini</a>
-		</li>
-		<li>
-			<a class="dropdown-item mb-3" asp-area="" asp-controller="Pezzi interi" asp-action="Index">Pezzi interi</a>
-		</li>
-		<li><a class="dropdown-item mb-3" asp-area="" asp-controller="Soprabiti" asp-action="Index">Soprabiti</a></li>
-		<li><a class="dropdown-item mb-3" asp-area="" asp-controller="Top" asp-action="Index">Top</a></li>
-		<li><a class="dropdown-item mb-3" asp-area="" asp-controller="Vestiti" asp-action="Index">Vestiti</a></li>
+		@if (cat != null)
+		{
+			@foreach (var item in cat)
+			{
+				<li><a class="dropdown-item mb-3" asp-controller="Products" asp-action="Index" asp-route-filter=@item.IdCategory asp-route-gender=@gender>@item.Name</a></li>
+			}
+		}
 	</ul>
 </div>
 
