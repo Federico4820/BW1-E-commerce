@@ -71,16 +71,13 @@
 
                         <!-- Rimuovi prodotto -->
                         <td class="text-end">
-                            <form asp-action="RemoveFromCart" method="post">
-                                <!-- Passa i parametri necessari per identificare il prodotto da rimuovere -->
+                            <form asp-action="DeleteFromCart" method="post">
+                                <input type="hidden" name="idOrder" value="@item.IdOrder" />
                                 <input type="hidden" name="idProd" value="@item.IdProd" />
                                 <input type="hidden" name="idColor" value="@item.IdColor" />
                                 <input type="hidden" name="idSize" value="@item.IdSize" />
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                    <i class="bi bi-trash"></i> Rimuovi
-                                </button>
+                                <button type="submit" class="btn btn-danger">Delete</button>
                             </form>
-                        </td>
                     </tr>
                 }
             </tbody>

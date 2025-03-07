@@ -114,11 +114,11 @@
 							</select>
 
 							<div class="mb-3 d-flex align-items-center">
-								<button type="submit" class="btn btn-success btn-lg rounded-0 fw-bolder me-4 flex-grow-1">
+								<a class="btn btn-success btn-lg rounded-0 fw-bolder me-4 flex-grow-1" asp-controller="Products" asp-action="AddToCart" asp-route-idProd=@Model.Id asp-route-quantity=1 asp-route-price=@Model.Price>
 									AGGIUNGI AL
 									CARRELLO
-								</button>
-								<button class="favorite-detail" type="button">
+								</a>
+								<button class="favorite-detail">
 									<i class="bi bi-heart"></i>
 								</button>
 							</div>
