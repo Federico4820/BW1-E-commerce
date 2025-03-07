@@ -1269,7 +1269,7 @@ namespace BW1_E_commerce.Controllers
                         await transaction.CommitAsync();
                     }
                 }
-                return RedirectToAction("TableProducts", new { id = model.IdProd });
+                return RedirectToAction("AddDelete");
             }
             catch (Exception ex)
             {

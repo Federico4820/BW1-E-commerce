@@ -87,10 +87,14 @@
 
     <fieldset>
         <legend>Colori Disponibili</legend>
-        <div>
+        @* Pulsante per aggiungere un nuovo colore *@
+        <button type="button" class="btn btn-primary mb-3" id="add-color-btn">Aggiungi Colore</button>
+
+        @* Form per i colori e le immagini *@
+        <div id="color-fields-container">
             @for (int i = 0; i < color.Count; i++)
             {
-                <div class="colorField mb-3" id="colorField-@i">
+                <div class="colorField mb-3" id="colorField-@i" style="display: @(Model.SelectedColors != null && Model.SelectedColors.Count > i ? "block" : "none")">
                     <div class="row align-items-start">
                         <div class="col-md-2">
                             <select name="SelectedColors[@i].IdColor" class="form-control">
@@ -105,21 +109,29 @@
                             </select>
                         </div>
                         <div class="col-md-9">
-                            @for (int j = 0; j < 3; j++)
+                            @for (int j = 0; j < 4; j++)
                             {
                                 var imgValue = Model.SelectedColors != null && Model.SelectedColors.Count > i && Model.SelectedColors[i].ImgListModel != null && Model.SelectedColors[i].ImgListModel.Count > j
                                 ? Model.SelectedColors[i].ImgListModel[j]
                                 : "";
-                                <input type="text" class="form-control"
-                                       name="SelectedColors[@i].ImgListModel[@j]"
-                                       value="@imgValue"
-                                       placeholder="URL immagine" />
+                                <div class="extra-field mb-3" id="field-@i-@j" style="display: @(!string.IsNullOrEmpty(imgValue) ? "block" : "none")">
+                                    <div class="d-flex">
+                                        <span class="input-group-text" id="basic-addon3">https://example.com/photo.jpg</span>
+                                        <div class="form-floating flex-grow-1">
+                                            <input type="text" class="form-control" id="image-@i-@j" placeholder="Inserisci l'URL dell'immagine"
+                                                   autocomplete="off" name="SelectedColors[@i].ImgListModel[@j]" value="@imgValue">
+                                            <label for="image-@i-@j" class="text-secondary">Product ImageURL</label>
+                                        </div>
+                                    </div>
+                                </div>
                             }
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-light btn-sm add-image-btn" data-color-index="@i">Aggiungi immagine</button>
                         </div>
                     </div>
                 </div>
             }
-
         </div>
     </fieldset>
 
@@ -180,4 +192,73 @@
             }
         });
     });
+
+
+       // Aggiungi un nuovo colore
+    document.getElementById('add-color-btn').addEventListener('click', function () {
+        const container = document.getElementById('color-fields-container');
+        const colorIndex = document.querySelectorAll('.colorField').length;
+
+        // Crea un nuovo campo colore
+        const newColorField = `
+            <div class="colorField mb-3" id="colorField-${colorIndex}" style="display: block;">
+                <div class="row align-items-start">
+                    <div class="col-md-2">
+                        <select name="SelectedColors[${colorIndex}].IdColor" class="form-control">
+                            <option value="" selected disabled>Seleziona un Colore</option>
+    @foreach (var item in color)
+    {
+                                    <option value="@item.IdColor">@item.Name</option>
+    }
+                        </select>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="extra-field mb-3" id="field-${colorIndex}-0" style="display: block;">
+                            <div class="d-flex">
+                                <span class="input-group-text" id="basic-addon3">https://example.com/photo.jpg</span>
+                                <div class="form-floating flex-grow-1">
+                                    <input type="text" class="form-control" id="image-${colorIndex}-0" placeholder="Inserisci l'URL dell'immagine"
+                                           autocomplete="off" name="SelectedColors[${colorIndex}].ImgListModel[0]">
+                                    <label for="image-${colorIndex}-0" class="text-secondary">Product ImageURL</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-light btn-sm add-image-btn" data-color-index="${colorIndex}">Aggiungi immagine</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Aggiungi il nuovo campo al contenitore
+        container.insertAdjacentHTML('beforeend', newColorField);
+    });
+
+    // Aggiungi una nuova immagine a un colore esistente
+    document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('add-image-btn')) {
+            const colorIndex = event.target.getAttribute('data-color-index');
+            const colorField = document.getElementById(`colorField-${colorIndex}`);
+            const imageCount = colorField.querySelectorAll('.extra-field').length;
+
+            // Crea un nuovo campo immagine
+            const newImageField = `
+                <div class="extra-field mb-3" id="field-${colorIndex}-${imageCount}" style="display: block;">
+                    <div class="d-flex">
+                        <span class="input-group-text" id="basic-addon3">https://example.com/photo.jpg</span>
+                        <div class="form-floating flex-grow-1">
+                            <input type="text" class="form-control" id="image-${colorIndex}-${imageCount}" placeholder="Inserisci l'URL dell'immagine"
+                                   autocomplete="off" name="SelectedColors[${colorIndex}].ImgListModel[${imageCount}]">
+                            <label for="image-${colorIndex}-${imageCount}" class="text-secondary">Product ImageURL</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Aggiungi il nuovo campo al colore
+            colorField.querySelector('.col-md-9').insertAdjacentHTML('beforeend', newImageField);
+        }
+    });
+
 </script>
